@@ -20,24 +20,24 @@ public class ManualController : Controller
     // GET /Admin/Manual/Customer
     [HttpGet]
     [RequirePermission("Manual.View")]
-    public Task<IActionResult> Customer() => RenderPage("customer");
+    public Task<IActionResult> Customer() => RenderPage("customer-manual");
 
     // GET /Admin/Manual/Admin
     [HttpGet]
     [RequirePermission("Manual.View")]
-    public Task<IActionResult> Admin() => RenderPage("admin");
+    public Task<IActionResult> Admin() => RenderPage("admin-manual");
 
     // GET /Admin/Manual/Testing
     [HttpGet]
     [RequirePermission("Manual.View")]
-    public Task<IActionResult> Testing() => RenderPage("testing");
+    public Task<IActionResult> Testing() => RenderPage("uat-guide");
 
     // GET /Admin/Manual/Deployment
     [HttpGet]
     [RequirePermission("Manual.View")]
-    public Task<IActionResult> Deployment() => RenderPage("deployment");
+    public Task<IActionResult> Deployment() => RenderPage("deployment-manual");
 
-    // GET /Admin/Manual/Print/{manualKey} — print-friendly, no Admin sidebar
+    // GET /Admin/Manual/Print/{manualKey}
     [HttpGet]
     [RequirePermission("Manual.View")]
     public async Task<IActionResult> Print(string? manualKey)
@@ -50,13 +50,11 @@ public class ManualController : Controller
 
     // ── Helpers ─────────────────────────────────────────────────────────────
 
-    // Accepts null/empty/unknown keys and falls back to the customer manual.
-    private const string DefaultKey = "customer";
     private string NormalizeKey(string? key)
     {
-        if (string.IsNullOrWhiteSpace(key)) return DefaultKey;
+        if (string.IsNullOrWhiteSpace(key)) return ManualService.DefaultKey;
         key = key.Trim();
-        return _manual.ManualExists(key) ? key : DefaultKey;
+        return _manual.ManualExists(key) ? key : ManualService.DefaultKey;
     }
 
     private async Task<IActionResult> RenderPage(string key)
@@ -72,22 +70,22 @@ public class ManualController : Controller
         ManualKey   = key,
         Title       = key switch
         {
-            "customer"   => "คู่มือสำหรับลูกค้า",
-            "admin"      => "คู่มือผู้ดูแลระบบ",
-            "testing"    => "คู่มือทดสอบ UAT",
-            "deployment" => "คู่มือ Deploy",
-            _            => "คู่มือ",
+            "customer-manual"   => "คู่มือสำหรับลูกค้า",
+            "admin-manual"      => "คู่มือผู้ดูแลระบบ",
+            "uat-guide"         => "คู่มือทดสอบ UAT",
+            "deployment-manual" => "คู่มือ Deploy",
+            _                   => "คู่มือ",
         },
         HtmlContent = html,
         IsAdminPage = isAdmin,
         MenuItems   = _manual.GetAdminManualMenu()
             .Select(m => new ManualMenuItemViewModel
             {
-                Key     = m.Key,
-                TitleTH = m.TitleTH,
-                TitleEN = m.TitleEN,
-                Url     = m.Url,
-                IconCss = m.IconCss,
+                Key      = m.Key,
+                TitleTH  = m.TitleTH,
+                TitleEN  = m.TitleEN,
+                Url      = m.Url,
+                IconCss  = m.IconCss,
                 IsActive = string.Equals(m.Key, key, StringComparison.OrdinalIgnoreCase),
             })
             .ToList(),

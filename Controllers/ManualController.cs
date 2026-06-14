@@ -15,8 +15,8 @@ public class ManualController : Controller
     // GET /Manual
     public async Task<IActionResult> Index()
     {
-        var html = await _manual.GetManualHtmlAsync("customer");
-        var vm   = BuildVm("customer", html);
+        var html = await _manual.GetManualHtmlAsync("customer-manual");
+        var vm   = BuildVm("customer-manual", html);
         ViewData["Title"] = "คู่มือการใช้งาน — User Manual";
         return View(vm);
     }
@@ -25,8 +25,8 @@ public class ManualController : Controller
     [HttpGet]
     public async Task<IActionResult> Print()
     {
-        var html = await _manual.GetManualHtmlAsync("customer");
-        var vm   = BuildVm("customer", html);
+        var html = await _manual.GetManualHtmlAsync("customer-manual");
+        var vm   = BuildVm("customer-manual", html);
         ViewData["Title"] = "คู่มือการใช้งาน — พิมพ์";
         return View(vm);
     }

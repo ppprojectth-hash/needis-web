@@ -6,31 +6,40 @@ namespace Needis.Web.Services.Manual;
 public class ManualService : IManualService
 {
     private readonly IWebHostEnvironment _env;
-    private readonly MarkdownPipeline   _pipeline;
+    private readonly MarkdownPipeline    _pipeline;
 
-    private static readonly Dictionary<string, string> FileMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["customer"]   = "CUSTOMER_USER_MANUAL.md",
-        ["admin"]      = "ADMIN_MANUAL.md",
-        ["testing"]    = "TESTING_GUIDE.md",
-        ["deployment"] = "DEPLOYMENT_MANUAL.md",
-    };
+    // ── Keys & file mapping ────────────────────────────────────────────────
+    public const string DefaultKey = "customer-manual";
 
-    private static readonly Dictionary<string, string> TitleMapTH = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["customer"]   = "คู่มือสำหรับลูกค้า",
-        ["admin"]      = "คู่มือผู้ดูแลระบบ",
-        ["testing"]    = "คู่มือการทดสอบ UAT",
-        ["deployment"] = "คู่มือ Deploy",
-    };
+    private static readonly Dictionary<string, string> FileMap =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["customer-manual"]   = "CUSTOMER_USER_MANUAL.md",
+            ["admin-manual"]      = "ADMIN_MANUAL.md",
+            ["uat-guide"]         = "TESTING_GUIDE.md",
+            ["deployment-manual"] = "DEPLOYMENT_MANUAL.md",
+            ["user-manual"]       = "USER_MANUAL.md",
+        };
 
-    private static readonly Dictionary<string, string> TitleMapEN = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["customer"]   = "Customer Manual",
-        ["admin"]      = "Admin Manual",
-        ["testing"]    = "Testing Guide",
-        ["deployment"] = "Deployment Manual",
-    };
+    private static readonly Dictionary<string, string> TitleMapTH =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["customer-manual"]   = "คู่มือสำหรับลูกค้า",
+            ["admin-manual"]      = "คู่มือผู้ดูแลระบบ",
+            ["uat-guide"]         = "คู่มือการทดสอบ UAT",
+            ["deployment-manual"] = "คู่มือ Deploy",
+            ["user-manual"]       = "คู่มือผู้ใช้งาน",
+        };
+
+    private static readonly Dictionary<string, string> TitleMapEN =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["customer-manual"]   = "Customer Manual",
+            ["admin-manual"]      = "Admin Manual",
+            ["uat-guide"]         = "Testing Guide",
+            ["deployment-manual"] = "Deployment Manual",
+            ["user-manual"]       = "User Manual",
+        };
 
     public ManualService(IWebHostEnvironment env)
     {
@@ -40,7 +49,7 @@ public class ManualService : IManualService
             .Build();
     }
 
-    private const string DefaultKey = "customer";
+    // ── Public API ─────────────────────────────────────────────────────────
 
     public bool ManualExists(string? manualKey)
     {
@@ -62,34 +71,39 @@ public class ManualService : IManualService
     {
         var markdown = await GetManualMarkdownAsync(manualKey);
         if (string.IsNullOrEmpty(markdown))
-            return "<p class=\"text-muted\">ไม่พบเนื้อหาคู่มือ (Manual file not found)</p>";
+            return "<p class=\"text-muted fst-italic\">ไม่พบเนื้อหาคู่มือ (Manual file not found)</p>";
         return Markdown.ToHtml(markdown, _pipeline);
     }
 
     public List<ManualMenuItemViewModel> GetAdminManualMenu() =>
     [
-        new() { Key = "customer",   TitleTH = "คู่มือลูกค้า",    TitleEN = "Customer Manual",  Url = "/Admin/Manual/Customer",   IconCss = "bi-person-lines-fill" },
-        new() { Key = "admin",      TitleTH = "คู่มือ Admin",     TitleEN = "Admin Manual",     Url = "/Admin/Manual/Admin",      IconCss = "bi-shield-lock" },
-        new() { Key = "testing",    TitleTH = "คู่มือทดสอบ UAT", TitleEN = "Testing Guide",    Url = "/Admin/Manual/Testing",    IconCss = "bi-clipboard2-check" },
-        new() { Key = "deployment", TitleTH = "คู่มือ Deploy",   TitleEN = "Deployment Manual", Url = "/Admin/Manual/Deployment", IconCss = "bi-cloud-upload" },
+        new() { Key = "customer-manual",   TitleTH = "คู่มือลูกค้า",    TitleEN = "Customer Manual",   Url = "/Admin/Manual/Customer",   IconCss = "bi-person-lines-fill" },
+        new() { Key = "admin-manual",      TitleTH = "คู่มือ Admin",     TitleEN = "Admin Manual",      Url = "/Admin/Manual/Admin",      IconCss = "bi-shield-lock" },
+        new() { Key = "uat-guide",         TitleTH = "คู่มือทดสอบ UAT", TitleEN = "Testing Guide",     Url = "/Admin/Manual/Testing",    IconCss = "bi-clipboard2-check" },
+        new() { Key = "deployment-manual", TitleTH = "คู่มือ Deploy",   TitleEN = "Deployment Manual", Url = "/Admin/Manual/Deployment", IconCss = "bi-cloud-upload" },
     ];
 
     public List<ManualMenuItemViewModel> GetCustomerManualMenu() =>
     [
-        new() { Key = "customer", TitleTH = "คู่มือการใช้งาน", TitleEN = "User Manual", Url = "/Manual", IconCss = "bi-book" },
+        new() { Key = "customer-manual", TitleTH = "คู่มือการใช้งาน", TitleEN = "User Manual", Url = "/Manual", IconCss = "bi-book" },
     ];
 
-    public string GetTitle(string manualKey, bool thFirst = true) =>
-        thFirst
+    public string GetTitle(string? manualKey, bool thFirst = true)
+    {
+        if (string.IsNullOrWhiteSpace(manualKey)) manualKey = DefaultKey;
+        return thFirst
             ? TitleMapTH.GetValueOrDefault(manualKey, manualKey)
             : TitleMapEN.GetValueOrDefault(manualKey, manualKey);
+    }
 
-    // ── Path resolution ──────────────────────────────────────────────────────
+    // ── Path resolution ────────────────────────────────────────────────────
+    // docs/ lives inside Needis.Web/ and is copied to output by the csproj.
+    // We try several candidate directories to cover:
+    //   - Published / production  : ContentRootPath/docs/
+    //   - Dev (run from proj dir) : ContentRootPath/docs/
+    //   - Dev (run from solution root, where CWD != proj dir):
+    //       AppContext.BaseDirectory is bin/Debug/net10.0/ → 3 levels up = Needis.Web/
 
-    // Returns the full path to the markdown file, or null if not found.
-    // Tries several candidate directories because ContentRootPath varies
-    // depending on whether the app is started from the solution root or
-    // the project directory.
     private string? FindFilePath(string manualKey)
     {
         if (!FileMap.TryGetValue(manualKey, out var fileName)) return null;
@@ -103,29 +117,22 @@ public class ManualService : IManualService
 
     private IEnumerable<string> CandidateDocsDirs()
     {
-        var contentRoot = _env.ContentRootPath;
-        var cwd         = Directory.GetCurrentDirectory();
-        var baseDir     = AppContext.BaseDirectory; // e.g. bin/Debug/net10.0
-
-        // Normalise: strip trailing slash
-        contentRoot = contentRoot.TrimEnd(Path.DirectorySeparatorChar);
-        cwd         = cwd.TrimEnd(Path.DirectorySeparatorChar);
-        baseDir     = baseDir.TrimEnd(Path.DirectorySeparatorChar);
+        var contentRoot = _env.ContentRootPath.TrimEnd(Path.DirectorySeparatorChar);
+        var cwd         = Directory.GetCurrentDirectory().TrimEnd(Path.DirectorySeparatorChar);
+        var baseDir     = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
 
         return new[]
         {
-            // When CWD == solution root (most common with "dotnet run --project Needis.Web")
-            Path.GetFullPath(Path.Combine(cwd, "docs")),
-            // When CWD == project dir  (dotnet run inside Needis.Web/)
-            Path.GetFullPath(Path.Combine(cwd, "..", "docs")),
-            // ContentRoot == solution root
+            // Published / dev from project dir → ContentRootPath/docs
             Path.GetFullPath(Path.Combine(contentRoot, "docs")),
-            // ContentRoot == project dir (Needis.Web/)
-            Path.GetFullPath(Path.Combine(contentRoot, "..", "docs")),
-            // From bin/Debug/net10.0 — go up 4 levels to solution root
+            // Dev from solution root → CWD/Needis.Web/docs
+            Path.GetFullPath(Path.Combine(cwd, "Needis.Web", "docs")),
+            // CWD itself has a docs child (CWD = project dir)
+            Path.GetFullPath(Path.Combine(cwd, "docs")),
+            // From bin/Debug/net10.0 → 3 levels up = Needis.Web/docs  ← KEY FIX
+            Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "docs")),
+            // From bin/Debug/net10.0 → 4 levels up = solution root/docs (legacy)
             Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "docs")),
-            // From bin/Debug/net10.0 — go up 3 levels to Needis.Web/, then sibling docs/
-            Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", "docs")),
         }.Distinct();
     }
 }
