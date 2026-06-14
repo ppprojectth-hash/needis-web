@@ -40,17 +40,24 @@ public class ManualController : Controller
     // GET /Admin/Manual/Print/{manualKey} — print-friendly, no Admin sidebar
     [HttpGet]
     [RequirePermission("Manual.View")]
-    public async Task<IActionResult> Print(string manualKey)
+    public async Task<IActionResult> Print(string? manualKey)
     {
-        if (!_manual.ManualExists(manualKey))
-            return NotFound();
-
-        var html = await _manual.GetManualHtmlAsync(manualKey);
-        var vm   = BuildVm(manualKey, html, isAdmin: true);
+        var key  = NormalizeKey(manualKey);
+        var html = await _manual.GetManualHtmlAsync(key);
+        var vm   = BuildVm(key, html, isAdmin: true);
         return View("Print", vm);
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
+
+    // Accepts null/empty/unknown keys and falls back to the customer manual.
+    private const string DefaultKey = "customer";
+    private string NormalizeKey(string? key)
+    {
+        if (string.IsNullOrWhiteSpace(key)) return DefaultKey;
+        key = key.Trim();
+        return _manual.ManualExists(key) ? key : DefaultKey;
+    }
 
     private async Task<IActionResult> RenderPage(string key)
     {

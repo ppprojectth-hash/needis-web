@@ -8,7 +8,6 @@ public class ManualService : IManualService
     private readonly IWebHostEnvironment _env;
     private readonly MarkdownPipeline   _pipeline;
 
-    // Maps manualKey → docs-relative file name
     private static readonly Dictionary<string, string> FileMap = new(StringComparer.OrdinalIgnoreCase)
     {
         ["customer"]   = "CUSTOMER_USER_MANUAL.md",
@@ -41,31 +40,38 @@ public class ManualService : IManualService
             .Build();
     }
 
-    public bool ManualExists(string manualKey) =>
-        FileMap.ContainsKey(manualKey) && File.Exists(ResolvePath(manualKey));
+    private const string DefaultKey = "customer";
 
-    public async Task<string> GetManualMarkdownAsync(string manualKey)
+    public bool ManualExists(string? manualKey)
     {
-        if (!FileMap.ContainsKey(manualKey)) return "";
-        var path = ResolvePath(manualKey);
-        if (!File.Exists(path)) return "";
+        if (string.IsNullOrWhiteSpace(manualKey)) return false;
+        return FileMap.ContainsKey(manualKey.Trim()) && FindFilePath(manualKey.Trim()) is not null;
+    }
+
+    public async Task<string> GetManualMarkdownAsync(string? manualKey)
+    {
+        if (string.IsNullOrWhiteSpace(manualKey)) return "";
+        var key = manualKey.Trim();
+        if (!FileMap.ContainsKey(key)) return "";
+        var path = FindFilePath(key);
+        if (path is null) return "";
         return await File.ReadAllTextAsync(path);
     }
 
-    public async Task<string> GetManualHtmlAsync(string manualKey)
+    public async Task<string> GetManualHtmlAsync(string? manualKey)
     {
         var markdown = await GetManualMarkdownAsync(manualKey);
         if (string.IsNullOrEmpty(markdown))
-            return "<p class=\"text-muted\">ไม่พบเนื้อหาคู่มือ</p>";
+            return "<p class=\"text-muted\">ไม่พบเนื้อหาคู่มือ (Manual file not found)</p>";
         return Markdown.ToHtml(markdown, _pipeline);
     }
 
     public List<ManualMenuItemViewModel> GetAdminManualMenu() =>
     [
-        new() { Key = "customer",   TitleTH = "คู่มือลูกค้า",       TitleEN = "Customer Manual",  Url = "/Admin/Manual/Customer",   IconCss = "bi-person-lines-fill" },
-        new() { Key = "admin",      TitleTH = "คู่มือ Admin",        TitleEN = "Admin Manual",     Url = "/Admin/Manual/Admin",      IconCss = "bi-shield-lock" },
-        new() { Key = "testing",    TitleTH = "คู่มือทดสอบ UAT",     TitleEN = "Testing Guide",    Url = "/Admin/Manual/Testing",    IconCss = "bi-clipboard2-check" },
-        new() { Key = "deployment", TitleTH = "คู่มือ Deploy",       TitleEN = "Deployment Manual",Url = "/Admin/Manual/Deployment", IconCss = "bi-cloud-upload" },
+        new() { Key = "customer",   TitleTH = "คู่มือลูกค้า",    TitleEN = "Customer Manual",  Url = "/Admin/Manual/Customer",   IconCss = "bi-person-lines-fill" },
+        new() { Key = "admin",      TitleTH = "คู่มือ Admin",     TitleEN = "Admin Manual",     Url = "/Admin/Manual/Admin",      IconCss = "bi-shield-lock" },
+        new() { Key = "testing",    TitleTH = "คู่มือทดสอบ UAT", TitleEN = "Testing Guide",    Url = "/Admin/Manual/Testing",    IconCss = "bi-clipboard2-check" },
+        new() { Key = "deployment", TitleTH = "คู่มือ Deploy",   TitleEN = "Deployment Manual", Url = "/Admin/Manual/Deployment", IconCss = "bi-cloud-upload" },
     ];
 
     public List<ManualMenuItemViewModel> GetCustomerManualMenu() =>
@@ -78,12 +84,48 @@ public class ManualService : IManualService
             ? TitleMapTH.GetValueOrDefault(manualKey, manualKey)
             : TitleMapEN.GetValueOrDefault(manualKey, manualKey);
 
-    private string ResolvePath(string manualKey)
+    // ── Path resolution ──────────────────────────────────────────────────────
+
+    // Returns the full path to the markdown file, or null if not found.
+    // Tries several candidate directories because ContentRootPath varies
+    // depending on whether the app is started from the solution root or
+    // the project directory.
+    private string? FindFilePath(string manualKey)
     {
-        var fileName = FileMap[manualKey];
-        // docs/ is sibling of Needis.Web/ — go up from ContentRootPath
+        if (!FileMap.TryGetValue(manualKey, out var fileName)) return null;
+        foreach (var dir in CandidateDocsDirs())
+        {
+            var path = Path.Combine(dir, fileName);
+            if (File.Exists(path)) return path;
+        }
+        return null;
+    }
+
+    private IEnumerable<string> CandidateDocsDirs()
+    {
         var contentRoot = _env.ContentRootPath;
-        var docsDir = Path.Combine(contentRoot, "..", "docs");
-        return Path.GetFullPath(Path.Combine(docsDir, fileName));
+        var cwd         = Directory.GetCurrentDirectory();
+        var baseDir     = AppContext.BaseDirectory; // e.g. bin/Debug/net10.0
+
+        // Normalise: strip trailing slash
+        contentRoot = contentRoot.TrimEnd(Path.DirectorySeparatorChar);
+        cwd         = cwd.TrimEnd(Path.DirectorySeparatorChar);
+        baseDir     = baseDir.TrimEnd(Path.DirectorySeparatorChar);
+
+        return new[]
+        {
+            // When CWD == solution root (most common with "dotnet run --project Needis.Web")
+            Path.GetFullPath(Path.Combine(cwd, "docs")),
+            // When CWD == project dir  (dotnet run inside Needis.Web/)
+            Path.GetFullPath(Path.Combine(cwd, "..", "docs")),
+            // ContentRoot == solution root
+            Path.GetFullPath(Path.Combine(contentRoot, "docs")),
+            // ContentRoot == project dir (Needis.Web/)
+            Path.GetFullPath(Path.Combine(contentRoot, "..", "docs")),
+            // From bin/Debug/net10.0 — go up 4 levels to solution root
+            Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "docs")),
+            // From bin/Debug/net10.0 — go up 3 levels to Needis.Web/, then sibling docs/
+            Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", "docs")),
+        }.Distinct();
     }
 }
