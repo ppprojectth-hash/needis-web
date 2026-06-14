@@ -1,0 +1,83 @@
+@model List<Needis.Web.Models.AboutSectionItem>
+@{
+    var section = ViewBag.Section as Needis.Web.Models.AboutSection;
+    ViewData["Title"] = $"Items — {section?.TitleEN ?? section?.SectionKey}";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left me-1"></i>Sections
+        </a>
+        <span class="fw-semibold">@(section?.TitleEN ?? section?.SectionKey)</span>
+        <code class="ms-2 small text-muted">@(section?.SectionKey)</code>
+    </div>
+    <a asp-action="CreateItem" asp-route-sectionId="@(section?.Id)" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Item
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3" style="width:60px">Image</th>
+                    <th>Title EN</th>
+                    <th>Title TH</th>
+                    <th>Icon</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="" class="rounded" style="width:40px;height:40px;object-fit:cover" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>@(item.TitleEN ?? "—")</td>
+                        <td class="text-muted small">@item.TitleTH</td>
+                        <td><code class="small">@(item.IconUrl ?? "—")</code></td>
+                        <td class="text-center">@item.DisplayOrder</td>
+                        <td class="text-center">
+                            <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
+                                @(item.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a asp-action="EditItem" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="DeleteItem" asp-route-id="@item.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this item?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No items. Click Add Item to add content.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

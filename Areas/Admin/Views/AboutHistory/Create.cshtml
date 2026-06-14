@@ -1,0 +1,58 @@
+@model Needis.Web.ViewModels.Admin.AboutHistoryViewModel
+@{ ViewData["Title"] = "Add History Event"; }
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:680px">
+    <div class="card-body p-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="Year" class="form-label fw-medium">Year <span class="text-danger">*</span></label>
+                    <input asp-for="Year" type="number" class="form-control" placeholder="e.g. 2010" />
+                    <span asp-validation-for="Year" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Position" class="form-label fw-medium">Position</label>
+                    <select asp-for="Position" class="form-select">
+                        <option value="left">Left</option>
+                        <option value="right">Right</option>
+                    </select>
+                    <span asp-validation-for="Position" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TitleEN" class="form-label fw-medium">Title EN <span class="text-danger">*</span></label>
+                    <input asp-for="TitleEN" class="form-control" />
+                    <span asp-validation-for="TitleEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="TitleTH" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="DescriptionEN" class="form-label fw-medium">Description EN</label>
+                    <textarea asp-for="DescriptionEN" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="DescriptionTH" class="form-label fw-medium">Description TH</label>
+                    <textarea asp-for="DescriptionTH" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" checked />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

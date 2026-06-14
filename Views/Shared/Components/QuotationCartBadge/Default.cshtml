@@ -1,0 +1,20 @@
+@model int
+@{
+    var count = Model;
+    var lang  = (string)(ViewData["CurrentLanguage"] ?? "en");
+    var label = lang == "th" ? "ขอใบเสนอราคา" : "Quote Cart";
+}
+
+<a class="nav-link position-relative d-flex align-items-center gap-1"
+   asp-controller="QuotationCart" asp-action="Index"
+   title="@label">
+    <i class="bi bi-cart3"></i>
+    <span class="d-none d-lg-inline">@label</span>
+    @if (count > 0)
+    {
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+              style="background:#e63946;font-size:.65rem;min-width:18px;padding:2px 5px">
+            @(count > 99 ? "99+" : count.ToString())
+        </span>
+    }
+</a>

@@ -1,0 +1,104 @@
+@model Needis.Web.ViewModels.Admin.AdminUserCreateViewModel
+@{
+    ViewData["Title"] = "Create Admin User";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+        <h4 class="fw-bold mb-0">Create Admin User</h4>
+    </div>
+</div>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-person me-2 text-primary"></i>Account Info</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label fw-medium"></label>
+                        <input asp-for="Username" class="form-control" placeholder="Username" autocomplete="off" />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-medium"></label>
+                        <input asp-for="Email" class="form-control" type="email" placeholder="email@example.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="DisplayName" class="form-label fw-medium"></label>
+                        <input asp-for="DisplayName" class="form-control" placeholder="Full name for display (optional)" />
+                        <span asp-validation-for="DisplayName" class="text-danger small"></span>
+                        <div class="form-text">Defaults to username if left blank.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-4">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-lock me-2 text-primary"></i>Password</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-medium"></label>
+                        <input asp-for="Password" class="form-control" type="password"
+                               autocomplete="new-password" placeholder="Minimum 8 characters" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="ConfirmPassword" class="form-label fw-medium"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" type="password"
+                               autocomplete="new-password" placeholder="Repeat password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-shield me-2 text-primary"></i>Role & Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="AdminRoleId" class="form-label fw-medium">Role</label>
+                        <select asp-for="AdminRoleId" asp-items="ViewBag.AdminRoles" class="form-select">
+                            <option value="">— Select Role —</option>
+                        </select>
+                        <span asp-validation-for="AdminRoleId" class="text-danger small"></span>
+                        <div class="form-text">SuperAdmin can manage all users and settings.</div>
+                    </div>
+                    <div>
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-floppy-fill me-2"></i>Create User
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

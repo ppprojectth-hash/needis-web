@@ -1,0 +1,298 @@
+@model ProductListViewModel
+@{
+    ViewData["FullWidth"] = true;
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+
+    var pageTitle = Model.SelectedCategory != null
+        ? L(Model.SelectedCategory.NameTH, Model.SelectedCategory.NameEN)
+        : (lang == "th" ? "สินค้าทั้งหมด" : "Products");
+    ViewData["Title"] = pageTitle;
+
+    bool hasFilter = !string.IsNullOrEmpty(Model.SelectedCategorySlug) || !string.IsNullOrEmpty(Model.Search);
+}
+
+@* ── Page Header ─────────────────────────────────────────────────────────── *@
+<div class="product-page-header">
+    <div class="container py-4">
+        @* Breadcrumb *@
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-3">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index" class="text-white-50">
+                        @(lang == "th" ? "หน้าหลัก" : "Home")
+                    </a>
+                </li>
+                <li class="breadcrumb-item text-white-50">
+                    @if (Model.SelectedCategory != null)
+                    {
+                        <a asp-controller="Product" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "สินค้า" : "Products")
+                        </a>
+                    }
+                    else
+                    {
+                        @(lang == "th" ? "สินค้า" : "Products")
+                    }
+                </li>
+                @if (Model.SelectedCategory != null)
+                {
+                    <li class="breadcrumb-item active text-white" aria-current="page">
+                        @L(Model.SelectedCategory.NameTH, Model.SelectedCategory.NameEN)
+                    </li>
+                }
+            </ol>
+        </nav>
+
+        <h1 class="text-white fw-bold mb-1">@pageTitle</h1>
+        @if (Model.SelectedCategory != null)
+        {
+            var desc = L(Model.SelectedCategory.ShortDescriptionTH, Model.SelectedCategory.ShortDescriptionEN);
+            if (!string.IsNullOrEmpty(desc))
+            {
+                <p class="text-white-50 mb-0">@desc</p>
+            }
+        }
+        else
+        {
+            <p class="text-white-50 mb-0">
+                @(lang == "th"
+                    ? "เครื่องมือวัดและอุปกรณ์วิทยาศาสตร์คุณภาพสูง"
+                    : "Precision measuring instruments and scientific equipment")
+            </p>
+        }
+    </div>
+</div>
+
+@* ── Filter + Grid ────────────────────────────────────────────────────────── *@
+<div class="container py-5">
+    <div class="row g-4">
+
+        @* ── Sidebar Filter ── *@
+        <div class="col-lg-3">
+
+            @* Search *@
+            <div class="card border-0 shadow-sm rounded-3 mb-3">
+                <div class="card-body p-3">
+                    <form asp-controller="Product" asp-action="Index" method="get">
+                        @if (!string.IsNullOrEmpty(Model.SelectedCategorySlug))
+                        {
+                            <input type="hidden" name="category" value="@Model.SelectedCategorySlug" />
+                        }
+                        <label class="form-label small fw-semibold text-muted mb-1">
+                            @(lang == "th" ? "ค้นหาสินค้า" : "Search Products")
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="search" value="@Model.Search"
+                                   class="form-control"
+                                   placeholder="@(lang == "th" ? "ชื่อ, รุ่น, รหัส..." : "Name, model, SKU...")" />
+                            <button type="submit" class="btn btn-primary" style="background:#2d4199;border-color:#2d4199">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @* Category filter *@
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-3">
+                    <p class="small fw-semibold text-muted mb-2">
+                        @(lang == "th" ? "หมวดหมู่" : "Categories")
+                    </p>
+                    <ul class="list-unstyled mb-0 category-filter-list">
+                        <li>
+                            <a asp-controller="Product" asp-action="Index"
+                               asp-route-search="@Model.Search"
+                               class="category-filter-item @(Model.SelectedCategorySlug == null ? "active" : "")">
+                                <i class="bi bi-grid me-2"></i>
+                                @(lang == "th" ? "สินค้าทั้งหมด" : "All Products")
+                                <span class="badge ms-auto rounded-pill">@Model.Products.Count</span>
+                            </a>
+                        </li>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            var catName = L(cat.NameTH, cat.NameEN);
+                            var isSelected = cat.Slug == Model.SelectedCategorySlug;
+                            var catCount = Model.Products.Count(p => p.CategoryId == cat.Id);
+
+                            <li>
+                                <a asp-controller="Product" asp-action="Index"
+                                   asp-route-category="@cat.Slug"
+                                   asp-route-search="@Model.Search"
+                                   class="category-filter-item @(isSelected ? "active" : "")">
+                                    <i class="bi bi-tag me-2"></i>
+                                    @catName
+                                    <span class="badge ms-auto rounded-pill">@catCount</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            @if (hasFilter)
+            {
+                <div class="mt-3">
+                    <a asp-controller="Product" asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="bi bi-x-circle me-1"></i>
+                        @(lang == "th" ? "ล้างตัวกรอง" : "Clear Filters")
+                    </a>
+                </div>
+            }
+
+        </div>
+
+        @* ── Product Grid ── *@
+        <div class="col-lg-9">
+
+            @* Result count + active filters *@
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+                <p class="text-muted small mb-0">
+                    @if (lang == "th")
+                    {
+                        @:พบ <strong>@Model.Products.Count</strong> รายการ
+                    }
+                    else
+                    {
+                        @:<strong>@Model.Products.Count</strong> product@(Model.Products.Count == 1 ? "" : "s") found
+                    }
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    @if (!string.IsNullOrEmpty(Model.Search))
+                    {
+                        <span class="badge filter-badge">
+                            <i class="bi bi-search me-1"></i>@Model.Search
+                            <a asp-controller="Product" asp-action="Index"
+                               asp-route-category="@Model.SelectedCategorySlug"
+                               class="text-white ms-1">×</a>
+                        </span>
+                    }
+                    @if (Model.SelectedCategory != null)
+                    {
+                        <span class="badge filter-badge">
+                            <i class="bi bi-tag me-1"></i>@L(Model.SelectedCategory.NameTH, Model.SelectedCategory.NameEN)
+                            <a asp-controller="Product" asp-action="Index"
+                               asp-route-search="@Model.Search"
+                               class="text-white ms-1">×</a>
+                        </span>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Products.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var (product, prodIdx) in Model.Products.Select((p, i) => (p, i)))
+                    {
+                        var name     = L(product.NameTH, product.NameEN);
+                        var shortDesc = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
+                        var catName  = L(product.Category?.NameTH, product.Category?.NameEN);
+                        var pDelay = (prodIdx % 3) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+
+                        <div class="col-xl-4 col-md-6 reveal @pDelay">
+                            <div class="product-card card shadow-sm h-100">
+                                <a asp-controller="Product" asp-action="Detail"
+                                   asp-route-slug="@product.Slug"
+                                   class="text-decoration-none">
+                                    @if (!string.IsNullOrEmpty(product.MainImagePath))
+                                    {
+                                        <img src="@product.MainImagePath" alt="@name"
+                                             class="product-card-img" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-card-img-placeholder">
+                                            <i class="bi bi-box-seam"></i>
+                                        </div>
+                                    }
+                                </a>
+                                <div class="card-body d-flex flex-column">
+                                    @if (!string.IsNullOrEmpty(catName))
+                                    {
+                                        <span class="badge product-cat-badge mb-2 align-self-start">@catName</span>
+                                    }
+                                    <a asp-controller="Product" asp-action="Detail"
+                                       asp-route-slug="@product.Slug"
+                                       class="text-decoration-none">
+                                        <h6 class="card-title fw-bold text-dark mb-1">@name</h6>
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(product.Brand) || !string.IsNullOrEmpty(product.Model))
+                                    {
+                                        <p class="small text-muted mb-1">
+                                            @product.Brand@(!string.IsNullOrEmpty(product.Brand) && !string.IsNullOrEmpty(product.Model) ? " · " : "")@product.Model
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(product.Sku))
+                                    {
+                                        <p class="small text-muted mb-2">
+                                            <code>@product.Sku</code>
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(shortDesc))
+                                    {
+                                        <p class="small text-muted flex-grow-1 mb-2">
+                                            @(shortDesc.Length > 90 ? shortDesc[..90] + "…" : shortDesc)
+                                        </p>
+                                    }
+                                    <div class="mt-auto pt-2 d-flex align-items-center justify-content-between">
+                                        <div>
+                                            @if (product.IsPriceVisible && product.Price.HasValue)
+                                            {
+                                                <span class="fw-bold" style="color:#2d4199">
+                                                    @product.Price.Value.ToString("N2") ฿
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="small text-muted">
+                                                    @(lang == "th" ? "สอบถามราคา" : "Contact for price")
+                                                </span>
+                                            }
+                                        </div>
+                                        <a asp-controller="Product" asp-action="Detail"
+                                           asp-route-slug="@product.Slug"
+                                           class="btn btn-sm btn-outline-primary">
+                                            @(lang == "th" ? "รายละเอียด" : "Details")
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                @* Empty state *@
+                <div class="empty-state text-center py-5">
+                    <i class="bi bi-search fs-1 d-block mb-3" style="color:#c5cde8"></i>
+                    <h5 class="fw-bold text-muted">
+                        @(lang == "th" ? "ไม่พบสินค้า" : "No products found")
+                    </h5>
+                    <p class="text-muted small mb-4">
+                        @if (lang == "th")
+                        {
+                            @:ลองค้นหาด้วยคำอื่น หรือเลือกหมวดหมู่อื่น
+                        }
+                        else
+                        {
+                            @:Try a different search term or browse another category.
+                        }
+                    </p>
+                    @if (hasFilter)
+                    {
+                        <a asp-controller="Product" asp-action="Index"
+                           class="btn btn-primary px-4"
+                           style="background:#2d4199;border-color:#2d4199">
+                            <i class="bi bi-x-circle me-1"></i>
+                            @(lang == "th" ? "ล้างตัวกรอง" : "Clear Filters")
+                        </a>
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

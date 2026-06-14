@@ -1,0 +1,140 @@
+@model Needis.Web.ViewModels.Manual.ManualPageViewModel
+@{
+    ViewData["Title"] = "คู่มือการใช้งานเว็บไซต์";
+    ViewData["MetaDescription"] = "คู่มือการใช้งานเว็บไซต์ Needis สำหรับลูกค้า";
+    ViewData["FullWidth"] = true;
+}
+
+@* ── Hero strip ──────────────────────────────────────────────── *@
+<div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#2d4199 100%);padding:2.5rem 0 2.25rem">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-2">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index"
+                       style="color:rgba(255,255,255,.6);text-decoration:none">หน้าแรก</a>
+                </li>
+                <li class="breadcrumb-item active" style="color:rgba(255,255,255,.85)">คู่มือการใช้งาน</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <div class="manual-hero-badge" style="margin-bottom:.45rem">
+                    <i class="bi bi-book-half"></i> User Manual
+                </div>
+                <h1 class="fw-bold text-white mb-1" style="font-size:1.55rem">
+                    คู่มือการใช้งานเว็บไซต์
+                </h1>
+                <p class="mb-0" style="color:rgba(255,255,255,.6);font-size:.9rem">
+                    วิธีใช้งานเว็บไซต์สำหรับลูกค้า — Needis Instrument
+                </p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap no-print">
+                <a href="/Manual/Print" target="_blank" class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-printer me-1"></i>Print View
+                </a>
+                <button onclick="window.print()"
+                        class="btn btn-sm fw-semibold"
+                        style="background:#fff;color:#2d4199;border:none">
+                    <i class="bi bi-file-earmark-pdf me-1"></i>พิมพ์ / บันทึก PDF
+                </button>
+                <a asp-controller="Home" asp-action="Index"
+                   class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-house me-1"></i>หน้าแรก
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── Content area ────────────────────────────────────────────── *@
+<div style="background:#f5f7fb;padding:2rem 0 4rem">
+    <div class="container">
+        <div class="row g-4 align-items-start">
+
+            @* Sidebar (desktop only) *@
+            <div class="col-lg-3 d-none d-lg-block no-print">
+                <div class="manual-sidebar-public">
+                    <div class="manual-sidebar-title">เนื้อหา</div>
+                    <ul class="manual-menu-list" style="padding:.4rem .4rem .3rem">
+                        <li>
+                            <a href="/Manual" class="manual-menu-item active">
+                                <span class="manual-menu-icon">
+                                    <i class="bi bi-book"></i>
+                                </span>
+                                <span class="manual-menu-text">
+                                    <span class="manual-menu-title">คู่มือสำหรับลูกค้า</span>
+                                    <span class="manual-menu-subtitle">Customer User Manual</span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="manual-sidebar-title" style="border-top:1px solid #f1f5f9;margin-top:.25rem">
+                        ลิงก์ด่วน
+                    </div>
+                    <div style="padding:.35rem .5rem .5rem">
+                        <a asp-controller="Product" asp-action="Index" class="manual-menu-link">
+                            <i class="bi bi-box-seam" style="color:#2d4199"></i>สินค้าทั้งหมด
+                        </a>
+                        <a asp-controller="Services" asp-action="Index" class="manual-menu-link">
+                            <i class="bi bi-tools" style="color:#2d4199"></i>บริการ
+                        </a>
+                        <a asp-controller="Quotation" asp-action="Create" class="manual-menu-link">
+                            <i class="bi bi-file-earmark-text" style="color:#2d4199"></i>ขอใบเสนอราคา
+                        </a>
+                        <a asp-controller="Contact" asp-action="Index" class="manual-menu-link">
+                            <i class="bi bi-chat-dots" style="color:#2d4199"></i>ติดต่อเรา
+                        </a>
+                    </div>
+
+                    @* <div style="padding:.35rem .5rem .6rem;border-top:1px solid #f1f5f9;margin-top:.15rem">
+                        <a href="/Manual/Print" target="_blank" class="manual-download-btn">
+                            <i class="bi bi-printer" style="color:#2d4199"></i>Print / Save as PDF
+                        </a>
+                    </div> *@
+                </div>
+            </div>
+
+            @* Main content *@
+            <div class="col-lg-9">
+                <article class="manual-content-card">
+                    <div class="manual-content-top">
+                        <span class="manual-content-badge">
+                            <i class="bi bi-book"></i>คู่มือการใช้งาน
+                        </span>
+                    </div>
+                    <div class="manual-prose-wrap">
+                        <div class="manual-prose">
+                            @Html.Raw(Model.HtmlContent)
+                        </div>
+                    </div>
+                </article>
+
+                @* CTA *@
+                <div class="rounded-4 p-4 mt-4 no-print"
+                     style="background:linear-gradient(135deg,#0f172a,#2d4199);border-radius:18px">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-7">
+                            <h6 class="text-white fw-bold mb-1">ยังมีคำถามอยู่ใช่ไหม?</h6>
+                            <p class="mb-0" style="color:rgba(255,255,255,.6);font-size:.875rem">
+                                ทีมงานพร้อมให้ความช่วยเหลือ ติดต่อเราได้โดยตรง
+                            </p>
+                        </div>
+                        <div class="col-md-5 d-flex gap-2 justify-content-md-end flex-wrap">
+                            <a asp-controller="Contact" asp-action="Index"
+                               class="btn btn-light btn-sm fw-semibold">
+                                <i class="bi bi-chat-dots me-1"></i>ติดต่อเรา
+                            </a>
+                            <a asp-controller="Quotation" asp-action="Create"
+                               class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-file-earmark-text me-1"></i>ขอใบเสนอราคา
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,226 @@
+@model string
+@inject Needis.Web.Services.Permissions.IPermissionService PermSvc
+@{
+    string Active(string controller) =>
+        string.Equals(Model, controller, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+
+<div class="sidebar-section">Main</div>
+<nav class="sidebar-nav nav flex-column gap-1 mb-2">
+    @if (await PermSvc.HasPermissionAsync(User, "Dashboard.View"))
+    {
+        <a class="nav-link @Active("Dashboard")"
+           asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+    }
+</nav>
+
+@if (await PermSvc.HasPermissionAsync(User, "Banner.View") ||
+     await PermSvc.HasPermissionAsync(User, "Category.View") ||
+     await PermSvc.HasPermissionAsync(User, "Product.View"))
+{
+    <div class="sidebar-section">Content</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        @if (await PermSvc.HasPermissionAsync(User, "Banner.View"))
+        {
+            <a class="nav-link @Active("Banner")"
+               asp-area="Admin" asp-controller="Banner" asp-action="Index">
+                <i class="bi bi-images"></i> Home Banners
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "Category.View"))
+        {
+            <a class="nav-link @Active("Category")"
+               asp-area="Admin" asp-controller="Category" asp-action="Index">
+                <i class="bi bi-grid"></i> Categories
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "Product.View"))
+        {
+            <a class="nav-link @Active("Product")"
+               asp-area="Admin" asp-controller="Product" asp-action="Index">
+                <i class="bi bi-box-seam"></i> Products
+            </a>
+        }
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "About.View"))
+{
+    <div class="sidebar-section">About Us</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("AboutSection")"
+           asp-area="Admin" asp-controller="AboutSection" asp-action="Index">
+            <i class="bi bi-layout-text-sidebar"></i> About Sections
+        </a>
+        <a class="nav-link @Active("AboutHistory")"
+           asp-area="Admin" asp-controller="AboutHistory" asp-action="Index">
+            <i class="bi bi-clock-history"></i> Company History
+        </a>
+        <a class="nav-link @Active("AboutStatCard")"
+           asp-area="Admin" asp-controller="AboutStatCard" asp-action="Index">
+            <i class="bi bi-123"></i> Stat Cards
+        </a>
+        <a class="nav-link @Active("BrandPartner")"
+           asp-area="Admin" asp-controller="BrandPartner" asp-action="Index">
+            <i class="bi bi-award"></i> Brand Partners
+        </a>
+        <a class="nav-link @Active("StaffProfile")"
+           asp-area="Admin" asp-controller="StaffProfile" asp-action="Index">
+            <i class="bi bi-person-badge"></i> Staff Profiles
+        </a>
+        <a class="nav-link @Active("ProductSale")"
+           asp-area="Admin" asp-controller="ProductSale" asp-action="Index">
+            <i class="bi bi-receipt"></i> Product Sales
+        </a>
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "Service.View"))
+{
+    <div class="sidebar-section">Services</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("ServicePage")" asp-area="Admin" asp-controller="ServicePage" asp-action="Index">
+            <i class="bi bi-file-text"></i> Service Page Setting
+        </a>
+        <a class="nav-link @Active("Service")" asp-area="Admin" asp-controller="Service" asp-action="Index">
+            <i class="bi bi-tools"></i> Services
+        </a>
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "Activity.View"))
+{
+    <div class="sidebar-section">Activity</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("ActivityPage")" asp-area="Admin" asp-controller="ActivityPage" asp-action="Index">
+            <i class="bi bi-file-text"></i> Activity Page Setting
+        </a>
+        <a class="nav-link @Active("Activity")" asp-area="Admin" asp-controller="Activity" asp-action="Index">
+            <i class="bi bi-newspaper"></i> Activities
+        </a>
+        <a class="nav-link @Active("ActivityTag")" asp-area="Admin" asp-controller="ActivityTag" asp-action="Index">
+            <i class="bi bi-tags"></i> Tags
+        </a>
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "Quotation.View") ||
+     await PermSvc.HasPermissionAsync(User, "ContactMessage.View") ||
+     await PermSvc.HasPermissionAsync(User, "EmailLog.View"))
+{
+    <div class="sidebar-section">Requests</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        @if (await PermSvc.HasPermissionAsync(User, "Quotation.View"))
+        {
+            <a class="nav-link @Active("QuotationRequest")"
+               asp-area="Admin" asp-controller="QuotationRequest" asp-action="Index">
+                <i class="bi bi-file-earmark-text"></i> Quotation Requests
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "ContactMessage.View"))
+        {
+            <a class="nav-link @Active("ContactMessage")"
+               asp-area="Admin" asp-controller="ContactMessage" asp-action="Index">
+                <i class="bi bi-chat-left-dots"></i> Contact Messages
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "EmailLog.View"))
+        {
+            <a class="nav-link @Active("EmailLog")"
+               asp-area="Admin" asp-controller="EmailLog" asp-action="Index">
+                <i class="bi bi-envelope-check"></i> Email Logs
+            </a>
+        }
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "Media.View"))
+{
+    <div class="sidebar-section">Media</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("MediaLibrary")"
+           asp-area="Admin" asp-controller="MediaLibrary" asp-action="Index">
+            <i class="bi bi-images"></i> Media Library
+        </a>
+        @if (await PermSvc.HasPermissionAsync(User, "Media.Upload"))
+        {
+            <a class="nav-link @Active("")"
+               asp-area="Admin" asp-controller="MediaLibrary" asp-action="Upload">
+                <i class="bi bi-upload"></i> Upload File
+            </a>
+        }
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "Seo.View"))
+{
+    <div class="sidebar-section">SEO</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("SeoSetting")"
+           asp-area="Admin" asp-controller="SeoSetting" asp-action="Index">
+            <i class="bi bi-search"></i> SEO Settings
+        </a>
+        <a class="nav-link @Active("SeoRedirect")"
+           asp-area="Admin" asp-controller="SeoRedirect" asp-action="Index">
+            <i class="bi bi-arrow-left-right"></i> Redirects
+        </a>
+        <a class="nav-link" href="/sitemap.xml" target="_blank">
+            <i class="bi bi-diagram-3"></i> Sitemap <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+        </a>
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "Manual.View"))
+{
+    <div class="sidebar-section">Manual</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("Manual")"
+           asp-area="Admin" asp-controller="Manual" asp-action="Index">
+            <i class="bi bi-book"></i> Manuals / คู่มือ
+        </a>
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "SiteSetting.View") ||
+     await PermSvc.HasPermissionAsync(User, "UsageStatistic.View") ||
+     await PermSvc.HasPermissionAsync(User, "AdminUser.View") ||
+     await PermSvc.HasPermissionAsync(User, "Role.View"))
+{
+    <div class="sidebar-section">System</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        @if (await PermSvc.HasPermissionAsync(User, "SiteSetting.View"))
+        {
+            <a class="nav-link @Active("SiteSetting")"
+               asp-area="Admin" asp-controller="SiteSetting" asp-action="Index">
+                <i class="bi bi-gear"></i> Site Settings
+            </a>
+            <a class="nav-link @Active("FooterContact")"
+               asp-area="Admin" asp-controller="FooterContact" asp-action="Index">
+                <i class="bi bi-telephone"></i> Footer Contact
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "UsageStatistic.View"))
+        {
+            <a class="nav-link @Active("UsageStatistic")"
+               asp-area="Admin" asp-controller="UsageStatistic" asp-action="Index">
+                <i class="bi bi-bar-chart"></i> Usage Statistics
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "AdminUser.View"))
+        {
+            <a class="nav-link @Active("AdminUser")"
+               asp-area="Admin" asp-controller="AdminUser" asp-action="Index">
+                <i class="bi bi-people"></i> Admin Users
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "Role.View"))
+        {
+            <a class="nav-link @Active("AdminRole")"
+               asp-area="Admin" asp-controller="AdminRole" asp-action="Index">
+                <i class="bi bi-shield-lock"></i> Roles & Permissions
+            </a>
+        }
+    </nav>
+}

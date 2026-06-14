@@ -1,0 +1,322 @@
+@model Needis.Web.ViewModels.Admin.ProductViewModel
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<form asp-action="Edit" asp-route-id="@Model.ProductId" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ProductId" />
+    <input type="hidden" asp-for="MainImageUrl" />
+    <input type="hidden" asp-for="BrochureFileUrl" />
+
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-pencil-square me-2" style="color:#2d4199"></i>Edit Product
+            </h5>
+            <p class="text-muted small mb-0 mt-1">@Model.ProductNameEN</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+            <a asp-area="Admin" asp-controller="ProductSpecification" asp-action="Index"
+               asp-route-productId="@Model.ProductId"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-list-check me-1"></i>Specifications
+            </a>
+            <button type="submit" class="btn btn-sm btn-primary px-3"
+                    style="background:#2d4199;border-color:#2d4199">
+                <i class="bi bi-save me-1"></i>Save Changes
+            </button>
+        </div>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div><div asp-validation-summary="ModelOnly"></div></div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        @* ── Left Column ── *@
+        <div class="col-lg-8">
+
+            @* A. Product Information *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>Product Information
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="mb-3">
+                        <label asp-for="ProductCategoryId" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.ProductCategoryId) <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="ProductCategoryId" asp-items="ViewBag.Categories"
+                                class="form-select">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="ProductCategoryId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="ProductNameEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ProductNameEN) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ProductNameEN" class="form-control" />
+                            <span asp-validation-for="ProductNameEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="ProductNameTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ProductNameTH)
+                            </label>
+                            <input asp-for="ProductNameTH" class="form-control" />
+                            <span asp-validation-for="ProductNameTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Slug" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.Slug) <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Slug" class="form-control font-monospace" />
+                        <div class="text-muted small mt-1">Changing this may break existing links.</div>
+                        <span asp-validation-for="Slug" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-4">
+                            <label asp-for="Brand" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.Brand)
+                            </label>
+                            <input asp-for="Brand" class="form-control" />
+                            <span asp-validation-for="Brand" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-4">
+                            <label asp-for="Model" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.Model)
+                            </label>
+                            <input asp-for="Model" class="form-control" />
+                            <span asp-validation-for="Model" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-4">
+                            <label asp-for="PartNumber" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.PartNumber)
+                            </label>
+                            <input asp-for="PartNumber" class="form-control font-monospace" />
+                            <span asp-validation-for="PartNumber" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-0">
+                        <div class="col-sm-6">
+                            <label asp-for="ShortDescriptionEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ShortDescriptionEN)
+                            </label>
+                            <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="ShortDescriptionEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="ShortDescriptionTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ShortDescriptionTH)
+                            </label>
+                            <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="ShortDescriptionTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @* B. Product Description *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-text-paragraph me-2 text-primary"></i>Product Description
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="DescriptionEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.DescriptionEN)
+                            </label>
+                            <textarea asp-for="DescriptionEN" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="DescriptionEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="DescriptionTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.DescriptionTH)
+                            </label>
+                            <textarea asp-for="DescriptionTH" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="DescriptionTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-0">
+                        <div class="col-sm-6">
+                            <label asp-for="SpecificationEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.SpecificationEN)
+                            </label>
+                            <textarea asp-for="SpecificationEN" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="SpecificationEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="SpecificationTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.SpecificationTH)
+                            </label>
+                            <textarea asp-for="SpecificationTH" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="SpecificationTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        @* ── Right Column ── *@
+        <div class="col-lg-4">
+
+            @* C. Media Files *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-images me-2 text-primary"></i>Media Files
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Product Image</label>
+                        @if (!string.IsNullOrEmpty(Model.MainImageUrl))
+                        {
+                            <div class="mb-2">
+                                <img id="imagePreview" src="@Model.MainImageUrl" alt="Current image"
+                                     class="img-fluid rounded-2 w-100"
+                                     style="max-height:200px;object-fit:contain;background:#f8f9fc" />
+                                <div class="text-muted small mt-1">Current image</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="imagePreviewWrap" class="mb-2 d-none">
+                                <img id="imagePreview" src="#" alt="Preview"
+                                     class="img-fluid rounded-2 w-100"
+                                     style="max-height:200px;object-fit:contain;background:#f8f9fc" />
+                            </div>
+                        }
+                        <input asp-for="MainImageFile" type="file" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp" id="ImageFileInput" />
+                        <span asp-validation-for="MainImageFile" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-2">
+                            Recommended: <strong>800 × 800 px</strong><br />
+                            JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB<br />
+                            Leave empty to keep current image.
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-semibold">Brochure (PDF)</label>
+                        @if (!string.IsNullOrEmpty(Model.BrochureFileUrl))
+                        {
+                            <div class="mb-2">
+                                <a href="@Model.BrochureFileUrl" target="_blank" class="btn btn-sm btn-outline-secondary w-100">
+                                    <i class="bi bi-file-earmark-pdf me-1 text-danger"></i>View Current Brochure
+                                </a>
+                            </div>
+                        }
+                        <input asp-for="BrochureFile" type="file" class="form-control"
+                               accept=".pdf" id="BrochureFileInput" />
+                        <span asp-validation-for="BrochureFile" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-2">
+                            PDF only &nbsp;·&nbsp; Max 10 MB<br />
+                            Leave empty to keep current brochure.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @* D. Price and Display Settings *@
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-sliders me-2 text-primary"></i>Price & Display
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="mb-3">
+                        <label asp-for="Price" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.Price)
+                        </label>
+                        <input asp-for="Price" type="number" class="form-control"
+                               step="0.01" min="0" />
+                        <span asp-validation-for="Price" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsPriceVisible" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsPriceVisible" class="form-check-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.IsPriceVisible)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DisplayOrder" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.DisplayOrder)
+                        </label>
+                        <input asp-for="DisplayOrder" type="number" class="form-control" min="0" max="9999" />
+                        <div class="text-muted small mt-1">Lower numbers appear first.</div>
+                        <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsFeatured" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsFeatured" class="form-check-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.IsFeatured)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.IsActive)
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    document.getElementById('ImageFileInput')?.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        const preview = document.getElementById('imagePreview');
+        const wrap    = document.getElementById('imagePreviewWrap');
+        if (preview) preview.src = URL.createObjectURL(file);
+        if (wrap)    wrap.classList.remove('d-none');
+    });
+</script>
+}

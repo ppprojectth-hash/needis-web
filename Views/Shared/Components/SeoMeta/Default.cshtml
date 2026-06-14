@@ -1,0 +1,58 @@
+@model Needis.Web.ViewModels.Seo.SeoViewModel
+@{
+    var title     = Model.Title ?? "Needis";
+    var ogTitle   = Model.OgTitle ?? title;
+    var canonical = Model.CanonicalUrl ?? "";
+}
+@if (!string.IsNullOrEmpty(title))
+{
+    <title>@title</title>
+}
+@if (!string.IsNullOrEmpty(Model.Description))
+{
+    <meta name="description" content="@Model.Description" />
+}
+@if (!string.IsNullOrEmpty(Model.Keywords))
+{
+    <meta name="keywords" content="@Model.Keywords" />
+}
+@if (!string.IsNullOrEmpty(Model.Robots))
+{
+    <meta name="robots" content="@Model.Robots" />
+}
+@if (!string.IsNullOrEmpty(canonical))
+{
+    <link rel="canonical" href="@canonical" />
+}
+
+<meta property="og:type" content="website" />
+@if (!string.IsNullOrEmpty(ogTitle))
+{
+    <meta property="og:title" content="@ogTitle" />
+}
+@if (!string.IsNullOrEmpty(Model.OgDescription))
+{
+    <meta property="og:description" content="@Model.OgDescription" />
+}
+@if (!string.IsNullOrEmpty(Model.OgImageUrl))
+{
+    <meta property="og:image" content="@Model.OgImageUrl" />
+}
+@if (!string.IsNullOrEmpty(canonical))
+{
+    <meta property="og:url" content="@canonical" />
+}
+
+<meta name="twitter:card" content="summary_large_image" />
+@if (!string.IsNullOrEmpty(ogTitle))
+{
+    <meta name="twitter:title" content="@ogTitle" />
+}
+@if (!string.IsNullOrEmpty(Model.OgDescription))
+{
+    <meta name="twitter:description" content="@Model.OgDescription" />
+}
+@if (!string.IsNullOrEmpty(Model.OgImageUrl))
+{
+    <meta name="twitter:image" content="@Model.OgImageUrl" />
+}

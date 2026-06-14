@@ -1,0 +1,48 @@
+@inject Needis.Web.Services.ILanguageService LanguageService
+@{
+    var currentLanguage = LanguageService.GetCurrentLanguage(Context);
+}
+<!DOCTYPE html>
+<html lang="@currentLanguage">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @await Component.InvokeAsync("SeoMeta", new {
+        pageKey               = ViewData["SeoPageKey"]       as string ?? "home",
+        entityType            = ViewData["SeoEntityType"]    as string,
+        entityId              = ViewData["SeoEntityId"]      as int?,
+        fallbackTitleTH       = ViewData["SeoTitleTH"]       as string,
+        fallbackTitleEN       = ViewData["SeoTitleEN"]       as string,
+        fallbackDescriptionTH = ViewData["SeoDescriptionTH"] as string,
+        fallbackDescriptionEN = ViewData["SeoDescriptionEN"] as string,
+        fallbackImageUrl      = ViewData["SeoImageUrl"]      as string
+    })
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+    @await Component.InvokeAsync("SiteHeader")
+
+    <main role="main">
+        @if (ViewData["FullWidth"] is true)
+        {
+            @RenderBody()
+        }
+        else
+        {
+            <div class="container py-4">
+                @RenderBody()
+            </div>
+        }
+    </main>
+
+    @await Component.InvokeAsync("SiteFooter")
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

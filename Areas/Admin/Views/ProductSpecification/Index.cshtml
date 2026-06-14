@@ -1,0 +1,213 @@
+@model Needis.Web.ViewModels.Admin.ProductSpecificationIndexViewModel
+@{
+    ViewData["Title"] = $"Specifications — {Model.ProductNameEN}";
+    Layout = "_AdminLayout";
+}
+
+@if (TempData["Success"] is string ok)
+{
+    <div class="alert alert-success alert-dismissible d-flex align-items-center gap-2 rounded-3 mb-4">
+        <i class="bi bi-check-circle-fill flex-shrink-0"></i><span>@ok</span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible d-flex align-items-center gap-2 rounded-3 mb-4">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i><span>@err</span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@* ── Header ── *@
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-list-check me-2" style="color:#2d4199"></i>Product Specifications
+        </h5>
+        <p class="text-muted small mb-0 mt-1">
+            @(Model.ProductNameEN)
+            @if (!string.IsNullOrEmpty(Model.ProductNameTH))
+            {
+                <span class="ms-1 text-muted">(@Model.ProductNameTH)</span>
+            }
+            · @Model.Specifications.Count spec(s)
+        </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index"
+           class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Products
+        </a>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.ProductId"
+           class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil me-1"></i>Edit Product
+        </a>
+        @if (!string.IsNullOrEmpty(Model.ProductSlug))
+        {
+            <a href="/Product/Detail/@Model.ProductSlug" target="_blank"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-box-arrow-up-right me-1"></i>View Page
+            </a>
+        }
+        <a asp-action="Create" asp-route-productId="@Model.ProductId"
+           class="btn btn-sm btn-primary px-3" style="background:#2d4199;border-color:#2d4199">
+            <i class="bi bi-plus-lg me-1"></i>Add Specification
+        </a>
+    </div>
+</div>
+
+@* ── Search ── *@
+<form method="get" asp-action="Index" class="mb-3">
+    <input type="hidden" name="productId" value="@Model.ProductId" />
+    <div class="input-group" style="max-width:400px">
+        <input type="text" name="keyword" value="@Model.Keyword" class="form-control form-control-sm"
+               placeholder="Search specifications…" />
+        <button type="submit" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-search"></i>
+        </button>
+        @if (!string.IsNullOrEmpty(Model.Keyword))
+        {
+            <a asp-action="Index" asp-route-productId="@Model.ProductId"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-x"></i>
+            </a>
+        }
+    </div>
+</form>
+
+@* ── Table ── *@
+<div class="card border-0 shadow-sm rounded-3">
+    @if (!Model.Specifications.Any())
+    {
+        <div class="card-body text-center text-muted py-5">
+            <i class="bi bi-list-check fs-1 d-block mb-3" style="color:#c5cde8"></i>
+            <p class="mb-2">No specifications yet.</p>
+            <a asp-action="Create" asp-route-productId="@Model.ProductId"
+               class="btn btn-sm btn-primary" style="background:#2d4199;border-color:#2d4199">
+                <i class="bi bi-plus-lg me-1"></i>Add First Specification
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background:#f8f9fc">
+                    <tr class="text-muted small fw-semibold"
+                        style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em">
+                        <th class="ps-4 py-3" style="width:60px">Order</th>
+                        <th class="py-3">Group</th>
+                        <th class="py-3">Spec Name</th>
+                        <th class="py-3">Value</th>
+                        <th class="py-3" style="width:100px">Unit</th>
+                        <th class="py-3 text-center" style="width:90px">Highlight</th>
+                        <th class="py-3 text-center" style="width:80px">Status</th>
+                        <th class="py-3 text-end pe-4" style="width:160px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        // Group by SpecGroupEN for visual grouping
+                        var grouped = Model.Specifications
+                            .GroupBy(s => s.SpecGroupEN ?? "")
+                            .OrderBy(g => g.Key);
+                    }
+                    @foreach (var group in grouped)
+                    {
+                        @if (!string.IsNullOrEmpty(group.Key))
+                        {
+                            <tr style="background:#f0f4ff">
+                                <td colspan="8" class="ps-4 py-2">
+                                    <span class="badge" style="background:#2d4199;font-size:.72rem">
+                                        @group.Key
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var s in group.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id))
+                        {
+                            <tr class="@(s.IsHighlight ? "table-warning" : "")">
+                                <td class="ps-4 py-2">
+                                    <span class="badge rounded-pill bg-light text-dark border fw-normal">
+                                        @s.DisplayOrder
+                                    </span>
+                                </td>
+                                <td class="py-2 small text-muted">
+                                    @(s.SpecGroupEN ?? "—")
+                                </td>
+                                <td class="py-2">
+                                    <div class="fw-semibold small">@s.SpecNameEN</div>
+                                    @if (!string.IsNullOrEmpty(s.SpecNameTH))
+                                    {
+                                        <div class="text-muted small">@s.SpecNameTH</div>
+                                    }
+                                </td>
+                                <td class="py-2 small">
+                                    @if (!string.IsNullOrEmpty(s.SpecValueEN))
+                                    {
+                                        <div>@s.SpecValueEN</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(s.SpecValueTH))
+                                    {
+                                        <div class="text-muted">@s.SpecValueTH</div>
+                                    }
+                                    @if (string.IsNullOrEmpty(s.SpecValueEN) && string.IsNullOrEmpty(s.SpecValueTH))
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td class="py-2 small text-muted">
+                                    @(s.UnitEN ?? s.UnitTH ?? "—")
+                                </td>
+                                <td class="py-2 text-center">
+                                    @if (s.IsHighlight)
+                                    {
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star text-muted"></i>
+                                    }
+                                </td>
+                                <td class="py-2 text-center">
+                                    @if (s.IsActive)
+                                    {
+                                        <span class="badge rounded-pill text-bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill text-bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="py-2 text-end pe-4">
+                                    <a asp-action="Edit" asp-route-id="@s.Id"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="ToggleHighlight" asp-route-id="@s.Id" method="post"
+                                          class="d-inline" title="@(s.IsHighlight ? "Remove highlight" : "Set as highlight")">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit"
+                                                class="btn btn-sm @(s.IsHighlight ? "btn-warning" : "btn-outline-warning") me-1">
+                                            <i class="bi bi-star@(s.IsHighlight ? "-fill" : "")"></i>
+                                        </button>
+                                    </form>
+                                    <form asp-action="Delete" asp-route-id="@s.Id" method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Delete this specification?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,90 @@
+@model List<Needis.Web.Models.ServiceDetailSection>
+@{
+    var svc = ViewBag.Service as Needis.Web.Models.Service;
+    ViewData["Title"] = $"Sections — {svc?.ServiceNameEN ?? "Service"}";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Service" asp-action="Index">Services</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-controller="Service" asp-action="Details" asp-route-id="@svc?.Id">@(svc?.ServiceNameEN ?? "Service")</a>
+        </li>
+        <li class="breadcrumb-item active">Sections</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="text-muted mb-0">Detail sections for <strong>@(svc?.ServiceNameEN ?? "—")</strong></h6>
+    <a asp-action="Create" asp-route-serviceId="@svc?.Id" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Section
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Section Key</th>
+                    <th>Title EN</th>
+                    <th>Layout</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sec in Model)
+                {
+                    <tr>
+                        <td class="ps-3"><code>@sec.SectionKey</code></td>
+                        <td>
+                            <div>@sec.SectionTitleEN</div>
+                            <div class="text-muted small">@sec.SectionTitleTH</div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">@(sec.LayoutType ?? "—")</span></td>
+                        <td class="text-center">@sec.DisplayOrder</td>
+                        <td class="text-center">
+                            @if (sec.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end pe-3 text-nowrap">
+                            <a asp-controller="ServiceScopeItem" asp-action="Index" asp-route-sectionId="@sec.Id"
+                               class="btn btn-sm btn-outline-info me-1">
+                                <i class="bi bi-list-ul me-1"></i>Scope Items
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@sec.Id"
+                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@sec.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this section?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">No sections found. Add the first one.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

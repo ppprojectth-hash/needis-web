@@ -1,0 +1,59 @@
+@model Needis.Web.ViewModels.Admin.BrandPartnerViewModel
+@{ ViewData["Title"] = "Add Brand Partner"; }
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:620px">
+    <div class="card-body p-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="BrandName" class="form-label fw-medium">Brand Name <span class="text-danger">*</span></label>
+                    <input asp-for="BrandName" class="form-control" />
+                    <span asp-validation-for="BrandName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="BrandType" class="form-label fw-medium">Brand Type</label>
+                    <select asp-for="BrandType" class="form-select">
+                        <option value="">— Select —</option>
+                        <option value="Partner">Partner</option>
+                        <option value="Supplier">Supplier</option>
+                        <option value="Manufacturer">Manufacturer</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label asp-for="LogoFile" class="form-label fw-medium">Logo Image</label>
+                    <input asp-for="LogoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <span asp-validation-for="LogoFile" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="WebsiteUrl" class="form-label fw-medium">Website URL</label>
+                    <input asp-for="WebsiteUrl" class="form-control" placeholder="https://..." />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-8 d-flex align-items-end gap-4">
+                    <div class="form-check">
+                        <input asp-for="IsGlobalBrand" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsGlobalBrand" class="form-check-label fw-medium">Global Brand</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="ShowOnPartnerSection" type="checkbox" class="form-check-input" checked />
+                        <label asp-for="ShowOnPartnerSection" class="form-check-label fw-medium">Show on Partner Section</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" checked />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

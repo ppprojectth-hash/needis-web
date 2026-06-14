@@ -1,0 +1,65 @@
+@model Needis.Web.ViewModels.Admin.ActivityTagManageViewModel
+@{
+    ViewData["Title"] = "Manage Tags";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex align-items-center gap-2 mb-3">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Activities
+    </a>
+    <a asp-action="Details" asp-route-id="@Model.ActivityId" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-info-circle me-1"></i>Activity Details
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:640px">
+    <div class="card-body p-4">
+        <h6 class="fw-bold mb-1">Manage Tags</h6>
+        <p class="text-muted small mb-3">@Model.ActivityTitleEN</p>
+
+        <form asp-action="UpdateTags" asp-route-id="@Model.ActivityId" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label fw-medium">Primary Tag (radio)</label>
+                <div class="text-muted small mb-2">Select which tag is the primary label for this activity.</div>
+                @foreach (var tagItem in Model.Tags)
+                {
+                    <div class="d-flex align-items-center gap-3 p-2 border rounded mb-2">
+                        <div class="form-check mb-0">
+                            <input type="checkbox" class="form-check-input"
+                                   name="selectedTagIds" value="@tagItem.TagId"
+                                   id="tag_@tagItem.TagId"
+                                   @(tagItem.IsSelected ? "checked" : "") />
+                            <label class="form-check-label" for="tag_@tagItem.TagId">
+                                <span class="badge" style="background-color:@(tagItem.TagColor ?? "#6c757d")">@tagItem.TagNameEN</span>
+                            </label>
+                        </div>
+                        <div class="form-check mb-0 ms-auto">
+                            <input type="radio" class="form-check-input"
+                                   name="primaryTagId" value="@tagItem.TagId"
+                                   id="primary_@tagItem.TagId"
+                                   @(tagItem.IsPrimary ? "checked" : "") />
+                            <label class="form-check-label text-muted small" for="primary_@tagItem.TagId">Primary</label>
+                        </div>
+                    </div>
+                }
+                @if (!Model.Tags.Any())
+                {
+                    <div class="text-muted text-center py-3">No active tags available.</div>
+                }
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save Tags</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

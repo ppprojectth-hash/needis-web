@@ -1,0 +1,114 @@
+@model AdminRolePermissionsViewModel
+@{
+    ViewData["Title"] = $"Permissions: {Model.RoleName}";
+}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+    <div>
+        <h5 class="fw-bold mb-0">Assign Permissions</h5>
+        <p class="text-muted small mb-0">
+            Role: <strong>@Model.RoleName</strong>
+            @if (Model.IsSystem) { <span class="badge bg-primary ms-1" style="font-size:.7rem">System</span> }
+        </p>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (Model.RoleKey == "SuperAdmin")
+{
+    <div class="alert alert-info">
+        <i class="bi bi-shield-check me-2"></i>
+        <strong>SuperAdmin</strong> has full access to all permissions automatically.
+        Individual permission assignments cannot be changed for this role.
+    </div>
+}
+else
+{
+    <form asp-action="UpdatePermissions" asp-route-id="@Model.RoleId" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnSelectAll">
+                    <i class="bi bi-check-all me-1"></i>Select All
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnClearAll">
+                    <i class="bi bi-x-circle me-1"></i>Clear All
+                </button>
+            </div>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-floppy-fill me-1"></i>Save Permissions
+            </button>
+        </div>
+
+        @foreach (var group in Model.Groups)
+        {
+            <div class="card border-0 shadow-sm rounded-3 mb-3">
+                <div class="card-header py-2 bg-light d-flex align-items-center justify-content-between">
+                    <span class="fw-semibold small text-uppercase" style="letter-spacing:.06em">@group.GroupName</span>
+                    <button type="button" class="btn btn-xs btn-link text-muted p-0"
+                            onclick="toggleGroup(this)" style="font-size:.75rem">Select all</button>
+                </div>
+                <div class="card-body py-3">
+                    <div class="row g-2">
+                        @foreach (var p in group.Permissions)
+                        {
+                            <div class="col-sm-6 col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input perm-check" type="checkbox"
+                                           name="selectedPermissionIds" value="@p.Id"
+                                           id="perm_@p.Id"
+                                           @(p.IsSelected ? "checked" : "") />
+                                    <label class="form-check-label" for="perm_@p.Id" style="font-size:.84rem">
+                                        @p.PermissionName
+                                        <br /><code class="text-muted" style="font-size:.7rem">@p.PermissionKey</code>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="mt-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-floppy-fill me-1"></i>Save Permissions
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+}
+
+@section Scripts {
+<script>
+    document.getElementById('btnSelectAll')?.addEventListener('click', () =>
+        document.querySelectorAll('.perm-check').forEach(c => c.checked = true));
+
+    document.getElementById('btnClearAll')?.addEventListener('click', () =>
+        document.querySelectorAll('.perm-check').forEach(c => c.checked = false));
+
+    function toggleGroup(btn) {
+        const card = btn.closest('.card');
+        const checks = card.querySelectorAll('.perm-check');
+        const allChecked = [...checks].every(c => c.checked);
+        checks.forEach(c => c.checked = !allChecked);
+        btn.textContent = allChecked ? 'Select all' : 'Clear all';
+    }
+</script>
+}

@@ -1,0 +1,129 @@
+@model List<Needis.Web.Models.ActivityImage>
+@{
+    var activity = ViewBag.Activity as Needis.Web.Models.Activity;
+    var blockId = ViewBag.BlockId as int?;
+    ViewData["Title"] = "Activity Images";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Activity" asp-action="Index">Activities</a></li>
+        <li class="breadcrumb-item active">@(activity?.ActivityTitleEN ?? "Activity") — Images</li>
+        @if (blockId.HasValue)
+        {
+            <li class="breadcrumb-item active">Block #@blockId</li>
+        }
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="text-muted small">
+        @if (blockId.HasValue)
+        {
+            <span>Images for block #@blockId</span>
+        }
+        else
+        {
+            <span>All images for this activity</span>
+        }
+    </div>
+    <div class="d-flex gap-2">
+        @if (blockId.HasValue)
+        {
+            <a asp-controller="ActivityDetailBlock" asp-action="Index" asp-route-activityId="@activity?.Id"
+               class="btn btn-sm btn-outline-secondary">Blocks</a>
+        }
+        <a asp-controller="Activity" asp-action="Details" asp-route-id="@activity?.Id"
+           class="btn btn-sm btn-outline-secondary">Details</a>
+        <a asp-action="Create" asp-route-activityId="@activity?.Id" asp-route-blockId="@blockId"
+           class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add Image
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3" style="width:80px">Preview</th>
+                    <th>Title EN</th>
+                    <th>Image Type</th>
+                    <th class="text-center">Cover</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var imgItem in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            @if (!string.IsNullOrEmpty(imgItem.ImageUrl))
+                            {
+                                <img src="@imgItem.ImageUrl" alt="@imgItem.AltTextEN" class="rounded"
+                                     style="width:60px;height:45px;object-fit:cover" />
+                            }
+                            else
+                            {
+                                <div class="rounded bg-light d-flex align-items-center justify-content-center"
+                                     style="width:60px;height:45px">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <div class="fw-medium">@(imgItem.ImageTitleEN ?? "—")</div>
+                            <div class="text-muted small">@(imgItem.CaptionEN?.Length > 50 ? imgItem.CaptionEN[..50] + "…" : imgItem.CaptionEN)</div>
+                        </td>
+                        <td class="text-muted small">@(imgItem.ImageType ?? "—")</td>
+                        <td class="text-center">
+                            @if (imgItem.IsCover)
+                            {
+                                <i class="bi bi-star-fill text-warning"></i>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td class="text-center">@imgItem.DisplayOrder</td>
+                        <td class="text-center">
+                            @if (imgItem.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end pe-3 text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@imgItem.Id"
+                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@imgItem.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this image?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No images found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

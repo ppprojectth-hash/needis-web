@@ -1,0 +1,288 @@
+@model SiteSettingViewModel
+@{
+    ViewData["Title"] = "Site Settings / Logo";
+}
+
+@* Success alert *@
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible d-flex align-items-center gap-2 mb-4 rounded-3" role="alert">
+        <i class="bi bi-check-circle-fill flex-shrink-0"></i>
+        <span>@msg</span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<form asp-action="Index" asp-area="Admin" asp-controller="SiteSetting"
+      method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SiteSettingId" />
+    <input type="hidden" asp-for="LogoUrl" />
+    <input type="hidden" asp-for="FaviconUrl" />
+
+    @* Page header *@
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-gear me-2" style="color:#2d4199"></i>Site Settings / Logo
+            </h5>
+            <p class="text-muted small mb-0 mt-1">
+                Manage company information, branding and contact details
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Dashboard
+            </a>
+            <button type="submit" class="btn btn-sm btn-primary px-3"
+                    style="background:#2d4199;border-color:#2d4199">
+                <i class="bi bi-save me-1"></i>Save Changes
+            </button>
+        </div>
+    </div>
+
+    @* Validation summary *@
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div>
+                <div asp-validation-summary="ModelOnly"></div>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        @* ── Left column ── *@
+        <div class="col-lg-7">
+
+            @* A. Company Information *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-building me-2 text-primary"></i>Company Information
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label asp-for="CompanyNameEN" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.CompanyNameEN)
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="CompanyNameEN" class="form-control"
+                               placeholder="e.g. Needis Co., Ltd." />
+                        <span asp-validation-for="CompanyNameEN" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="CompanyNameTH" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.CompanyNameTH)
+                        </label>
+                        <input asp-for="CompanyNameTH" class="form-control"
+                               placeholder="e.g. บริษัท นีดิส จำกัด" />
+                        <span asp-validation-for="CompanyNameTH" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            @* C. Contact Information *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-telephone me-2 text-primary"></i>Contact Information
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="Phone" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.Phone)
+                            </label>
+                            <input asp-for="Phone" class="form-control" placeholder="+66 2 xxx xxxx" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="Email" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.Email)
+                            </label>
+                            <input asp-for="Email" class="form-control" type="email"
+                                   placeholder="info@company.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="AddressEN" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.AddressEN)
+                        </label>
+                        <textarea asp-for="AddressEN" class="form-control" rows="2"
+                                  placeholder="English address"></textarea>
+                        <span asp-validation-for="AddressEN" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="AddressTH" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.AddressTH)
+                        </label>
+                        <textarea asp-for="AddressTH" class="form-control" rows="2"
+                                  placeholder="ที่อยู่ภาษาไทย"></textarea>
+                        <span asp-validation-for="AddressTH" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            @* D. Social Links *@
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-share me-2 text-primary"></i>Social Links
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label asp-for="FacebookUrl" class="form-label small fw-semibold">
+                            <i class="bi bi-facebook me-1 text-primary"></i>
+                            @Html.DisplayNameFor(m => m.FacebookUrl)
+                        </label>
+                        <input asp-for="FacebookUrl" class="form-control"
+                               placeholder="https://facebook.com/yourpage" />
+                        <span asp-validation-for="FacebookUrl" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="LineUrl" class="form-label small fw-semibold">
+                            <i class="bi bi-chat-dots me-1 text-success"></i>
+                            @Html.DisplayNameFor(m => m.LineUrl)
+                        </label>
+                        <input asp-for="LineUrl" class="form-control"
+                               placeholder="https://line.me/ti/p/..." />
+                        <span asp-validation-for="LineUrl" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="LinkedInUrl" class="form-label small fw-semibold">
+                            <i class="bi bi-linkedin me-1 text-info"></i>
+                            @Html.DisplayNameFor(m => m.LinkedInUrl)
+                        </label>
+                        <input asp-for="LinkedInUrl" class="form-control"
+                               placeholder="https://linkedin.com/company/..." />
+                        <span asp-validation-for="LinkedInUrl" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* ── Right column ── *@
+        <div class="col-lg-5">
+
+            @* B. Branding *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-palette me-2 text-primary"></i>Branding
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    @* Logo *@
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold d-block">
+                            Logo Image
+                        </label>
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <div class="mb-2 p-2 border rounded-2 bg-white d-inline-block">
+                                <img src="@Model.LogoUrl" alt="Current Logo"
+                                     style="max-height:60px;max-width:220px;object-fit:contain" />
+                            </div>
+                            <div class="text-muted small mb-2">Current logo</div>
+                        }
+                        <label asp-for="LogoFile" class="form-label small fw-semibold d-none"></label>
+                        <input asp-for="LogoFile" type="file" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp,.svg" />
+                        <span asp-validation-for="LogoFile" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-1">
+                            Recommended: 250 × 80 px &nbsp;·&nbsp; JPG, PNG, WebP, SVG &nbsp;·&nbsp; Max 2 MB
+                        </div>
+                    </div>
+
+                    @* Favicon *@
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold d-block">
+                            Favicon Image
+                        </label>
+                        @if (!string.IsNullOrEmpty(Model.FaviconUrl))
+                        {
+                            <div class="mb-2 p-2 border rounded-2 bg-white d-inline-block">
+                                <img src="@Model.FaviconUrl" alt="Current Favicon"
+                                     style="width:32px;height:32px;object-fit:contain" />
+                            </div>
+                            <div class="text-muted small mb-2">Current favicon</div>
+                        }
+                        <label asp-for="FaviconFile" class="form-label small fw-semibold d-none"></label>
+                        <input asp-for="FaviconFile" type="file" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp,.ico" />
+                        <span asp-validation-for="FaviconFile" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-1">
+                            Recommended: 64 × 64 px &nbsp;·&nbsp; PNG, ICO &nbsp;·&nbsp; Max 2 MB
+                        </div>
+                    </div>
+
+                    @* Main Color *@
+                    <div class="mb-4">
+                        <label asp-for="MainColor" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.MainColor)
+                        </label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input asp-for="MainColor" type="color" class="form-control form-control-color"
+                                   style="width:46px;height:38px;padding:2px 4px" />
+                            <input id="MainColorText" type="text" class="form-control font-monospace"
+                                   value="@Model.MainColor" placeholder="#2d4199"
+                                   style="max-width:120px" />
+                        </div>
+                        <div class="text-muted small mt-1">Hex color code, e.g. #2d4199</div>
+                    </div>
+
+                    @* IsActive *@
+                    <div class="mb-0">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox"
+                                   role="switch" />
+                            <label asp-for="IsActive" class="form-check-label small fw-semibold">
+                                Site Active
+                            </label>
+                        </div>
+                        <div class="text-muted small mt-1">
+                            Enables or disables this site configuration record.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @* Save card (sticky helper) *@
+            <div class="card border-0 shadow-sm rounded-3" style="border-left:3px solid #2d4199!important">
+                <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
+                    <i class="bi bi-info-circle text-primary fs-5"></i>
+                    <div class="small text-muted flex-grow-1">
+                        Changes will take effect immediately after saving.
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary flex-shrink-0"
+                            style="background:#2d4199;border-color:#2d4199">
+                        <i class="bi bi-save me-1"></i>Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    const picker = document.getElementById('MainColor');
+    const text   = document.getElementById('MainColorText');
+    if (picker && text) {
+        text.addEventListener('input', () => { picker.value = text.value; });
+        picker.addEventListener('input', () => { text.value = picker.value; });
+    }
+</script>
+}

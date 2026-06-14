@@ -1,0 +1,166 @@
+@model Needis.Web.Models.SiteSetting?
+@{
+    var lang = (string)(ViewData["CurrentLanguage"] ?? "en");
+    var fc   = ViewData["FooterContact"] as Needis.Web.Models.FooterContact;
+
+    var companyEN   = Model?.CompanyNameEN ?? "Needis";
+    var companyTH   = Model?.CompanyNameTH ?? companyEN;
+    var companyName = lang == "th" ? companyTH : companyEN;
+
+    // Description: FooterContact first, then static fallback
+    var descEN = fc?.DescriptionEN;
+    var descTH = fc?.DescriptionTH;
+
+    // Address: FooterContact first, then SiteSetting
+    var addressEN = !string.IsNullOrEmpty(fc?.AddressEN) ? fc.AddressEN : Model?.AddressEN;
+    var addressTH = !string.IsNullOrEmpty(fc?.AddressTH) ? fc.AddressTH : Model?.AddressTH;
+    var address   = lang == "th" ? (addressTH ?? addressEN) : (addressEN ?? addressTH);
+
+    // Phone: FooterContact first, then SiteSetting
+    var phone = !string.IsNullOrEmpty(fc?.Phone) ? fc.Phone : Model?.ContactPhone;
+
+    // Email: FooterContact first, then SiteSetting
+    var email = !string.IsNullOrEmpty(fc?.Email) ? fc.Email : Model?.ContactEmail;
+
+    // Social: FooterContact first, then SiteSetting
+    var facebook  = !string.IsNullOrEmpty(fc?.FacebookUrl)  ? fc.FacebookUrl  : Model?.FacebookUrl;
+    var line      = !string.IsNullOrEmpty(fc?.LineUrl)      ? fc.LineUrl      : Model?.LineUrl;
+    var linkedIn  = !string.IsNullOrEmpty(fc?.LinkedInUrl)  ? fc.LinkedInUrl  : Model?.LinkedInUrl;
+}
+
+<footer class="site-footer" id="contact">
+    <div class="container">
+        <div class="row g-4 py-5">
+
+            @* Company Info *@
+            <div class="col-lg-4 col-md-6">
+                <div class="mb-3">
+                    @if (!string.IsNullOrEmpty(Model?.LogoPath))
+                    {
+                        <img src="@Model.LogoPath" alt="@companyName" class="site-logo-footer mb-2" />
+                    }
+                    else
+                    {
+                        <h5 class="text-white fw-bold mb-0">@companyEN</h5>
+                    }
+                </div>
+                <p class="footer-text small">
+                    @if (lang == "th")
+                    {
+                        @(descTH ?? "ผู้นำด้านเครื่องมือวัด เครื่องมือวิทยาศาสตร์ และอุปกรณ์ตรวจสอบสิ่งแวดล้อม")
+                    }
+                    else
+                    {
+                        @(descEN ?? "Leading supplier of measuring instruments, scientific equipment, and environmental monitoring solutions.")
+                    }
+                </p>
+                @* Social links *@
+                <div class="d-flex gap-3 mt-3">
+                    @if (!string.IsNullOrEmpty(facebook))
+                    {
+                        <a href="@facebook" target="_blank" class="footer-social" aria-label="Facebook">
+                            <i class="bi bi-facebook fs-5"></i>
+                        </a>
+                    }
+                    @if (!string.IsNullOrEmpty(line))
+                    {
+                        <a href="@line" target="_blank" class="footer-social" aria-label="Line">
+                            <i class="bi bi-line fs-5"></i>
+                        </a>
+                    }
+                    @if (!string.IsNullOrEmpty(linkedIn))
+                    {
+                        <a href="@linkedIn" target="_blank" class="footer-social" aria-label="LinkedIn">
+                            <i class="bi bi-linkedin fs-5"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            @* Quick Links *@
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="text-white fw-semibold mb-3">
+                    @(lang == "th" ? "ลิงก์ด่วน" : "Quick Links")
+                </h6>
+                <ul class="list-unstyled footer-links">
+                    <li><a asp-controller="Home" asp-action="Index">@(lang == "th" ? "หน้าหลัก" : "Home")</a></li>
+                    <li><a asp-controller="About" asp-action="Index">@(lang == "th" ? "เกี่ยวกับเรา" : "About Us")</a></li>
+                    <li><a asp-controller="Product" asp-action="Index">@(lang == "th" ? "สินค้า" : "Products")</a></li>
+                    <li><a asp-controller="Services" asp-action="Index">@(lang == "th" ? "บริการ" : "Services")</a></li>
+                    <li><a asp-controller="Activity" asp-action="Index">@(lang == "th" ? "กิจกรรม" : "Activity")</a></li>
+                    <li><a asp-controller="Contact" asp-action="Index">@(lang == "th" ? "ติดต่อ" : "Contact")</a></li>
+                </ul>
+            </div>
+
+            @* Services *@
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="text-white fw-semibold mb-3">
+                    @(lang == "th" ? "บริการ" : "Services")
+                </h6>
+                <ul class="list-unstyled footer-links">
+                    <li>
+                        <a asp-controller="Services" asp-action="Index">
+                            @(lang == "th" ? "จำหน่ายเครื่องมือ" : "Instrument Sales")
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Services" asp-action="Index">
+                            @(lang == "th" ? "สอบเทียบ" : "Calibration")
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Services" asp-action="Index">
+                            @(lang == "th" ? "ซ่อมบำรุง" : "Maintenance")
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Quotation" asp-action="Create">
+                            @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quote")
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            @* Contact *@
+            <div class="col-lg-4 col-md-6">
+                <h6 class="text-white fw-semibold mb-3">
+                    @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                </h6>
+                <ul class="list-unstyled footer-contact">
+                    @if (!string.IsNullOrEmpty(address))
+                    {
+                        <li class="d-flex gap-2 mb-2">
+                            <i class="bi bi-geo-alt-fill text-primary-light mt-1 flex-shrink-0"></i>
+                            <span class="small">@address</span>
+                        </li>
+                    }
+                    @if (!string.IsNullOrEmpty(phone))
+                    {
+                        <li class="d-flex gap-2 mb-2">
+                            <i class="bi bi-telephone-fill text-primary-light flex-shrink-0"></i>
+                            <a href="tel:@phone" class="small">@phone</a>
+                        </li>
+                    }
+                    @if (!string.IsNullOrEmpty(email))
+                    {
+                        <li class="d-flex gap-2 mb-2">
+                            <i class="bi bi-envelope-fill text-primary-light flex-shrink-0"></i>
+                            <a href="mailto:@email" class="small">@email</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+        </div>
+
+        <hr class="footer-divider" />
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center py-3 gap-2">
+            <p class="footer-text small mb-0">
+                &copy; @DateTime.Now.Year @companyEN.
+                @(lang == "th" ? "สงวนลิขสิทธิ์" : "All rights reserved.")
+            </p>
+        </div>
+
+    </div>
+</footer>

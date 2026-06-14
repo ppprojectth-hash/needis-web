@@ -1,0 +1,76 @@
+@model List<Needis.Web.Models.BrandPartner>
+@{ ViewData["Title"] = "Brand Partners"; }
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" class="d-flex gap-2">
+        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control form-control-sm"
+               placeholder="Search brand name..." style="width:220px" />
+        <button type="submit" class="btn btn-sm btn-primary">Search</button>
+        @if (!string.IsNullOrEmpty(ViewBag.Keyword as string)) { <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Clear</a> }
+    </form>
+    <a asp-action="Create" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Brand</a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3" style="width:60px">Logo</th>
+                    <th>Brand Name</th>
+                    <th>Type</th>
+                    <th class="text-center">Global</th>
+                    <th class="text-center">Show Partner</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            @if (!string.IsNullOrEmpty(b.LogoUrl))
+                            {
+                                <img src="@b.LogoUrl" alt="@b.BrandName" style="max-height:36px;max-width:60px;object-fit:contain" />
+                            }
+                            else { <span class="text-muted">—</span> }
+                        </td>
+                        <td class="fw-semibold">@b.BrandName</td>
+                        <td><span class="badge bg-light text-dark border">@(b.BrandType ?? "—")</span></td>
+                        <td class="text-center">
+                            @if (b.IsGlobalBrand) { <i class="bi bi-check-circle-fill text-success"></i> }
+                            else { <i class="bi bi-dash text-muted"></i> }
+                        </td>
+                        <td class="text-center">
+                            @if (b.ShowOnPartnerSection) { <i class="bi bi-check-circle-fill text-success"></i> }
+                            else { <i class="bi bi-dash text-muted"></i> }
+                        </td>
+                        <td class="text-center">@b.DisplayOrder</td>
+                        <td class="text-center">
+                            <span class="badge @(b.IsActive ? "bg-success" : "bg-secondary")">@(b.IsActive ? "Active" : "Inactive")</span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a asp-action="Edit" asp-route-id="@b.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@b.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this brand partner?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any()) { <tr><td colspan="8" class="text-center text-muted py-4">No brand partners found.</td></tr> }
+            </tbody>
+        </table>
+    </div>
+</div>

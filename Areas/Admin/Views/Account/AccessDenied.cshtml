@@ -1,0 +1,33 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Access Denied";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied — Needis Admin</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f6fb;
+        }
+    </style>
+</head>
+<body>
+<div class="text-center px-3">
+    <div style="font-size:4rem;color:#dc3545;">&#128683;</div>
+    <h4 class="fw-bold mt-3 mb-2">Access Denied</h4>
+    <p class="text-muted mb-4">You do not have permission to view this page.</p>
+    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+       class="btn btn-primary px-4" style="background:#2d4199;border-color:#2d4199">
+        Go to Dashboard
+    </a>
+</div>
+</body>
+</html>

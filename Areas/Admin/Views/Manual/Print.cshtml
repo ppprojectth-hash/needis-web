@@ -1,0 +1,84 @@
+@model Needis.Web.ViewModels.Manual.ManualPageViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Print — " + Model.Title;
+    var backUrl = Model.IsAdminPage && Model.ManualKey.Length > 0
+        ? "/Admin/Manual/" + char.ToUpper(Model.ManualKey[0]) + Model.ManualKey[1..]
+        : "/Manual";
+}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@Model.Title — Print</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { font-family: 'Segoe UI', 'Noto Sans Thai', Arial, sans-serif; }
+    </style>
+</head>
+<body class="manual-print-page">
+
+    @* Toolbar — hidden on @media print *@
+    <div class="manual-print-toolbar no-print">
+        <div class="manual-print-toolbar-inner">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-book-half fs-5"></i>
+                <span class="fw-bold">@Model.Title</span>
+                <span class="badge px-2 py-1"
+                      style="background:rgba(255,255,255,.12);font-size:.68rem;border-radius:8px">
+                    Print View
+                </span>
+            </div>
+            <div class="d-flex gap-2">
+                <button onclick="window.print()"
+                        class="btn btn-sm fw-semibold"
+                        style="background:#2d4199;color:#fff;border:none">
+                    <i class="bi bi-printer me-1"></i>พิมพ์ / Save as PDF
+                </button>
+                <a href="@backUrl" class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-arrow-left me-1"></i>กลับ
+                </a>
+                <button onclick="window.close()" class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div class="manual-print-hint-bar">
+            <i class="bi bi-info-circle me-1"></i>
+            กด <kbd>Ctrl+P</kbd> (Windows) หรือ <kbd>Cmd+P</kbd> (Mac) แล้วเลือก
+            <strong>"Save as PDF"</strong>
+        </div>
+    </div>
+
+    @* Paper *@
+    <div class="manual-print-body">
+        <div class="manual-print-paper">
+
+            <div class="manual-print-cover">
+                <div class="manual-print-logo-circle">
+                    <i class="bi bi-book-half"></i>
+                </div>
+                <div>
+                    <div class="manual-print-brand">Needis</div>
+                    <div class="manual-print-doc-title">@Model.Title</div>
+                    <div class="manual-print-date-line">
+                        พิมพ์วันที่ @DateTime.Now.ToString("dd MMMM yyyy  HH:mm")
+                    </div>
+                </div>
+            </div>
+
+            <div class="manual-prose">
+                @Html.Raw(Model.HtmlContent)
+            </div>
+
+            <div class="manual-print-footer-bar">
+                Needis Instrument Co., Ltd. &nbsp;|&nbsp; @DateTime.Now.Year
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

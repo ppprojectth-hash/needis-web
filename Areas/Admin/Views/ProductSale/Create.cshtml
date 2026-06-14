@@ -1,0 +1,54 @@
+@model Needis.Web.ViewModels.Admin.ProductSaleViewModel
+@{ ViewData["Title"] = "Add Product Sale"; }
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:620px">
+    <div class="card-body p-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-12">
+                    <label asp-for="ProductId" class="form-label fw-medium">Product <span class="text-danger">*</span></label>
+                    <select asp-for="ProductId" asp-items="ViewBag.Products" class="form-select">
+                        <option value="">— Select Product —</option>
+                    </select>
+                    <span asp-validation-for="ProductId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SaleDate" class="form-label fw-medium">Sale Date <span class="text-danger">*</span></label>
+                    <input asp-for="SaleDate" type="date" class="form-control"
+                           value="@Model.SaleDate.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="SaleDate" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Quantity" class="form-label fw-medium">Quantity <span class="text-danger">*</span></label>
+                    <input asp-for="Quantity" type="number" min="1" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CustomerName" class="form-label fw-medium">Customer Name</label>
+                    <input asp-for="CustomerName" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ReferenceNo" class="form-label fw-medium">Reference No.</label>
+                    <input asp-for="ReferenceNo" class="form-control" />
+                </div>
+                <div class="col-12 d-flex gap-4">
+                    <div class="form-check">
+                        <input asp-for="CountInAboutStats" type="checkbox" class="form-check-input" checked />
+                        <label asp-for="CountInAboutStats" class="form-check-label fw-medium">Count in About Stats</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" checked />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

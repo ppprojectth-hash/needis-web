@@ -1,0 +1,398 @@
+@model ActivityDetailViewModel
+@{
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+
+    var act        = Model.Activity;
+    var bannerUrl  = act.BannerImageUrl ?? act.CoverImageUrl;
+    var heroTitle  = L(act.ActivityTitleTH, act.ActivityTitleEN);
+    var heroSub    = L(act.ShortDescriptionTH, act.ShortDescriptionEN);
+    var actDate    = (act.PublishedDate ?? act.ActivityDate)?.ToString("dd MMM yyyy") ?? "";
+    var location   = L(act.LocationTH, act.LocationEN);
+    var metaTitle  = L(act.MetaTitleTH, act.MetaTitleEN) is { Length: > 0 } mt ? mt : heroTitle;
+
+    ViewData["Title"] = metaTitle;
+
+    // YouTube / Vimeo embed helper
+    string GetEmbedUrl(string? url)
+    {
+        if (string.IsNullOrEmpty(url)) return "";
+        if (url.Contains("youtube.com/watch?v="))
+            return url.Replace("watch?v=", "embed/").Split('&')[0];
+        if (url.Contains("youtu.be/"))
+            return "https://www.youtube.com/embed/" + url.Split('/').Last();
+        if (url.Contains("vimeo.com/") && !url.Contains("player.vimeo.com"))
+            return "https://player.vimeo.com/video/" + url.Split('/').Last().Split('?')[0];
+        return url;
+    }
+
+    bool IsEmbed(string? url) =>
+        !string.IsNullOrEmpty(url) &&
+        (url.Contains("youtube") || url.Contains("youtu.be") || url.Contains("vimeo"));
+}
+
+@* ── A. Banner ─────────────────────────────────────────────────────────────── *@
+<div class="activity-banner">
+    @if (!string.IsNullOrEmpty(bannerUrl))
+    {
+        <img src="@bannerUrl" alt="@heroTitle" class="activity-banner-bg" />
+    }
+    <div class="activity-banner-overlay"></div>
+    <div class="activity-banner-content">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb breadcrumb-dark mb-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Home" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "หน้าหลัก" : "Home")
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Activity" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "กิจกรรม" : "Activity")
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">
+                        @(heroTitle.Length > 50 ? heroTitle[..50] + "…" : heroTitle)
+                    </li>
+                </ol>
+            </nav>
+
+            @* Tags *@
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                @foreach (var t in Model.Tags.Take(3))
+                {
+                    <span class="activity-tag-badge" style="background:@(t.TagColor ?? "#2d4199")">
+                        @L(t.TagNameTH, t.TagNameEN)
+                    </span>
+                }
+            </div>
+
+            <h1 class="fw-bold text-white mb-2" style="font-size:clamp(1.4rem,3.5vw,2.25rem);max-width:800px">
+                @heroTitle
+            </h1>
+
+            @if (!string.IsNullOrEmpty(heroSub))
+            {
+                <p class="mb-3 lh-lg" style="color:rgba(255,255,255,.8);max-width:640px">@heroSub</p>
+            }
+
+            <div class="d-flex flex-wrap gap-3" style="font-size:.85rem;color:rgba(255,255,255,.7)">
+                @if (!string.IsNullOrEmpty(actDate))
+                {
+                    <span><i class="bi bi-calendar3 me-1"></i>@actDate</span>
+                }
+                @if (!string.IsNullOrEmpty(act.AuthorName))
+                {
+                    <span><i class="bi bi-person me-1"></i>@act.AuthorName</span>
+                }
+                @if (!string.IsNullOrEmpty(location))
+                {
+                    <span><i class="bi bi-geo-alt me-1"></i>@location</span>
+                }
+                @if (act.ViewCount > 0)
+                {
+                    <span><i class="bi bi-eye me-1"></i>@act.ViewCount.ToString("N0")</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── B. Main Article Content ──────────────────────────────────────────────── *@
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <a asp-controller="Activity" asp-action="Index"
+               class="btn btn-sm btn-outline-secondary mb-4">
+                <i class="bi bi-arrow-left me-1"></i>
+                @(lang == "th" ? "กลับหน้ากิจกรรม" : "Back to Activity")
+            </a>
+
+            @* Dynamic content blocks *@
+            @foreach (var blk in Model.DetailBlocks)
+            {
+                var bTitle    = L(blk.BlockTitleTH,    blk.BlockTitleEN);
+                var bSubtitle = L(blk.BlockSubtitleTH, blk.BlockSubtitleEN);
+                var bContent  = L(blk.BlockContentTH,  blk.BlockContentEN);
+                var bBtnText  = L(blk.ButtonTextTH,    blk.ButtonTextEN);
+                var blkImages = blk.Images.Where(i => i.IsActive && !i.IsDelete).OrderBy(i => i.DisplayOrder).ToList();
+
+                <div class="activity-block reveal">
+
+                    @if (blk.BlockType == "heading")
+                    {
+                        <div class="activity-block-heading">
+                            @if (!string.IsNullOrEmpty(bTitle))
+                            {
+                                <h3>@bTitle</h3>
+                            }
+                            @if (!string.IsNullOrEmpty(bSubtitle))
+                            {
+                                <p class="text-muted fw-semibold mb-0">@bSubtitle</p>
+                            }
+                        </div>
+                    }
+                    else if (blk.BlockType == "text")
+                    {
+                        @if (!string.IsNullOrEmpty(bTitle))
+                        {
+                            <h5 class="fw-bold mb-2" style="color:#1a2b6b">@bTitle</h5>
+                        }
+                        @if (!string.IsNullOrEmpty(bContent))
+                        {
+                            <div class="activity-block-text">@bContent</div>
+                        }
+                    }
+                    else if (blk.BlockType == "quote")
+                    {
+                        <blockquote class="activity-block-quote">
+                            @if (!string.IsNullOrEmpty(bContent)) { @bContent }
+                            @if (!string.IsNullOrEmpty(bTitle))
+                            {
+                                <div class="quote-source">— @bTitle</div>
+                            }
+                        </blockquote>
+                    }
+                    else if (blk.BlockType == "image")
+                    {
+                        @if (!string.IsNullOrEmpty(blk.ImageUrl))
+                        {
+                            <figure class="mb-0">
+                                <img src="@blk.ImageUrl" alt="@bTitle" class="activity-block-img" />
+                                @if (!string.IsNullOrEmpty(bTitle))
+                                {
+                                    <figcaption class="text-muted small text-center mt-2">@bTitle</figcaption>
+                                }
+                            </figure>
+                        }
+                        @if (blkImages.Any())
+                        {
+                            foreach (var img in blkImages)
+                            {
+                                if (!string.IsNullOrEmpty(img.ImageUrl))
+                                {
+                                    <figure class="mb-2 mt-3">
+                                        <img src="@img.ImageUrl" alt="@L(img.AltTextTH, img.AltTextEN)"
+                                             class="activity-block-img" />
+                                        @if (!string.IsNullOrEmpty(L(img.CaptionTH, img.CaptionEN)))
+                                        {
+                                            <figcaption class="text-muted small text-center mt-1">
+                                                @L(img.CaptionTH, img.CaptionEN)
+                                            </figcaption>
+                                        }
+                                    </figure>
+                                }
+                            }
+                        }
+                    }
+                    else if (blk.BlockType == "album")
+                    {
+                        @if (!string.IsNullOrEmpty(bTitle))
+                        {
+                            <h5 class="fw-bold mb-3" style="color:#1a2b6b">@bTitle</h5>
+                        }
+                        @if (blkImages.Any())
+                        {
+                            <div class="activity-album-grid">
+                                @foreach (var img in blkImages)
+                                {
+                                    if (!string.IsNullOrEmpty(img.ImageUrl))
+                                    {
+                                        <div>
+                                            <img src="@img.ImageUrl"
+                                                 alt="@L(img.AltTextTH, img.AltTextEN)"
+                                                 title="@L(img.CaptionTH, img.CaptionEN)" />
+                                            @if (!string.IsNullOrEmpty(L(img.CaptionTH, img.CaptionEN)))
+                                            {
+                                                <div class="album-caption">@L(img.CaptionTH, img.CaptionEN)</div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                    }
+                    else if (blk.BlockType == "video")
+                    {
+                        @if (!string.IsNullOrEmpty(bTitle))
+                        {
+                            <h5 class="fw-bold mb-3" style="color:#1a2b6b">@bTitle</h5>
+                        }
+                        @if (!string.IsNullOrEmpty(blk.VideoUrl))
+                        {
+                            if (IsEmbed(blk.VideoUrl))
+                            {
+                                <div class="activity-block-video">
+                                    <iframe src="@GetEmbedUrl(blk.VideoUrl)"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen
+                                            title="@bTitle"></iframe>
+                                </div>
+                            }
+                            else
+                            {
+                                <a href="@blk.VideoUrl" target="_blank" rel="noopener"
+                                   class="btn btn-outline-primary"
+                                   style="color:#2d4199;border-color:#2d4199">
+                                    <i class="bi bi-play-circle me-2"></i>
+                                    @(lang == "th" ? "ดูวิดีโอ" : "Watch Video")
+                                </a>
+                            }
+                        }
+                    }
+                    else if (blk.BlockType == "button")
+                    {
+                        @if (!string.IsNullOrEmpty(bBtnText) && !string.IsNullOrEmpty(blk.ButtonUrl))
+                        {
+                            <div class="py-2">
+                                <a href="@blk.ButtonUrl"
+                                   class="btn btn-primary px-4"
+                                   style="background:#2d4199;border-color:#2d4199">
+                                    @bBtnText
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @* Fallback: treat unknown block as text *@
+                        @if (!string.IsNullOrEmpty(bTitle))
+                        {
+                            <h5 class="fw-bold mb-2" style="color:#1a2b6b">@bTitle</h5>
+                        }
+                        @if (!string.IsNullOrEmpty(bContent))
+                        {
+                            <div class="activity-block-text">@bContent</div>
+                        }
+                    }
+                </div>
+            }
+
+            @* ── C. Free activity-level images (not in any block) ── *@
+            @if (Model.Images.Any())
+            {
+                <div class="activity-block reveal">
+                    <h5 class="fw-bold mb-3" style="color:#1a2b6b">
+                        @(lang == "th" ? "รูปภาพกิจกรรม" : "Activity Images")
+                    </h5>
+                    <div class="activity-album-grid">
+                        @foreach (var img in Model.Images)
+                        {
+                            if (!string.IsNullOrEmpty(img.ImageUrl))
+                            {
+                                <div>
+                                    <img src="@img.ImageUrl" alt="@L(img.AltTextTH, img.AltTextEN)"
+                                         title="@L(img.CaptionTH, img.CaptionEN)" />
+                                    @if (!string.IsNullOrEmpty(L(img.CaptionTH, img.CaptionEN)))
+                                    {
+                                        <div class="album-caption">@L(img.CaptionTH, img.CaptionEN)</div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@* ── D. More Articles / Related ───────────────────────────────────────────── *@
+@{
+    var relatedActivities = Model.RelatedItems.Select(r => r.RelatedActivity).OfType<Needis.Web.Models.Activity>().ToList();
+    var moreList = relatedActivities.Any() ? relatedActivities : Model.MoreActivities;
+}
+@if (moreList.Any())
+{
+    <section class="py-5" style="background:#f8f9fc">
+        <div class="container">
+            <h4 class="fw-bold mb-4 reveal" style="color:#1a2b6b">
+                @(lang == "th" ? "บทความและกิจกรรมเพิ่มเติม" : "More Articles")
+            </h4>
+            <div class="row g-4">
+                @foreach (var (more, mi) in moreList.Take(3).Select((a, i) => (a, i)))
+                {
+                    var mDelay = (mi % 3) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+                    var mDate  = ((more.PublishedDate ?? more.ActivityDate)?.ToString("dd MMM yyyy")) ?? "";
+                    <div class="col-md-4 reveal @mDelay">
+                        <div class="activity-more-card card shadow-sm">
+                            @if (!string.IsNullOrEmpty(more.CoverImageUrl))
+                            {
+                                <img src="@more.CoverImageUrl"
+                                     alt="@L(more.ActivityTitleTH, more.ActivityTitleEN)"
+                                     class="card-img-top"
+                                     style="height:160px;object-fit:cover" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center"
+                                     style="height:140px;background:linear-gradient(135deg,#e8ecf8 0%,#c5cde8 100%)">
+                                    <i class="bi bi-newspaper fs-2 text-muted"></i>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @foreach (var m in more.ActivityTagMaps.Where(m => m.ActivityTag?.IsActive == true).Take(1))
+                                    {
+                                        <span class="activity-tag-badge"
+                                              style="background:@(m.ActivityTag?.TagColor ?? "#2d4199");font-size:.65rem">
+                                            @L(m.ActivityTag?.TagNameTH, m.ActivityTag?.TagNameEN)
+                                        </span>
+                                    }
+                                </div>
+                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                    @L(more.ActivityTitleTH, more.ActivityTitleEN)
+                                </h6>
+                                @if (!string.IsNullOrEmpty(mDate))
+                                {
+                                    <div class="activity-date mb-2"><i class="bi bi-calendar3"></i> @mDate</div>
+                                }
+                                <a asp-controller="Activity" asp-action="Detail"
+                                   asp-route-slug="@more.ActivitySlug"
+                                   class="btn btn-sm btn-outline-primary"
+                                   style="color:#2d4199;border-color:#2d4199">
+                                    @(lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── E. CTA ────────────────────────────────────────────────────────────────── *@
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8 reveal">
+                <h2 class="text-white fw-bold mb-2">
+                    @(lang == "th" ? "สนใจสินค้าและบริการของเรา?" : "Interested in our products or services?")
+                </h2>
+                <p class="text-white-50 mb-0">
+                    @(lang == "th"
+                        ? "ติดต่อทีมผู้เชี่ยวชาญของเราเพื่อรับคำปรึกษาและใบเสนอราคา"
+                        : "Contact our specialist team for consultation and quotation.")
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end reveal reveal-delay-1">
+                <a asp-controller="Contact" asp-action="Index"
+                   class="btn btn-light btn-lg px-4 me-2">
+                    <i class="bi bi-chat-dots me-1"></i>
+                    @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                </a>
+                <a asp-controller="Product" asp-action="Index"
+                   class="btn btn-outline-light btn-lg px-4">
+                    @(lang == "th" ? "ดูสินค้า" : "Products")
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

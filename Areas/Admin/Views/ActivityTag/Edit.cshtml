@@ -1,0 +1,65 @@
+@model Needis.Web.ViewModels.Admin.ActivityTagViewModel
+@{
+    ViewData["Title"] = "Edit Activity Tag";
+}
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:640px">
+    <div class="card-body p-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="TagKey" class="form-label fw-medium">Tag Key <span class="text-danger">*</span></label>
+                    <input asp-for="TagKey" class="form-control" />
+                    <span asp-validation-for="TagKey" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="TagColor" class="form-label fw-medium">Color</label>
+                    <input asp-for="TagColor" class="form-control" placeholder="#2d4199" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TagNameEN" class="form-label fw-medium">Name EN <span class="text-danger">*</span></label>
+                    <input asp-for="TagNameEN" class="form-control" />
+                    <span asp-validation-for="TagNameEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TagNameTH" class="form-label fw-medium">Name TH</label>
+                    <input asp-for="TagNameTH" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="TagDescriptionEN" class="form-label fw-medium">Description EN</label>
+                    <textarea asp-for="TagDescriptionEN" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="TagDescriptionTH" class="form-label fw-medium">Description TH</label>
+                    <textarea asp-for="TagDescriptionTH" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsFilterable" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsFilterable" class="form-check-label fw-medium">Filterable</label>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

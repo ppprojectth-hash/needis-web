@@ -1,0 +1,192 @@
+@model Needis.Web.ViewModels.Admin.SeoSettingEditViewModel
+@{
+    ViewData["Title"] = "Edit SEO Setting";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var frequencies = ViewBag.Frequencies as string[] ?? [];
+}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+    <div>
+        <h4 class="fw-bold mb-0">Edit SEO Setting</h4>
+        <p class="text-muted small mb-0">Page key: <strong>@Model.PageKey</strong></p>
+    </div>
+</div>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row g-4">
+
+        @* Card A: Page / Entity *@
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-link-45deg me-2 text-primary"></i>Page / Entity</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="PageKey" class="form-label fw-medium"></label>
+                        <input asp-for="PageKey" class="form-control" />
+                        <span asp-validation-for="PageKey" class="text-danger small"></span>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-8">
+                            <label asp-for="EntityType" class="form-label fw-medium"></label>
+                            <input asp-for="EntityType" class="form-control" placeholder="e.g. Product, Service" />
+                            <span asp-validation-for="EntityType" class="text-danger small"></span>
+                        </div>
+                        <div class="col-4">
+                            <label asp-for="EntityId" class="form-label fw-medium"></label>
+                            <input asp-for="EntityId" class="form-control" type="number" />
+                            <span asp-validation-for="EntityId" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label asp-for="RoutePath" class="form-label fw-medium"></label>
+                        <input asp-for="RoutePath" class="form-control" placeholder="/path/to/page" />
+                        <span asp-validation-for="RoutePath" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Card D: Sitemap / Robots *@
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-diagram-3 me-2 text-primary"></i>Sitemap & Robots</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Robots" class="form-label fw-medium"></label>
+                        <input asp-for="Robots" class="form-control" />
+                        <span asp-validation-for="Robots" class="text-danger small"></span>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label asp-for="Priority" class="form-label fw-medium"></label>
+                            <input asp-for="Priority" class="form-control" type="number" step="0.1" min="0" max="1" />
+                            <span asp-validation-for="Priority" class="text-danger small"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="ChangeFrequency" class="form-label fw-medium"></label>
+                            <select asp-for="ChangeFrequency" class="form-select">
+                                @foreach (var f in frequencies)
+                                {
+                                    <option value="@f" selected="@(f == Model.ChangeFrequency ? "selected" : null)">@f</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ChangeFrequency" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label asp-for="CanonicalUrl" class="form-label fw-medium"></label>
+                        <input asp-for="CanonicalUrl" class="form-control" />
+                        <span asp-validation-for="CanonicalUrl" class="text-danger small"></span>
+                    </div>
+                    <div class="mt-3 d-flex gap-3">
+                        <div class="form-check">
+                            <input asp-for="IncludeInSitemap" class="form-check-input" type="checkbox" />
+                            <label asp-for="IncludeInSitemap" class="form-check-label fw-medium">Include in Sitemap</label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Card B: Meta Tags *@
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-tags me-2 text-primary"></i>Meta Tags</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="MetaTitleEN" class="form-label fw-medium"></label>
+                            <input asp-for="MetaTitleEN" class="form-control" />
+                            <span asp-validation-for="MetaTitleEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MetaTitleTH" class="form-label fw-medium"></label>
+                            <input asp-for="MetaTitleTH" class="form-control" />
+                            <span asp-validation-for="MetaTitleTH" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MetaDescriptionEN" class="form-label fw-medium"></label>
+                            <textarea asp-for="MetaDescriptionEN" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="MetaDescriptionEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MetaDescriptionTH" class="form-label fw-medium"></label>
+                            <textarea asp-for="MetaDescriptionTH" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="MetaDescriptionTH" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MetaKeywordsEN" class="form-label fw-medium"></label>
+                            <input asp-for="MetaKeywordsEN" class="form-control" />
+                            <span asp-validation-for="MetaKeywordsEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MetaKeywordsTH" class="form-label fw-medium"></label>
+                            <input asp-for="MetaKeywordsTH" class="form-control" />
+                            <span asp-validation-for="MetaKeywordsTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Card C: Open Graph *@
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-share me-2 text-primary"></i>Open Graph</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="OgTitleEN" class="form-label fw-medium"></label>
+                            <input asp-for="OgTitleEN" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="OgTitleTH" class="form-label fw-medium"></label>
+                            <input asp-for="OgTitleTH" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="OgDescriptionEN" class="form-label fw-medium"></label>
+                            <textarea asp-for="OgDescriptionEN" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="OgDescriptionTH" class="form-label fw-medium"></label>
+                            <textarea asp-for="OgDescriptionTH" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="OgImageUrl" class="form-label fw-medium"></label>
+                            <input asp-for="OgImageUrl" class="form-control" />
+                            <span asp-validation-for="OgImageUrl" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-floppy-fill me-2"></i>Save Changes
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

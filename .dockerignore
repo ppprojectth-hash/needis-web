@@ -1,0 +1,9 @@
+bin/
+obj/
+.git/
+.vscode/
+.env
+appsettings.Production.json
+*.user
+*.suo
+.DS_Store

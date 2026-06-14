@@ -1,0 +1,62 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Needis.Web.ViewModels.Admin;
+
+public class SiteSettingViewModel
+{
+    public int SiteSettingId { get; set; }
+
+    [Display(Name = "Company Name (Thai)")]
+    [MaxLength(200)]
+    public string? CompanyNameTH { get; set; }
+
+    [Required(ErrorMessage = "Company Name (English) is required.")]
+    [Display(Name = "Company Name (English)")]
+    [MaxLength(200)]
+    public string? CompanyNameEN { get; set; }
+
+    public string? LogoUrl { get; set; }
+
+    public string? FaviconUrl { get; set; }
+
+    [Display(Name = "Main Color")]
+    [MaxLength(20)]
+    public string? MainColor { get; set; } = "#2d4199";
+
+    [Display(Name = "Phone")]
+    [MaxLength(50)]
+    public string? Phone { get; set; }
+
+    [Display(Name = "Email")]
+    [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+    [MaxLength(200)]
+    public string? Email { get; set; }
+
+    [Display(Name = "Address (Thai)")]
+    [MaxLength(500)]
+    public string? AddressTH { get; set; }
+
+    [Display(Name = "Address (English)")]
+    [MaxLength(500)]
+    public string? AddressEN { get; set; }
+
+    [Display(Name = "Facebook URL")]
+    [MaxLength(500)]
+    public string? FacebookUrl { get; set; }
+
+    [Display(Name = "Line URL")]
+    [MaxLength(500)]
+    public string? LineUrl { get; set; }
+
+    [Display(Name = "LinkedIn URL")]
+    [MaxLength(500)]
+    public string? LinkedInUrl { get; set; }
+
+    public bool IsActive { get; set; } = true;
+
+    [Display(Name = "Logo Image")]
+    public IFormFile? LogoFile { get; set; }
+
+    [Display(Name = "Favicon Image")]
+    public IFormFile? FaviconFile { get; set; }
+}

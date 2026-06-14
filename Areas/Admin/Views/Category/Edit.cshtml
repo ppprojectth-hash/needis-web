@@ -1,0 +1,179 @@
+@model Needis.Web.ViewModels.Admin.ProductCategoryViewModel
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<form asp-action="Edit" asp-route-id="@Model.ProductCategoryId" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ProductCategoryId" />
+    <input type="hidden" asp-for="ImageUrl" />
+
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-pencil-square me-2" style="color:#2d4199"></i>Edit Category
+            </h5>
+            <p class="text-muted small mb-0 mt-1">@Model.CategoryNameEN</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+            <button type="submit" class="btn btn-sm btn-primary px-3"
+                    style="background:#2d4199;border-color:#2d4199">
+                <i class="bi bi-save me-1"></i>Save Changes
+            </button>
+        </div>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div><div asp-validation-summary="ModelOnly"></div></div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        @* ── Left: Category Information ── *@
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-translate me-2 text-primary"></i>Category Information
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="CategoryNameEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.CategoryNameEN) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="CategoryNameEN" class="form-control" />
+                            <span asp-validation-for="CategoryNameEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="CategoryNameTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.CategoryNameTH)
+                            </label>
+                            <input asp-for="CategoryNameTH" class="form-control" />
+                            <span asp-validation-for="CategoryNameTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Slug" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.Slug) <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Slug" class="form-control font-monospace" />
+                        <div class="text-muted small mt-1">URL-safe identifier. Changing this may break existing links.</div>
+                        <span asp-validation-for="Slug" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-0">
+                        <div class="col-sm-6">
+                            <label asp-for="ShortDescriptionEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ShortDescriptionEN)
+                            </label>
+                            <textarea asp-for="ShortDescriptionEN" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ShortDescriptionEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="ShortDescriptionTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ShortDescriptionTH)
+                            </label>
+                            <textarea asp-for="ShortDescriptionTH" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ShortDescriptionTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        @* ── Right: Image + Settings ── *@
+        <div class="col-lg-5">
+
+            @* Category Image *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-image me-2 text-primary"></i>Category Image
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img id="imagePreview" src="@Model.ImageUrl" alt="Current image"
+                                 class="img-fluid rounded-2 w-100"
+                                 style="max-height:160px;object-fit:cover" />
+                            <div class="text-muted small mt-1">Current image</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="imagePreviewWrap" class="mb-2 d-none">
+                            <img id="imagePreview" src="#" alt="Preview"
+                                 class="img-fluid rounded-2 w-100"
+                                 style="max-height:160px;object-fit:cover" />
+                        </div>
+                    }
+                    <input asp-for="ImageFile" type="file" class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp,.svg" id="ImageFileInput" />
+                    <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
+                    <div class="text-muted small mt-2">
+                        Recommended: <strong>600 × 400 px</strong> &nbsp;·&nbsp;
+                        JPG, PNG, WebP, SVG &nbsp;·&nbsp; Max 2 MB
+                        <br />Leave empty to keep the current image.
+                    </div>
+                </div>
+            </div>
+
+            @* Display Settings *@
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-sliders me-2 text-primary"></i>Display Settings
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="mb-3">
+                        <label asp-for="DisplayOrder" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.DisplayOrder)
+                        </label>
+                        <input asp-for="DisplayOrder" type="number" class="form-control" min="0" max="9999" />
+                        <div class="text-muted small mt-1">Lower numbers appear first.</div>
+                        <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-0">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label small fw-semibold">Active</label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    document.getElementById('ImageFileInput')?.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        const preview = document.getElementById('imagePreview');
+        const wrap    = document.getElementById('imagePreviewWrap');
+        if (preview) preview.src = URL.createObjectURL(file);
+        if (wrap)    wrap.classList.remove('d-none');
+    });
+</script>
+}

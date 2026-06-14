@@ -1,0 +1,204 @@
+@model Needis.Web.ViewModels.Contact.ContactPageViewModel
+@{
+    ViewData["Title"] = Model.CurrentLanguage == "th" ? "ติดต่อเรา" : "Contact Us";
+    ViewData["FullWidth"] = true;
+    var lang = Model.CurrentLanguage;
+    var fc   = Model.FooterContact;
+    var ss   = Model.SiteSetting;
+
+    var address  = lang == "th"
+        ? (!string.IsNullOrEmpty(fc?.AddressTH) ? fc.AddressTH : (!string.IsNullOrEmpty(fc?.AddressEN) ? fc.AddressEN : ss?.AddressTH ?? ss?.AddressEN))
+        : (!string.IsNullOrEmpty(fc?.AddressEN) ? fc.AddressEN : (!string.IsNullOrEmpty(fc?.AddressTH) ? fc.AddressTH : ss?.AddressEN ?? ss?.AddressTH));
+
+    var phone    = !string.IsNullOrEmpty(fc?.Phone)    ? fc.Phone    : ss?.ContactPhone;
+    var email    = !string.IsNullOrEmpty(fc?.Email)    ? fc.Email    : ss?.ContactEmail;
+    var facebook = !string.IsNullOrEmpty(fc?.FacebookUrl) ? fc.FacebookUrl : ss?.FacebookUrl;
+    var line     = !string.IsNullOrEmpty(fc?.LineUrl)     ? fc.LineUrl     : ss?.LineUrl;
+    var linkedIn = !string.IsNullOrEmpty(fc?.LinkedInUrl) ? fc.LinkedInUrl : ss?.LinkedInUrl;
+}
+
+@* Page Header *@
+<section class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark mb-2">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index">@(lang == "th" ? "หน้าหลัก" : "Home")</a>
+                </li>
+                <li class="breadcrumb-item active">@(lang == "th" ? "ติดต่อเรา" : "Contact Us")</li>
+            </ol>
+        </nav>
+        <h1 class="page-header-title">@(lang == "th" ? "ติดต่อเรา" : "Contact Us")</h1>
+        <p class="page-header-subtitle">
+            @(lang == "th"
+                ? "ติดต่อทีมผู้เชี่ยวชาญของเรา เราพร้อมให้คำปรึกษาและช่วยเหลือคุณ"
+                : "Get in touch with our team of experts. We're here to help and advise you.")
+        </p>
+    </div>
+</section>
+
+@* Contact Info + Form *@
+<section class="py-5">
+    <div class="container">
+
+        @if (TempData["ContactSuccess"] is string successMsg)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>@successMsg
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-5">
+
+            @* Left — Contact Info *@
+            <div class="col-lg-4 reveal">
+                <h4 class="fw-bold mb-4" style="color: var(--needis-primary)">
+                    @(lang == "th" ? "ข้อมูลติดต่อ" : "Contact Information")
+                </h4>
+
+                <div class="d-flex flex-column gap-4">
+
+                    @if (!string.IsNullOrEmpty(address))
+                    {
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div>
+                                <div class="contact-info-label">@(lang == "th" ? "ที่อยู่" : "Address")</div>
+                                <div class="contact-info-value">@address</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(phone))
+                    {
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                            <div>
+                                <div class="contact-info-label">@(lang == "th" ? "โทรศัพท์" : "Phone")</div>
+                                <a href="tel:@phone" class="contact-info-value contact-info-link">@phone</a>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(email))
+                    {
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="bi bi-envelope-fill"></i>
+                            </div>
+                            <div>
+                                <div class="contact-info-label">@(lang == "th" ? "อีเมล" : "Email")</div>
+                                <a href="mailto:@email" class="contact-info-value contact-info-link">@email</a>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+                @* Social Links *@
+                @if (!string.IsNullOrEmpty(facebook) || !string.IsNullOrEmpty(line) || !string.IsNullOrEmpty(linkedIn))
+                {
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="contact-info-label mb-3">@(lang == "th" ? "ช่องทางอื่น" : "Follow Us")</div>
+                        <div class="d-flex gap-3">
+                            @if (!string.IsNullOrEmpty(facebook))
+                            {
+                                <a href="@facebook" target="_blank" class="contact-social-btn" aria-label="Facebook">
+                                    <i class="bi bi-facebook fs-5"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(line))
+                            {
+                                <a href="@line" target="_blank" class="contact-social-btn" aria-label="Line">
+                                    <i class="bi bi-line fs-5"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(linkedIn))
+                            {
+                                <a href="@linkedIn" target="_blank" class="contact-social-btn" aria-label="LinkedIn">
+                                    <i class="bi bi-linkedin fs-5"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* Right — Contact Form *@
+            <div class="col-lg-8 reveal reveal-delay-1">
+                <div class="contact-form-card">
+                    <h4 class="fw-bold mb-1">@(lang == "th" ? "ส่งข้อความถึงเรา" : "Send Us a Message")</h4>
+                    <p class="text-muted mb-4">
+                        @(lang == "th"
+                            ? "กรอกแบบฟอร์มด้านล่าง ทีมงานของเราจะติดต่อกลับโดยเร็ว"
+                            : "Fill in the form below and our team will get back to you promptly.")
+                    </p>
+
+                    <form asp-action="Index" asp-controller="Contact" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Form.FullName" class="form-label fw-medium">
+                                    @(lang == "th" ? "ชื่อ-นามสกุล" : "Full Name") <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Form.FullName" class="form-control"
+                                       placeholder="@(lang == "th" ? "ชื่อ-นามสกุล" : "Your full name")" />
+                                <span asp-validation-for="Form.FullName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Form.Email" class="form-label fw-medium">
+                                    @(lang == "th" ? "อีเมล" : "Email Address") <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Form.Email" class="form-control" type="email"
+                                       placeholder="@(lang == "th" ? "อีเมลของคุณ" : "your@email.com")" />
+                                <span asp-validation-for="Form.Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Form.Phone" class="form-label fw-medium">
+                                    @(lang == "th" ? "เบอร์โทรศัพท์" : "Phone Number")
+                                </label>
+                                <input asp-for="Form.Phone" class="form-control"
+                                       placeholder="@(lang == "th" ? "เบอร์โทร (ไม่บังคับ)" : "Optional")" />
+                                <span asp-validation-for="Form.Phone" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Form.Subject" class="form-label fw-medium">
+                                    @(lang == "th" ? "หัวข้อ" : "Subject") <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Form.Subject" class="form-control"
+                                       placeholder="@(lang == "th" ? "หัวข้อข้อความ" : "How can we help?")" />
+                                <span asp-validation-for="Form.Subject" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Form.Message" class="form-label fw-medium">
+                                    @(lang == "th" ? "ข้อความ" : "Message") <span class="text-danger">*</span>
+                                </label>
+                                <textarea asp-for="Form.Message" class="form-control" rows="5"
+                                          placeholder="@(lang == "th" ? "รายละเอียดข้อความของคุณ" : "Tell us more about your inquiry...")"></textarea>
+                                <span asp-validation-for="Form.Message" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary px-4 py-2">
+                                    <i class="bi bi-send-fill me-2"></i>
+                                    @(lang == "th" ? "ส่งข้อความ" : "Send Message")
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

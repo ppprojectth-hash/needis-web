@@ -1,0 +1,84 @@
+@model List<Needis.Web.Models.AboutSection>
+@{
+    ViewData["Title"] = "About Sections";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <form method="get" class="d-flex gap-2">
+        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control form-control-sm"
+               placeholder="Search key, title..." style="width:240px" />
+        <button type="submit" class="btn btn-sm btn-primary">Search</button>
+        @if (!string.IsNullOrEmpty(ViewBag.Keyword as string))
+        {
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Clear</a>
+        }
+    </form>
+    <a asp-action="Create" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Section
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Section Key</th>
+                    <th>Title EN</th>
+                    <th>Title TH</th>
+                    <th>Layout</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td class="ps-3"><code>@s.SectionKey</code></td>
+                        <td>@s.TitleEN</td>
+                        <td class="text-muted small">@s.TitleTH</td>
+                        <td><span class="badge bg-light text-dark border">@(s.LayoutType ?? "—")</span></td>
+                        <td class="text-center">@s.DisplayOrder</td>
+                        <td class="text-center">
+                            @if (s.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end pe-3">
+                            <a asp-action="Items" asp-route-sectionId="@s.Id"
+                               class="btn btn-sm btn-outline-info me-1">
+                                <i class="bi bi-list-ul me-1"></i>Items
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@s.Id"
+                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@s.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this section?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No sections found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

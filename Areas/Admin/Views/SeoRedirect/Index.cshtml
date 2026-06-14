@@ -1,0 +1,105 @@
+@model IEnumerable<Needis.Web.ViewModels.Admin.SeoRedirectListItemViewModel>
+@{
+    ViewData["Title"] = "SEO Redirects";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">SEO Redirects</h4>
+        <p class="text-muted small mb-0">Manage 301/302 URL redirects</p>
+    </div>
+    <a asp-action="Create" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Redirect
+    </a>
+</div>
+
+@if (TempData["Success"] is string ok)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@ok
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label small fw-medium mb-1">Search</label>
+                <input name="keyword" value="@ViewBag.Keyword" class="form-control form-control-sm"
+                       placeholder="Source path or target path..." />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-search me-1"></i>Search
+                </button>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary ms-1">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Source Path</th>
+                    <th>Target Path</th>
+                    <th class="text-center">Code</th>
+                    <th class="text-center">Status</th>
+                    <th>Updated</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="font-monospace small">@item.SourcePath</td>
+                        <td class="font-monospace small text-truncate" style="max-width:240px">
+                            @item.TargetPath
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @(item.StatusCode == 301 ? "bg-warning-subtle text-warning-emphasis" : "bg-info-subtle text-info-emphasis")">
+                                @item.StatusCode
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success-subtle text-success-emphasis">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis">Inactive</span>
+                            }
+                        </td>
+                        <td class="small text-muted">@(item.UpdatedAt?.ToString("dd MMM yyyy") ?? "—")</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this redirect?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No redirects found. <a asp-action="Create" class="ms-2">Add one</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

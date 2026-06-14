@@ -1,0 +1,111 @@
+@model Needis.Web.ViewModels.Admin.ServiceContactCardViewModel
+@{
+    var svc = ViewBag.Service as Needis.Web.Models.Service;
+    ViewData["Title"] = "Edit Contact Card";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Service" asp-action="Index">Services</a></li>
+        <li class="breadcrumb-item">
+            <a asp-controller="ServiceContactCard" asp-action="Index" asp-route-serviceId="@svc?.Id">
+                @(svc?.ServiceNameEN ?? "Service")
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Edit Contact Card</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:860px">
+    <div class="card-body p-4">
+        <a asp-action="Index" asp-route-serviceId="@Model.ServiceId" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ServiceId" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="TitleEN" class="form-label fw-medium">Title EN <span class="text-danger">*</span></label>
+                    <input asp-for="TitleEN" class="form-control" />
+                    <span asp-validation-for="TitleEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="TitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DescriptionEN" class="form-label fw-medium">Description EN</label>
+                    <textarea asp-for="DescriptionEN" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DescriptionTH" class="form-label fw-medium">Description TH</label>
+                    <textarea asp-for="DescriptionTH" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="col-12"><hr class="my-1" /><h6 class="fw-bold text-primary mb-0">Primary Button</h6></div>
+                <div class="col-md-4">
+                    <label asp-for="PrimaryButtonTextEN" class="form-label fw-medium">Button Text EN</label>
+                    <input asp-for="PrimaryButtonTextEN" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PrimaryButtonTextTH" class="form-label fw-medium">Button Text TH</label>
+                    <input asp-for="PrimaryButtonTextTH" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PrimaryButtonUrl" class="form-label fw-medium">Button URL</label>
+                    <input asp-for="PrimaryButtonUrl" class="form-control" />
+                </div>
+
+                <div class="col-12"><hr class="my-1" /><h6 class="fw-bold text-primary mb-0">Secondary Button</h6></div>
+                <div class="col-md-4">
+                    <label asp-for="SecondaryButtonTextEN" class="form-label fw-medium">Button Text EN</label>
+                    <input asp-for="SecondaryButtonTextEN" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="SecondaryButtonTextTH" class="form-label fw-medium">Button Text TH</label>
+                    <input asp-for="SecondaryButtonTextTH" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="SecondaryButtonUrl" class="form-label fw-medium">Button URL</label>
+                    <input asp-for="SecondaryButtonUrl" class="form-control" />
+                </div>
+
+                <div class="col-12"><hr class="my-1" /><h6 class="fw-bold text-primary mb-0">Contact Info</h6></div>
+                <div class="col-md-3">
+                    <label asp-for="ContactLabelEN" class="form-label fw-medium">Label EN</label>
+                    <input asp-for="ContactLabelEN" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="ContactLabelTH" class="form-label fw-medium">Label TH</label>
+                    <input asp-for="ContactLabelTH" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="ContactValue" class="form-label fw-medium">Contact Value</label>
+                    <input asp-for="ContactValue" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="ContactIconUrl" class="form-label fw-medium">Contact Icon Class</label>
+                    <input asp-for="ContactIconUrl" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" asp-route-serviceId="@Model.ServiceId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

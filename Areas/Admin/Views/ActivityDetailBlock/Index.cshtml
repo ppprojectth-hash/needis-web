@@ -1,0 +1,97 @@
+@model List<Needis.Web.Models.ActivityDetailBlock>
+@{
+    var activity = ViewBag.Activity as Needis.Web.Models.Activity;
+    ViewData["Title"] = $"Detail Blocks";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Activity" asp-action="Index">Activities</a></li>
+        <li class="breadcrumb-item active">@(activity?.ActivityTitleEN ?? "Activity") — Blocks</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="text-muted small">Manage content blocks for this activity</div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Activity" asp-action="Details" asp-route-id="@activity?.Id"
+           class="btn btn-sm btn-outline-secondary">Details</a>
+        <a asp-action="Create" asp-route-activityId="@activity?.Id" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add Block
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Block Type</th>
+                    <th>Title EN</th>
+                    <th>Layout</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detailBlock in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            <span class="badge bg-primary">@detailBlock.BlockType</span>
+                        </td>
+                        <td>
+                            <div class="fw-medium">@detailBlock.BlockTitleEN</div>
+                            @if (!string.IsNullOrEmpty(detailBlock.ButtonUrl))
+                            {
+                                <div class="text-muted small"><i class="bi bi-link-45deg"></i> @detailBlock.ButtonUrl</div>
+                            }
+                        </td>
+                        <td class="text-muted small">@(detailBlock.LayoutType ?? "—")</td>
+                        <td class="text-center">@detailBlock.DisplayOrder</td>
+                        <td class="text-center">
+                            @if (detailBlock.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end pe-3 text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@detailBlock.Id"
+                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            @if (detailBlock.BlockType is "image" or "album")
+                            {
+                                <a asp-controller="ActivityImage" asp-action="Index"
+                                   asp-route-activityId="@detailBlock.ActivityId"
+                                   asp-route-blockId="@detailBlock.Id"
+                                   class="btn btn-sm btn-outline-info me-1">Images</a>
+                            }
+                            <form asp-action="Delete" asp-route-id="@detailBlock.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this block?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">No blocks found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

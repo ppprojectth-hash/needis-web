@@ -1,0 +1,324 @@
+@model QuotationRequestDetailViewModel
+@{
+    ViewData["Title"] = "Quotation Request Detail";
+    var req = Model.Request;
+
+    string StatusBadge(string s) => s switch
+    {
+        "New"       => "bg-primary",
+        "Contacted" => "bg-info text-dark",
+        "Quoted"    => "bg-warning text-dark",
+        "Closed"    => "bg-success",
+        "Cancelled" => "bg-secondary",
+        _           => "bg-light text-dark",
+    };
+
+    string[] AllStatuses = ["New", "Contacted", "Quoted", "Closed", "Cancelled"];
+}
+
+@* Alerts *@
+@if (TempData["Success"] is string successMsg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4">
+        <i class="bi bi-check-circle me-2"></i>@successMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string errorMsg)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4">
+        <i class="bi bi-exclamation-circle me-2"></i>@errorMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <a asp-area="Admin" asp-controller="QuotationRequest" asp-action="Index"
+           class="btn btn-sm btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+        <span class="fw-bold fs-6">
+            <code style="color:#2d4199">@req.RequestNo</code>
+        </span>
+        <span class="badge ms-2 @StatusBadge(req.Status)">@req.Status</span>
+        @{
+            string typeBadge = req.RequestType switch
+            {
+                "Product" => "bg-primary",
+                "Service" => "bg-purple",
+                "Mixed"   => "bg-warning text-dark",
+                _         => "bg-secondary",
+            };
+        }
+        <style>.bg-purple { background-color: #6f42c1 !important; }</style>
+        <span class="badge ms-1 @typeBadge">@(req.RequestType ?? "General")</span>
+    </div>
+    <span class="text-muted small">
+        Submitted: @req.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+        @if (req.UpdatedAt.HasValue)
+        {
+            @: · Updated: @req.UpdatedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+        }
+    </span>
+</div>
+
+<div class="row g-4">
+
+    @* ── Left column ── *@
+    <div class="col-lg-8">
+
+        @* Customer Info *@
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                <h6 class="fw-bold mb-0" style="color:#2d4199">
+                    <i class="bi bi-person-circle me-2"></i>Customer Information
+                </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-semibold mb-1">Full Name</div>
+                        <div>@(req.CustomerName ?? "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-semibold mb-1">Company</div>
+                        <div>@(req.CompanyName ?? "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-semibold mb-1">Email</div>
+                        <div>
+                            @if (!string.IsNullOrEmpty(req.Email))
+                            {
+                                <a href="mailto:@req.Email">@req.Email</a>
+                            }
+                            else
+                            {
+                                @:—
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-semibold mb-1">Phone</div>
+                        <div>
+                            @if (!string.IsNullOrEmpty(req.Phone))
+                            {
+                                <a href="tel:@req.Phone">@req.Phone</a>
+                            }
+                            else
+                            {
+                                @:—
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-semibold mb-1">Preferred Contact</div>
+                        <div>@(req.PreferredContactMethod ?? "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-semibold mb-1">Language</div>
+                        <div>@(req.Language?.ToUpperInvariant() ?? "—")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Request Detail *@
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                <h6 class="fw-bold mb-0" style="color:#2d4199">
+                    <i class="bi bi-file-earmark-text me-2"></i>Request Details
+                </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <div class="small text-muted fw-semibold mb-1">Subject</div>
+                <p class="mb-3">@(req.Subject ?? "—")</p>
+
+                <div class="small text-muted fw-semibold mb-1">Message</div>
+                @if (!string.IsNullOrWhiteSpace(req.Message))
+                {
+                    <p class="mb-0" style="white-space:pre-wrap;line-height:1.7">@req.Message</p>
+                }
+                else
+                {
+                    <p class="text-muted mb-0"><em>No message provided.</em></p>
+                }
+            </div>
+        </div>
+
+        @* Requested Items (Product + Service) *@
+        @if (Model.Items.Any())
+        {
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-bold mb-0" style="color:#2d4199">
+                        <i class="bi bi-box-seam me-2"></i>Requested Items
+                    </h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4" style="width:30px">#</th>
+                                <th style="width:70px">Type</th>
+                                <th>Name</th>
+                                <th>Details</th>
+                                <th class="text-center" style="width:50px">Qty</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (item, idx) in Model.Items.Select((x, i) => (x, i + 1)))
+                            {
+                                <tr>
+                                    <td class="ps-4 text-muted small">@idx</td>
+                                    <td>
+                                        @if (item.ItemType == "Service")
+                                        {
+                                            <span class="badge" style="background:#6f42c1;font-size:.68rem">Service</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-primary" style="font-size:.68rem">Product</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.ItemType == "Service")
+                                        {
+                                            @if (!string.IsNullOrEmpty(item.ServiceSlugSnapshot))
+                                            {
+                                                <a asp-area="" asp-controller="Services" asp-action="Detail"
+                                                   asp-route-slug="@item.ServiceSlugSnapshot"
+                                                   target="_blank" class="text-decoration-none">
+                                                    @(item.ServiceNameSnapshotEN ?? item.ServiceNameSnapshotTH ?? "—")
+                                                    <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                @(item.ServiceNameSnapshotEN ?? item.ServiceNameSnapshotTH ?? "—")
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.ServiceNameSnapshotTH) &&
+                                                 item.ServiceNameSnapshotTH != item.ServiceNameSnapshotEN)
+                                            {
+                                                <div class="text-muted small">@item.ServiceNameSnapshotTH</div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @if (!string.IsNullOrEmpty(item.ProductSlugSnapshot))
+                                            {
+                                                <a asp-area="" asp-controller="Product" asp-action="Detail"
+                                                   asp-route-slug="@item.ProductSlugSnapshot"
+                                                   target="_blank" class="text-decoration-none">
+                                                    @(item.ProductNameSnapshotEN ?? item.ProductNameSnapshotTH ?? "—")
+                                                    <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                @(item.ProductNameSnapshotEN ?? item.ProductNameSnapshotTH ?? "—")
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.ProductNameSnapshotTH) &&
+                                                 item.ProductNameSnapshotTH != item.ProductNameSnapshotEN)
+                                            {
+                                                <div class="text-muted small">@item.ProductNameSnapshotTH</div>
+                                            }
+                                        }
+                                    </td>
+                                    <td class="small">
+                                        @if (item.ItemType == "Service")
+                                        {
+                                            @if (!string.IsNullOrEmpty(item.ServiceCodeSnapshot))
+                                            {
+                                                <code>@item.ServiceCodeSnapshot</code>
+                                            }
+                                            else { <span class="text-muted">—</span> }
+                                        }
+                                        else
+                                        {
+                                            @item.BrandSnapshot@(!string.IsNullOrEmpty(item.BrandSnapshot) && !string.IsNullOrEmpty(item.ModelSnapshot) ? " · " : "")@item.ModelSnapshot
+                                            @if (!string.IsNullOrEmpty(item.PartNumberSnapshot))
+                                            {
+                                                <div><code class="small">@item.PartNumberSnapshot</code></div>
+                                            }
+                                        }
+                                    </td>
+                                    <td class="text-center fw-semibold">@item.Quantity</td>
+                                    <td class="small text-muted">@(item.ItemNote ?? "—")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    @* ── Right column: Status & Admin ── *@
+    <div class="col-lg-4">
+
+        @* Update Status Form *@
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                <h6 class="fw-bold mb-0" style="color:#2d4199">
+                    <i class="bi bi-pencil-square me-2"></i>Update Status
+                </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <form asp-area="Admin" asp-controller="QuotationRequest" asp-action="UpdateStatus"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@req.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Status</label>
+                        <select name="status" class="form-select">
+                            @foreach (var s in AllStatuses)
+                            {
+                                <option value="@s" selected="@(req.Status == s ? "selected" : null)">@s</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Admin Remark (internal)</label>
+                        <textarea name="adminRemark" class="form-control" rows="4"
+                                  placeholder="Internal notes for admin use only...">@req.AdminRemark</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100"
+                            style="background:#2d4199;border-color:#2d4199">
+                        <i class="bi bi-save me-1"></i>Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        @* Metadata *@
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                <h6 class="fw-bold mb-0 small text-muted">System Info</h6>
+            </div>
+            <div class="card-body px-4 pb-3">
+                <dl class="row small mb-0 g-1">
+                    <dt class="col-5 text-muted">ID</dt>
+                    <dd class="col-7">#@req.Id</dd>
+                    <dt class="col-5 text-muted">IP Address</dt>
+                    <dd class="col-7">@(req.IpAddress ?? "—")</dd>
+                    <dt class="col-5 text-muted">Language</dt>
+                    <dd class="col-7">@(req.Language?.ToUpperInvariant() ?? "—")</dd>
+                    <dt class="col-5 text-muted">Submitted</dt>
+                    <dd class="col-7">@req.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</dd>
+                    @if (req.UpdatedAt.HasValue)
+                    {
+                        <dt class="col-5 text-muted">Updated</dt>
+                        <dd class="col-7">@req.UpdatedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,163 @@
+@model IEnumerable<Needis.Web.Models.HomeBanner>
+@{
+    ViewData["Title"] = "Home Banners";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible d-flex align-items-center gap-2 rounded-3 mb-4">
+        <i class="bi bi-check-circle-fill flex-shrink-0"></i>
+        <span>@msg</span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-images me-2" style="color:#2d4199"></i>Home Banners
+        </h5>
+        <p class="text-muted small mb-0 mt-1">Manage hero banner slides for the home page</p>
+    </div>
+    <a asp-action="Create" class="btn btn-sm btn-primary px-3"
+       style="background:#2d4199;border-color:#2d4199">
+        <i class="bi bi-plus-lg me-1"></i>Add New Banner
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    @if (!Model.Any())
+    {
+        <div class="card-body text-center text-muted py-5">
+            <i class="bi bi-images fs-1 d-block mb-3" style="color:#c5cde8"></i>
+            <p class="mb-2">No banners yet.</p>
+            <a asp-action="Create" class="btn btn-sm btn-primary"
+               style="background:#2d4199;border-color:#2d4199">
+                <i class="bi bi-plus-lg me-1"></i>Add First Banner
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background:#f8f9fc">
+                    <tr class="text-muted small fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.04em">
+                        <th class="ps-4 py-3" style="width:90px">Preview</th>
+                        <th class="py-3">Title</th>
+                        <th class="py-3" style="width:110px">Type</th>
+                        <th class="py-3" style="width:190px">Date Range</th>
+                        <th class="py-3 text-center" style="width:70px">Order</th>
+                        <th class="py-3 text-center" style="width:90px">Status</th>
+                        <th class="py-3 text-end pe-4" style="width:130px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 py-2">
+                                @{
+                                    var mt = string.IsNullOrEmpty(item.MediaType) ? "Image" : item.MediaType;
+                                }
+                                @if (mt == "Video")
+                                {
+                                    <div class="rounded-2 d-flex align-items-center justify-content-center"
+                                         style="width:72px;height:42px;background:#1a1a2e;color:#7c8ff4;border:1px solid #2d4199">
+                                        <i class="bi bi-play-circle fs-5"></i>
+                                    </div>
+                                }
+                                else if (mt == "YouTube")
+                                {
+                                    <div class="rounded-2 d-flex align-items-center justify-content-center"
+                                         style="width:72px;height:42px;background:#ff0000;color:#fff;border:1px solid #cc0000">
+                                        <i class="bi bi-youtube fs-5"></i>
+                                    </div>
+                                }
+                                else if (!string.IsNullOrEmpty(item.ImagePath))
+                                {
+                                    <img src="@item.ImagePath" alt="Banner"
+                                         class="rounded-2 object-fit-cover"
+                                         style="width:72px;height:42px;object-fit:cover;border:1px solid #eee" />
+                                }
+                                else
+                                {
+                                    <div class="rounded-2 d-flex align-items-center justify-content-center bg-light"
+                                         style="width:72px;height:42px;color:#aaa">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td class="py-2">
+                                <div class="fw-semibold small">@item.TitleEN</div>
+                                @if (!string.IsNullOrEmpty(item.TitleTH))
+                                {
+                                    <div class="text-muted small">@item.TitleTH</div>
+                                }
+                            </td>
+                            <td class="py-2">
+                                @{
+                                    var mediaBadge = mt switch
+                                    {
+                                        "Video"   => ("bi-camera-video-fill", "badge-video",   "Video"),
+                                        "YouTube" => ("bi-youtube",           "badge-youtube", "YouTube"),
+                                        _         => ("bi-image-fill",        "badge-image",   "Image"),
+                                    };
+                                }
+                                <span class="badge rounded-pill d-inline-flex align-items-center gap-1
+                                    @(mt == "Video" ? "text-bg-dark" : mt == "YouTube" ? "" : "text-bg-primary")"
+                                    @(mt == "YouTube" ? "style=\"background:#ff0000\"" : "")>
+                                    <i class="bi @mediaBadge.Item1 small"></i>
+                                    @mediaBadge.Item3
+                                </span>
+                            </td>
+                            <td class="py-2 small text-muted">
+                                @if (item.StartDate.HasValue || item.EndDate.HasValue)
+                                {
+                                    <div><i class="bi bi-calendar3 me-1"></i>
+                                        @(item.StartDate?.ToString("dd MMM yy") ?? "—")
+                                        <span class="mx-1">→</span>
+                                        @(item.EndDate?.ToString("dd MMM yy") ?? "—")
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Always shown</span>
+                                }
+                            </td>
+                            <td class="py-2 text-center">
+                                <span class="badge rounded-pill bg-light text-dark border fw-normal">
+                                    @item.DisplayOrder
+                                </span>
+                            </td>
+                            <td class="py-2 text-center">
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge rounded-pill text-bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill text-bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="py-2 text-end pe-4">
+                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                      style="display:inline"
+                                      onsubmit="return confirm('Delete this banner? This cannot be undone.')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

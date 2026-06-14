@@ -1,0 +1,420 @@
+@model Needis.Web.ViewModels.Admin.HomeBannerViewModel
+@{
+    ViewData["Title"] = "Edit Banner";
+    var startVal = Model.StartDate?.ToString("yyyy-MM-dd") ?? "";
+    var endVal   = Model.EndDate?.ToString("yyyy-MM-dd")   ?? "";
+    var mt       = string.IsNullOrEmpty(Model.MediaType) ? "Image" : Model.MediaType;
+}
+
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-pencil-square me-2" style="color:#2d4199"></i>Edit Banner
+        </h5>
+        <p class="text-muted small mb-0 mt-1">@Model.TitleEN</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+    </div>
+</div>
+
+<form asp-action="Edit" asp-route-id="@Model.HomeBannerId" method="post" enctype="multipart/form-data" id="bannerForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="HomeBannerId" />
+    <input type="hidden" asp-for="ImageUrl" />
+    <input type="hidden" asp-for="VideoFileUrl" />
+    <input type="hidden" asp-for="MobileImageUrl" />
+    <input type="hidden" asp-for="MobileVideoUrl" />
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div><div asp-validation-summary="ModelOnly"></div></div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <!-- Left column: Content + Media -->
+        <div class="col-lg-7">
+
+            <!-- Banner Content -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-translate me-2 text-primary"></i>Banner Content
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="TitleEN" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.TitleEN) <span class="text-danger">*</span></label>
+                            <input asp-for="TitleEN" class="form-control" />
+                            <span asp-validation-for="TitleEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="TitleTH" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.TitleTH)</label>
+                            <input asp-for="TitleTH" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="SubtitleEN" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.SubtitleEN)</label>
+                            <textarea asp-for="SubtitleEN" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="SubtitleTH" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.SubtitleTH)</label>
+                            <textarea asp-for="SubtitleTH" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="ButtonTextEN" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ButtonTextEN)</label>
+                            <input asp-for="ButtonTextEN" class="form-control" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="ButtonTextTH" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ButtonTextTH)</label>
+                            <input asp-for="ButtonTextTH" class="form-control" />
+                        </div>
+                    </div>
+                    <div>
+                        <label asp-for="ButtonUrl" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ButtonUrl)</label>
+                        <input asp-for="ButtonUrl" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media section -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-film me-2 text-primary"></i>Media
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <!-- MediaType toggle -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Media Type</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm media-type-btn" data-type="Image" id="btn-Image">
+                                <i class="bi bi-image me-1"></i>Image
+                            </button>
+                            <button type="button" class="btn btn-sm media-type-btn" data-type="Video" id="btn-Video">
+                                <i class="bi bi-camera-video me-1"></i>Video File
+                            </button>
+                            <button type="button" class="btn btn-sm media-type-btn" data-type="YouTube" id="btn-YouTube">
+                                <i class="bi bi-youtube me-1"></i>YouTube
+                            </button>
+                        </div>
+                        <input asp-for="MediaType" type="hidden" id="MediaType" />
+                    </div>
+
+                    <!-- Image section -->
+                    <div id="section-Image">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">
+                                Banner Image
+                                <span class="text-muted fw-normal">(leave empty to keep current)</span>
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mb-2">
+                                    <img src="@Model.ImageUrl" alt="Current image"
+                                         class="rounded-2" style="max-height:120px;max-width:100%;object-fit:contain;border:1px solid #eee" />
+                                    <div class="text-muted small mt-1">Current image</div>
+                                </div>
+                            }
+                            <input asp-for="ImageFile" type="file" class="form-control"
+                                   accept=".jpg,.jpeg,.png,.webp,.svg"
+                                   onchange="previewFile(this,'imagePreview','imagePreviewWrap')" />
+                            <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
+                            <div id="imagePreviewWrap" class="mt-2 d-none">
+                                <img id="imagePreview" src="#" alt="Preview"
+                                     class="rounded-2" style="max-height:120px;max-width:100%;object-fit:contain" />
+                            </div>
+                        </div>
+                        <div>
+                            <label asp-for="MobileImageFile" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.MobileImageFile)
+                                <span class="text-muted fw-normal small">(optional)</span>
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.MobileImageUrl))
+                            {
+                                <div class="mb-2">
+                                    <img src="@Model.MobileImageUrl" alt="Current mobile"
+                                         class="rounded-2" style="max-height:80px;max-width:100%;object-fit:contain;border:1px solid #eee" />
+                                    <div class="text-muted small mt-1">Current mobile image</div>
+                                </div>
+                            }
+                            <input asp-for="MobileImageFile" type="file" class="form-control"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   onchange="previewFile(this,'mobileImgPreview','mobileImgWrap')" />
+                            <div id="mobileImgWrap" class="mt-2 d-none">
+                                <img id="mobileImgPreview" src="#" alt="Preview"
+                                     class="rounded-2" style="max-height:80px;max-width:100%;object-fit:contain" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video section -->
+                    <div id="section-Video" class="d-none">
+                        <div class="mb-3">
+                            <label asp-for="VideoFile" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.VideoFile)
+                                <span class="text-muted fw-normal small">(leave empty to keep current)</span>
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.VideoFileUrl))
+                            {
+                                <div class="mb-2 p-2 rounded-2 border d-flex align-items-center gap-2"
+                                     style="background:#f8f9fc">
+                                    <i class="bi bi-play-circle text-primary fs-5"></i>
+                                    <span class="small text-muted text-truncate">@Model.VideoFileUrl</span>
+                                </div>
+                            }
+                            <input asp-for="VideoFile" type="file" class="form-control" accept=".mp4,.webm,.mov" />
+                            <span asp-validation-for="VideoFile" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="VideoUrl" class="form-label small fw-semibold">
+                                Or Direct Video URL
+                            </label>
+                            <input asp-for="VideoUrl" class="form-control" placeholder="https://cdn.example.com/video.mp4" />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="MobileVideoFile" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.MobileVideoFile) <span class="text-muted fw-normal small">(optional)</span>
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.MobileVideoUrl))
+                            {
+                                <div class="mb-2 p-2 rounded-2 border d-flex align-items-center gap-2"
+                                     style="background:#f8f9fc">
+                                    <i class="bi bi-play-circle text-primary fs-5"></i>
+                                    <span class="small text-muted text-truncate">@Model.MobileVideoUrl</span>
+                                </div>
+                            }
+                            <input asp-for="MobileVideoFile" type="file" class="form-control" accept=".mp4,.webm,.mov" />
+                        </div>
+                        <div>
+                            <label class="form-label small fw-semibold">
+                                Fallback / Poster Image
+                                <span class="text-muted fw-normal small">(leave empty to keep current)</span>
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mb-2">
+                                    <img src="@Model.ImageUrl" alt="Current fallback"
+                                         class="rounded-2" style="max-height:80px;max-width:100%;object-fit:contain;border:1px solid #eee" />
+                                </div>
+                            }
+                            <input asp-for="ImageFile" type="file" class="form-control"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   onchange="previewFile(this,'videoFallbackPreview','videoFallbackWrap')" />
+                            <div id="videoFallbackWrap" class="mt-2 d-none">
+                                <img id="videoFallbackPreview" src="#" alt="Preview"
+                                     class="rounded-2" style="max-height:80px;max-width:100%;object-fit:contain" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- YouTube section -->
+                    <div id="section-YouTube" class="d-none">
+                        <div>
+                            <label asp-for="VideoUrl" class="form-label small fw-semibold">
+                                YouTube URL <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="VideoUrl" class="form-control"
+                                   placeholder="https://www.youtube.com/watch?v=..." />
+                            <span asp-validation-for="VideoUrl" class="text-danger small d-block mt-1"></span>
+                            <div class="text-muted small mt-1">Paste the full YouTube URL or a youtu.be short link.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Playback settings (Video/YouTube) -->
+            <div class="card border-0 shadow-sm rounded-3 @(mt == "Image" ? "d-none" : "")" id="playbackCard">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-sliders me-2 text-primary"></i>Playback Settings
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="row g-3">
+                        <div class="col-sm-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsAutoplay" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="IsAutoplay" class="form-check-label small fw-semibold"></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsMuted" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="IsMuted" class="form-check-label small fw-semibold"></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsLoop" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="IsLoop" class="form-check-label small fw-semibold"></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="ShowControls" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="ShowControls" class="form-check-label small fw-semibold"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right column: Appearance + Schedule + Save -->
+        <div class="col-lg-5">
+
+            <!-- Appearance -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-palette me-2 text-primary"></i>Appearance
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label asp-for="OverlayStyle" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.OverlayStyle)</label>
+                        <select asp-for="OverlayStyle" class="form-select">
+                            <option value="dark">Dark overlay (default)</option>
+                            <option value="light">Light overlay</option>
+                            <option value="gradient">Gradient overlay</option>
+                            <option value="none">No overlay</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TextPosition" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.TextPosition)</label>
+                        <select asp-for="TextPosition" class="form-select">
+                            <option value="left">Left (default)</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label asp-for="SlideDurationSeconds" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.SlideDurationSeconds)</label>
+                        <div class="input-group">
+                            <input asp-for="SlideDurationSeconds" type="number" class="form-control" min="3" max="20" />
+                            <span class="input-group-text">sec</span>
+                        </div>
+                        <span asp-validation-for="SlideDurationSeconds" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-calendar3 me-2 text-primary"></i>Schedule & Display
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.StartDate)</label>
+                            <input id="StartDate" name="StartDate" type="date" class="form-control" value="@startVal" />
+                            <span asp-validation-for="StartDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.EndDate)</label>
+                            <input id="EndDate" name="EndDate" type="date" class="form-control" value="@endVal" />
+                            <span asp-validation-for="EndDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="text-muted small mb-3">Leave blank to always display the banner.</div>
+                    <div class="mb-3">
+                        <label asp-for="DisplayOrder" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.DisplayOrder)</label>
+                        <input asp-for="DisplayOrder" type="number" class="form-control" min="0" max="9999" />
+                        <div class="text-muted small mt-1">Lower numbers appear first.</div>
+                        <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="IsActive" class="form-check-label small fw-semibold">Active</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save -->
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary"
+                                style="background:#2d4199;border-color:#2d4199">
+                            <i class="bi bi-check-lg me-1"></i>Save Changes
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    (function () {
+        const mediaInput = document.getElementById('MediaType');
+        const sections   = ['Image', 'Video', 'YouTube'];
+        const playback   = document.getElementById('playbackCard');
+
+        function showSection(type) {
+            sections.forEach(s => {
+                const el = document.getElementById('section-' + s);
+                if (el) el.classList.toggle('d-none', s !== type);
+            });
+            if (playback) playback.classList.toggle('d-none', type === 'Image');
+            sections.forEach(s => {
+                const b = document.getElementById('btn-' + s);
+                if (!b) return;
+                b.classList.remove('btn-primary', 'btn-danger', 'btn-dark', 'btn-outline-primary', 'btn-outline-danger', 'btn-outline-dark');
+                if (s === type) {
+                    if (s === 'YouTube') b.classList.add('btn-danger');
+                    else if (s === 'Video') b.classList.add('btn-dark');
+                    else b.classList.add('btn-primary');
+                } else {
+                    if (s === 'YouTube') b.classList.add('btn-outline-danger');
+                    else if (s === 'Video') b.classList.add('btn-outline-dark');
+                    else b.classList.add('btn-outline-primary');
+                }
+            });
+            mediaInput.value = type;
+        }
+
+        sections.forEach(s => {
+            const b = document.getElementById('btn-' + s);
+            if (b) b.addEventListener('click', () => showSection(s));
+        });
+
+        showSection(mediaInput.value || 'Image');
+    })();
+
+    function previewFile(input, imgId, wrapId) {
+        const wrap = document.getElementById(wrapId);
+        const img  = document.getElementById(imgId);
+        if (!wrap || !img) return;
+        if (input.files && input.files[0]) {
+            img.src = URL.createObjectURL(input.files[0]);
+            wrap.classList.remove('d-none');
+        } else {
+            wrap.classList.add('d-none');
+        }
+    }
+    </script>
+}

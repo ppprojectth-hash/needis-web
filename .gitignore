@@ -1,0 +1,35 @@
+# Build results
+bin/
+obj/
+
+# User/IDE files
+.vscode/
+*.user
+*.suo
+.DS_Store
+
+# Environment / secrets
+.env
+*.env
+appsettings.Production.json
+appsettings.Staging.json
+
+# Logs
+logs/
+*.log
+
+# Uploaded files - do not commit user uploaded files
+wwwroot/uploads/
+
+# Docker local data
+postgres_data/
+pgadmin_data/
+
+# Local development settings
+appsettings.Development.json
+
+# Local docker compose config with local passwords
+docker-compose.override.yml
+
+# Local docker compose only
+docker-compose.yml

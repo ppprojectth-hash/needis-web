@@ -1,0 +1,61 @@
+@model Needis.Web.ViewModels.Admin.AboutSectionItemViewModel
+@{
+    var section = ViewBag.Section as Needis.Web.Models.AboutSection;
+    ViewData["Title"] = "Add Section Item";
+}
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:700px">
+    <div class="card-body p-4">
+        <a asp-action="Items" asp-route-sectionId="@Model.AboutSectionId" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back to Items
+        </a>
+        <p class="text-muted small mb-3">Section: <strong>@(section?.TitleEN ?? section?.SectionKey)</strong></p>
+        <form asp-action="CreateItem" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="AboutSectionId" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="TitleEN" class="form-label fw-medium">Title EN</label>
+                    <input asp-for="TitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="TitleTH" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="DescriptionEN" class="form-label fw-medium">Description EN</label>
+                    <textarea asp-for="DescriptionEN" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="DescriptionTH" class="form-label fw-medium">Description TH</label>
+                    <textarea asp-for="DescriptionTH" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="IconUrl" class="form-label fw-medium">Icon (Bootstrap icon class)</label>
+                    <input asp-for="IconUrl" class="form-control" placeholder="e.g. bi bi-check-circle" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ImageFile" class="form-label fw-medium">Image</label>
+                    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" checked />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Items" asp-route-sectionId="@Model.AboutSectionId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

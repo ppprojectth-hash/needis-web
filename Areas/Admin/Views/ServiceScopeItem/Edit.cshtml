@@ -1,0 +1,75 @@
+@model Needis.Web.ViewModels.Admin.ServiceScopeItemViewModel
+@{
+    var detailSec = ViewBag.DetailSection as Needis.Web.Models.ServiceDetailSection;
+    var svc = detailSec?.Service;
+    ViewData["Title"] = "Edit Scope Item";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Service" asp-action="Index">Services</a></li>
+        <li class="breadcrumb-item">
+            <a asp-controller="ServiceDetailSection" asp-action="Index" asp-route-serviceId="@svc?.Id">
+                @(svc?.ServiceNameEN ?? "Service")
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-controller="ServiceScopeItem" asp-action="Index" asp-route-sectionId="@detailSec?.Id">
+                @(detailSec?.SectionTitleEN ?? "Section")
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Edit Item</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:680px">
+    <div class="card-body p-4">
+        <a asp-action="Index" asp-route-sectionId="@Model.ServiceDetailSectionId" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ServiceDetailSectionId" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="ItemTitleEN" class="form-label fw-medium">Title EN <span class="text-danger">*</span></label>
+                    <input asp-for="ItemTitleEN" class="form-control" />
+                    <span asp-validation-for="ItemTitleEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ItemTitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="ItemTitleTH" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="ItemDescriptionEN" class="form-label fw-medium">Description EN</label>
+                    <textarea asp-for="ItemDescriptionEN" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="ItemDescriptionTH" class="form-label fw-medium">Description TH</label>
+                    <textarea asp-for="ItemDescriptionTH" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="IconUrl" class="form-label fw-medium">Icon Class</label>
+                    <input asp-for="IconUrl" class="form-control" placeholder="e.g. bi bi-check-circle" />
+                    <div class="form-text">Bootstrap icon class</div>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" asp-route-sectionId="@Model.ServiceDetailSectionId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

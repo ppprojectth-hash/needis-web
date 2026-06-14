@@ -1,0 +1,432 @@
+@model AboutIndexViewModel
+@{
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+    ViewData["Title"] = lang == "th" ? "เกี่ยวกับเรา" : "About Us";
+}
+
+@* ── A. Hero ───────────────────────────────────────────────────────────────── *@
+<section class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark mb-2">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index">
+                        @(lang == "th" ? "หน้าหลัก" : "Home")
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">@(lang == "th" ? "เกี่ยวกับเรา" : "About Us")</li>
+            </ol>
+        </nav>
+        <h1 class="page-header-title">
+            @(lang == "th" ? "เกี่ยวกับ Needis" : "About Needis")
+        </h1>
+        <p class="page-header-subtitle">
+            @(lang == "th"
+                ? "พันธมิตรด้านเครื่องมือวัด เครื่องมือวิทยาศาสตร์ และบริการสนับสนุนทางเทคนิค"
+                : "Trusted partner for measuring tools, scientific instruments, and technical support.")
+        </p>
+    </div>
+</section>
+
+@* ── B. Stat Cards ────────────────────────────────────────────────────────── *@
+@if (Model.StatCards.Any())
+{
+    <section class="py-5" style="background:#f8f9fc">
+        <div class="container">
+            <div class="row g-4">
+                @foreach (var (card, i) in Model.StatCards.Select((c, idx) => (c, idx)))
+                {
+                    var delay = (i % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    <div class="col-6 col-lg-3 reveal @delay">
+                        <div class="about-stat-card">
+                            @if (!string.IsNullOrEmpty(card.IconUrl))
+                            {
+                                <i class="@card.IconUrl about-stat-icon"></i>
+                            }
+                            <div class="about-stat-value">@card.DisplayValue</div>
+                            <div class="about-stat-label">@card.Label</div>
+                            @if (!string.IsNullOrEmpty(card.Description))
+                            {
+                                <p class="about-stat-desc">@card.Description</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── C. About Sections ────────────────────────────────────────────────────── *@
+@foreach (var (section, sIdx) in Model.Sections.Select((s, i) => (s, i)))
+{
+    var sTitle    = L(section.TitleTH,       section.TitleEN);
+    var sSubtitle = L(section.SubtitleTH,    section.SubtitleEN);
+    var sDesc     = L(section.DescriptionTH, section.DescriptionEN);
+    var sImageUrl = section.ImageUrl;
+    var sItems    = section.Items;
+    var layout    = section.LayoutType ?? "text_right";
+    var bgClass   = sIdx % 2 == 0 ? "bg-white" : "";
+    var bgStyle   = sIdx % 2 != 0 ? "background:#f8f9fc" : "";
+
+    <section class="about-section py-5 @bgClass" style="@bgStyle">
+        <div class="container">
+
+            @* Cards / grid layout *@
+            @if (layout is "cards" or "card_grid")
+            {
+                <div class="text-center mb-5 reveal">
+                    @if (!string.IsNullOrEmpty(sTitle))
+                    {
+                        <p class="section-eyebrow">@sTitle</p>
+                    }
+                    @if (!string.IsNullOrEmpty(sSubtitle))
+                    {
+                        <h2 class="section-title">@sSubtitle</h2>
+                    }
+                    @if (!string.IsNullOrEmpty(sDesc))
+                    {
+                        <p class="section-subtitle">@sDesc</p>
+                    }
+                </div>
+                @if (sItems.Any())
+                {
+                    <div class="row g-4">
+                        @foreach (var (item, iIdx) in sItems.Select((x, j) => (x, j)))
+                        {
+                            var iDelay = (iIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                            <div class="col-md-6 col-lg-3 reveal @iDelay">
+                                <div class="about-item-card">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@L(item.TitleTH, item.TitleEN)"
+                                             style="max-height:72px;object-fit:contain;margin-bottom:.75rem" />
+                                    }
+                                    else if (!string.IsNullOrEmpty(item.IconUrl))
+                                    {
+                                        <i class="@item.IconUrl about-item-icon"></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(L(item.TitleTH, item.TitleEN)))
+                                    {
+                                        <h6 class="fw-bold mb-2" style="color:#1a2b6b">@L(item.TitleTH, item.TitleEN)</h6>
+                                    }
+                                    @if (!string.IsNullOrEmpty(L(item.DescriptionTH, item.DescriptionEN)))
+                                    {
+                                        <p class="text-muted small mb-0">@L(item.DescriptionTH, item.DescriptionEN)</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+            @* Text-center layout *@
+            else if (layout == "text_center")
+            {
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center reveal">
+                        @if (!string.IsNullOrEmpty(sTitle))
+                        {
+                            <p class="section-eyebrow">@sTitle</p>
+                        }
+                        @if (!string.IsNullOrEmpty(sSubtitle))
+                        {
+                            <h2 class="section-title">@sSubtitle</h2>
+                        }
+                        @if (!string.IsNullOrEmpty(sImageUrl))
+                        {
+                            <img src="@sImageUrl" alt="@sTitle" class="about-section-img my-4" />
+                        }
+                        @if (!string.IsNullOrEmpty(sDesc))
+                        {
+                            <p class="text-muted lh-lg">@sDesc</p>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* Image-left / Image-right two-column layout *@
+            else
+            {
+                var imgLeft = layout == "text_right" || layout == "image_left";
+                <div class="row align-items-center g-5">
+                    @if (imgLeft && !string.IsNullOrEmpty(sImageUrl))
+                    {
+                        <div class="col-lg-5 reveal">
+                            <img src="@sImageUrl" alt="@sTitle" class="about-section-img w-100" />
+                        </div>
+                        <div class="col-lg-7 reveal reveal-delay-1">
+                            @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
+                            @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <p class="text-muted lh-lg">@sDesc</p> }
+                        </div>
+                    }
+                    else if (!imgLeft && !string.IsNullOrEmpty(sImageUrl))
+                    {
+                        <div class="col-lg-7 reveal">
+                            @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
+                            @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <p class="text-muted lh-lg">@sDesc</p> }
+                        </div>
+                        <div class="col-lg-5 reveal reveal-delay-1">
+                            <img src="@sImageUrl" alt="@sTitle" class="about-section-img w-100" />
+                        </div>
+                    }
+                    else
+                    {
+                        @* No image — full width text + optional items *@
+                        <div class="col-lg-7 reveal">
+                            @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
+                            @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <p class="text-muted lh-lg">@sDesc</p> }
+                        </div>
+                        @if (sItems.Any())
+                        {
+                            <div class="col-lg-5 reveal reveal-delay-1">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var item in sItems)
+                                    {
+                                        <li class="d-flex gap-3 mb-3">
+                                            @if (!string.IsNullOrEmpty(item.IconUrl))
+                                            {
+                                                <i class="@item.IconUrl text-primary fs-5 flex-shrink-0 mt-1" style="color:var(--needis-primary)!important"></i>
+                                            }
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(L(item.TitleTH, item.TitleEN)))
+                                                {
+                                                    <div class="fw-semibold">@L(item.TitleTH, item.TitleEN)</div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(L(item.DescriptionTH, item.DescriptionEN)))
+                                                {
+                                                    <div class="text-muted small">@L(item.DescriptionTH, item.DescriptionEN)</div>
+                                                }
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            @* placeholder icon when no image and no items *@
+                            <div class="col-lg-5 reveal reveal-delay-1">
+                                <div class="about-section-img-placeholder">
+                                    <i class="bi bi-building"></i>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@* ── D. Brand Partners ────────────────────────────────────────────────────── *@
+@if (Model.BrandPartners.Any())
+{
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-eyebrow">
+                    @(lang == "th" ? "พาร์ทเนอร์ของเรา" : "Our Partners")
+                </p>
+                <h2 class="section-title">
+                    @(lang == "th" ? "พาร์ทเนอร์แบรนด์ของเรา" : "Our Brand Partners")
+                </h2>
+                <p class="section-subtitle">
+                    @(lang == "th"
+                        ? "เราเป็นตัวแทนจำหน่ายแบรนด์เครื่องมือวัดชั้นนำระดับโลก"
+                        : "We represent world-class measurement instrument brands you can trust.")
+                </p>
+            </div>
+            <div class="row g-3">
+                @foreach (var (brand, bIdx) in Model.BrandPartners.Select((b, i) => (b, i)))
+                {
+                    var bDelay = (bIdx % 6) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    <div class="col-6 col-md-4 col-lg-2 reveal @bDelay">
+                        @if (!string.IsNullOrEmpty(brand.WebsiteUrl))
+                        {
+                            <a href="@brand.WebsiteUrl" target="_blank" rel="noopener"
+                               class="brand-partner-card d-block">
+                                @if (!string.IsNullOrEmpty(brand.LogoUrl))
+                                {
+                                    <img src="@brand.LogoUrl" alt="@brand.BrandName" class="brand-partner-logo" />
+                                }
+                                else
+                                {
+                                    <span class="brand-name-text">@brand.BrandName</span>
+                                }
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="brand-partner-card">
+                                @if (!string.IsNullOrEmpty(brand.LogoUrl))
+                                {
+                                    <img src="@brand.LogoUrl" alt="@brand.BrandName" class="brand-partner-logo" />
+                                }
+                                else
+                                {
+                                    <span class="brand-name-text">@brand.BrandName</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── E. Company History Timeline ──────────────────────────────────────────── *@
+@if (Model.Histories.Any())
+{
+    <section class="py-5" style="background:#f8f9fc">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-eyebrow">
+                    @(lang == "th" ? "ก้าวสำคัญของเรา" : "Our Journey")
+                </p>
+                <h2 class="section-title">
+                    @(lang == "th" ? "ประวัติบริษัท" : "Company History")
+                </h2>
+            </div>
+
+            <div class="about-timeline">
+                @foreach (var (h, hIdx) in Model.Histories.Select((x, i) => (x, i)))
+                {
+                    var hTitle = L(h.TitleTH, h.TitleEN);
+                    var hDesc  = L(h.DescriptionTH, h.DescriptionEN);
+                    var isLeft = h.Position != "right";
+                    var hDelay = hIdx % 2 == 0 ? "" : "reveal-delay-1";
+
+                    <div class="row timeline-row align-items-start mb-4 reveal @hDelay">
+                        @* Left content *@
+                        <div class="col-lg-5 timeline-content-left @(isLeft ? "" : "timeline-spacer d-none d-lg-block")">
+                            @if (isLeft)
+                            {
+                                <div class="timeline-card">
+                                    <h6 class="fw-bold mb-1" style="color:#1a2b6b">@hTitle</h6>
+                                    @if (!string.IsNullOrEmpty(hDesc))
+                                    {
+                                        <p class="text-muted small mb-0 lh-lg">@hDesc</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @* Center year badge *@
+                        <div class="col-lg-2 timeline-year-col">
+                            <div class="timeline-year-badge">@h.Year</div>
+                        </div>
+
+                        @* Right content *@
+                        <div class="col-lg-5 timeline-content-right @(!isLeft ? "" : "d-none d-lg-block")">
+                            @if (!isLeft)
+                            {
+                                <div class="timeline-card">
+                                    <h6 class="fw-bold mb-1" style="color:#1a2b6b">@hTitle</h6>
+                                    @if (!string.IsNullOrEmpty(hDesc))
+                                    {
+                                        <p class="text-muted small mb-0 lh-lg">@hDesc</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── F. Public Staff Profiles ─────────────────────────────────────────────── *@
+@if (Model.PublicStaffProfiles.Any())
+{
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-eyebrow">
+                    @(lang == "th" ? "ทีมงานของเรา" : "Meet the Team")
+                </p>
+                <h2 class="section-title">
+                    @(lang == "th" ? "ทีมผู้เชี่ยวชาญของเรา" : "Our Expert Team")
+                </h2>
+                <p class="section-subtitle">
+                    @(lang == "th"
+                        ? "ผู้เชี่ยวชาญด้านเทคนิคที่พร้อมให้คำปรึกษาและสนับสนุนคุณ"
+                        : "Technical specialists ready to advise and support your instrumentation needs.")
+                </p>
+            </div>
+            <div class="row g-4">
+                @foreach (var (staff, sIdx) in Model.PublicStaffProfiles.Select((s, i) => (s, i)))
+                {
+                    var sDelay = (sIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    <div class="col-6 col-md-4 col-lg-3 reveal @sDelay">
+                        <div class="staff-card">
+                            @if (!string.IsNullOrEmpty(staff.ProfileImageUrl))
+                            {
+                                <img src="@staff.ProfileImageUrl"
+                                     alt="@(lang == "th" ? staff.FullNameTH : staff.FullNameEN)"
+                                     class="staff-photo mx-auto d-block" />
+                            }
+                            else
+                            {
+                                <div class="staff-photo-placeholder">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                            }
+                            <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                @(lang == "th" ? (staff.FullNameTH ?? staff.FullNameEN) : (staff.FullNameEN ?? staff.FullNameTH))
+                            </h6>
+                            @if (!string.IsNullOrEmpty(lang == "th" ? staff.PositionTH : staff.PositionEN))
+                            {
+                                <p class="text-muted small mb-1">
+                                    @(lang == "th" ? staff.PositionTH : staff.PositionEN)
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(staff.Department))
+                            {
+                                <p class="small mb-0" style="color:var(--needis-primary)">@staff.Department</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── G. CTA Section ───────────────────────────────────────────────────────── *@
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8 reveal">
+                <h2 class="text-white fw-bold mb-2">
+                    @(lang == "th"
+                        ? "ต้องการคำแนะนำในการเลือกเครื่องมือที่เหมาะสม?"
+                        : "Need help choosing the right instrument?")
+                </h2>
+                <p class="text-white-50 mb-0">
+                    @(lang == "th"
+                        ? "ทีมผู้เชี่ยวชาญของเราพร้อมให้คำปรึกษาและช่วยคุณเลือกเครื่องมือที่ตอบโจทย์"
+                        : "Our specialists are ready to advise you and help select the instruments that best fit your needs.")
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end reveal reveal-delay-1">
+                <a asp-controller="Contact" asp-action="Index"
+                   class="btn btn-light btn-lg px-4 me-2">
+                    <i class="bi bi-chat-dots me-1"></i>
+                    @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                </a>
+                <a asp-controller="Product" asp-action="Index"
+                   class="btn btn-outline-light btn-lg px-4">
+                    @(lang == "th" ? "ดูสินค้า" : "View Products")
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

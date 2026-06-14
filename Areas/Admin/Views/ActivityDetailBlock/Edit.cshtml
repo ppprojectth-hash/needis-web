@@ -1,0 +1,111 @@
+@model Needis.Web.ViewModels.Admin.ActivityDetailBlockViewModel
+@{
+    var activity = ViewBag.Activity as Needis.Web.Models.Activity;
+    var blockTypes = ViewBag.BlockTypes as string[] ?? Array.Empty<string>();
+    ViewData["Title"] = "Edit Detail Block";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Activity" asp-action="Index">Activities</a></li>
+        <li class="breadcrumb-item">
+            <a asp-action="Index" asp-route-activityId="@activity?.Id">@(activity?.ActivityTitleEN ?? "Activity")</a>
+        </li>
+        <li class="breadcrumb-item active">Edit Block</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:800px">
+    <div class="card-body p-4">
+        <a asp-action="Index" asp-route-activityId="@Model.ActivityId" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ActivityId" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="BlockType" class="form-label fw-medium">Block Type <span class="text-danger">*</span></label>
+                    <select asp-for="BlockType" class="form-select">
+                        @foreach (var bt in blockTypes)
+                        {
+                            <option value="@bt" selected="@(Model.BlockType == bt ? "selected" : null)">@bt</option>
+                        }
+                    </select>
+                    <span asp-validation-for="BlockType" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="BlockTitleEN" class="form-label fw-medium">Title EN</label>
+                    <input asp-for="BlockTitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="BlockTitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="BlockTitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="BlockSubtitleEN" class="form-label fw-medium">Subtitle EN</label>
+                    <input asp-for="BlockSubtitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="BlockSubtitleTH" class="form-label fw-medium">Subtitle TH</label>
+                    <input asp-for="BlockSubtitleTH" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="BlockContentEN" class="form-label fw-medium">Content EN</label>
+                    <textarea asp-for="BlockContentEN" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="BlockContentTH" class="form-label fw-medium">Content TH</label>
+                    <textarea asp-for="BlockContentTH" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Block Image</label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.ExistingImageUrl" alt="Block image" class="img-thumbnail" style="max-height:100px" />
+                        </div>
+                    }
+                    <input asp-for="BlockImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div class="form-text">Max 3 MB. Leave empty to keep current.</div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="VideoUrl" class="form-label fw-medium">Video URL</label>
+                    <input asp-for="VideoUrl" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ButtonTextEN" class="form-label fw-medium">Button Text EN</label>
+                    <input asp-for="ButtonTextEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ButtonTextTH" class="form-label fw-medium">Button Text TH</label>
+                    <input asp-for="ButtonTextTH" class="form-control" />
+                </div>
+                <div class="col-md-8">
+                    <label asp-for="ButtonUrl" class="form-label fw-medium">Button URL</label>
+                    <input asp-for="ButtonUrl" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="LayoutType" class="form-label fw-medium">Layout Type</label>
+                    <input asp-for="LayoutType" class="form-control" />
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" asp-route-activityId="@Model.ActivityId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

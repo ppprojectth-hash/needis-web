@@ -1,0 +1,363 @@
+@model ServiceDetailViewModel
+@{
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+
+    var svc        = Model.Service;
+    var bannerUrl  = svc.BannerImageUrl ?? svc.CoverImageUrl;
+    var heroTitle  = L(svc.DetailTitleTH,    svc.DetailTitleEN)    is { Length: > 0 } dt ? dt : L(svc.ServiceNameTH, svc.ServiceNameEN);
+    var heroSubtitle = L(svc.DetailSubtitleTH, svc.DetailSubtitleEN) is { Length: > 0 } ds ? ds : L(svc.ShortDescriptionTH, svc.ShortDescriptionEN);
+    var fullDesc   = L(svc.FullDescriptionTH, svc.FullDescriptionEN);
+    var shortDesc  = L(svc.ShortDescriptionTH, svc.ShortDescriptionEN);
+
+    ViewData["Title"] = L(svc.ServiceNameTH, svc.ServiceNameEN);
+}
+
+@* ── A. Detail Banner ─────────────────────────────────────────────────────── *@
+<div class="service-banner">
+    @if (!string.IsNullOrEmpty(bannerUrl))
+    {
+        <img src="@bannerUrl" alt="@heroTitle" class="service-banner-bg" />
+    }
+    <div class="service-banner-overlay"></div>
+    <div class="service-banner-content">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb breadcrumb-dark mb-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Home" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "หน้าหลัก" : "Home")
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Services" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "บริการ" : "Services")
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">@heroTitle</li>
+                </ol>
+            </nav>
+            @if (!string.IsNullOrEmpty(svc.IconUrl))
+            {
+                <div class="mb-3">
+                    <span class="badge px-3 py-2" style="background:rgba(255,255,255,.15);font-size:.85rem">
+                        <i class="@svc.IconUrl me-1"></i>
+                        @(lang == "th" ? "บริการของเรา" : "Our Service")
+                    </span>
+                </div>
+            }
+            <h1 class="fw-bold text-white mb-2" style="font-size:clamp(1.6rem,4vw,2.75rem)">@heroTitle</h1>
+            @if (!string.IsNullOrEmpty(heroSubtitle))
+            {
+                <p class="mb-0 lh-lg" style="color:rgba(255,255,255,.8);max-width:600px">@heroSubtitle</p>
+            }
+        </div>
+    </div>
+</div>
+
+@* ── B. Main Content (two-column on desktop) ───────────────────────────────── *@
+<div class="container py-5">
+    <div class="row g-5">
+
+        @* ── Left / Main column ── *@
+        <div class="col-lg-8">
+
+            @* Back link *@
+            <a asp-controller="Services" asp-action="Index"
+               class="btn btn-sm btn-outline-secondary mb-4">
+                <i class="bi bi-arrow-left me-1"></i>
+                @(lang == "th" ? "กลับไปหน้าบริการ" : "Back to Services")
+            </a>
+
+            @* ── C. Full/Short Description ── *@
+            @if (!string.IsNullOrEmpty(fullDesc) || !string.IsNullOrEmpty(shortDesc))
+            {
+                <div class="service-detail-section reveal">
+                    <p class="text-muted lh-lg" style="white-space:pre-line">
+                        @(string.IsNullOrEmpty(fullDesc) ? shortDesc : fullDesc)
+                    </p>
+                </div>
+            }
+
+            @* ── D. Dynamic Detail Sections ── *@
+            @foreach (var (detailSec, dsIdx) in Model.DetailSections.Select((ds, i) => (ds, i)))
+            {
+                var secTitle    = L(detailSec.SectionTitleTH,       detailSec.SectionTitleEN);
+                var secSubtitle = L(detailSec.SectionSubtitleTH,    detailSec.SectionSubtitleEN);
+                var secDesc     = L(detailSec.SectionDescriptionTH, detailSec.SectionDescriptionEN);
+                var secImgUrl   = detailSec.SectionImageUrl;
+                var secItems    = detailSec.ScopeItems;
+                var layoutType  = detailSec.LayoutType ?? "text";
+                var dsDelay     = dsIdx % 2 == 0 ? "" : "reveal-delay-1";
+
+                <div class="service-detail-section reveal @dsDelay">
+
+                    @if (!string.IsNullOrEmpty(secTitle))
+                    {
+                        <h4 class="fw-bold mb-2" style="color:#1a2b6b">@secTitle</h4>
+                    }
+                    @if (!string.IsNullOrEmpty(secSubtitle))
+                    {
+                        <p class="text-muted fw-semibold mb-2">@secSubtitle</p>
+                    }
+
+                    @* image_text layout: image beside description *@
+                    @if (layoutType == "image_text" && !string.IsNullOrEmpty(secImgUrl))
+                    {
+                        <div class="row g-4 align-items-center mb-3">
+                            <div class="col-md-5">
+                                <img src="@secImgUrl" alt="@secTitle" class="service-section-img" />
+                            </div>
+                            <div class="col-md-7">
+                                @if (!string.IsNullOrEmpty(secDesc))
+                                {
+                                    <p class="text-muted lh-lg mb-0">@secDesc</p>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Standard image above description *@
+                        @if (!string.IsNullOrEmpty(secImgUrl))
+                        {
+                            <img src="@secImgUrl" alt="@secTitle" class="service-section-img mb-3" />
+                        }
+                        @if (!string.IsNullOrEmpty(secDesc))
+                        {
+                            <p class="text-muted lh-lg mb-3">@secDesc</p>
+                        }
+                    }
+
+                    @* Scope / bullet items *@
+                    @if (secItems.Any())
+                    {
+                        @if (layoutType == "card")
+                        {
+                            <div class="row g-3">
+                                @foreach (var item in secItems)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="service-scope-item">
+                                            @if (!string.IsNullOrEmpty(item.IconUrl))
+                                            {
+                                                <i class="@item.IconUrl service-scope-icon"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-check-circle-fill service-scope-icon"></i>
+                                            }
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(L(item.ItemTitleTH, item.ItemTitleEN)))
+                                                {
+                                                    <div class="fw-semibold small">@L(item.ItemTitleTH, item.ItemTitleEN)</div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(L(item.ItemDescriptionTH, item.ItemDescriptionEN)))
+                                                {
+                                                    <div class="text-muted" style="font-size:.8rem">@L(item.ItemDescriptionTH, item.ItemDescriptionEN)</div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            @* bullet / text / default: vertical list *@
+                            <div>
+                                @foreach (var item in secItems)
+                                {
+                                    <div class="service-scope-item">
+                                        @if (!string.IsNullOrEmpty(item.IconUrl))
+                                        {
+                                            <i class="@item.IconUrl service-scope-icon"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-check-circle-fill service-scope-icon"></i>
+                                        }
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(L(item.ItemTitleTH, item.ItemTitleEN)))
+                                            {
+                                                <div class="fw-semibold small">@L(item.ItemTitleTH, item.ItemTitleEN)</div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(L(item.ItemDescriptionTH, item.ItemDescriptionEN)))
+                                            {
+                                                <div class="text-muted" style="font-size:.8rem">@L(item.ItemDescriptionTH, item.ItemDescriptionEN)</div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+
+        @* ── Right / Sidebar column ── *@
+        <div class="col-lg-4">
+            @* ── E. Contact Cards ── *@
+            @if (Model.ContactCards.Any())
+            {
+                @foreach (var card in Model.ContactCards)
+                {
+                    var cardTitle = L(card.TitleTH, card.TitleEN);
+                    var cardDesc  = L(card.DescriptionTH, card.DescriptionEN);
+                    var primText  = L(card.PrimaryButtonTextTH, card.PrimaryButtonTextEN);
+                    var secText   = L(card.SecondaryButtonTextTH, card.SecondaryButtonTextEN);
+                    var primUrl   = string.IsNullOrEmpty(card.PrimaryButtonUrl) ? "/Contact" : card.PrimaryButtonUrl;
+                    var svcQuoteUrl = $"/Quotation/Create?serviceSlug={svc.ServiceSlug}";
+                    var secUrl = string.IsNullOrEmpty(card.SecondaryButtonUrl) || card.SecondaryButtonUrl == "/Quotation/Create"
+                        ? svcQuoteUrl
+                        : card.SecondaryButtonUrl;
+                    var ctLabel   = L(card.ContactLabelTH, card.ContactLabelEN);
+
+                    <div class="service-contact-card reveal">
+                        @if (!string.IsNullOrEmpty(cardTitle))
+                        {
+                            <h5 class="fw-bold mb-2" style="color:#1a2b6b">@cardTitle</h5>
+                        }
+                        @if (!string.IsNullOrEmpty(cardDesc))
+                        {
+                            <p class="text-muted small mb-3 lh-lg">@cardDesc</p>
+                        }
+                        @if (!string.IsNullOrEmpty(primText))
+                        {
+                            <a href="@primUrl" class="btn btn-primary w-100 mb-2"
+                               style="background:#2d4199;border-color:#2d4199">
+                                @primText
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(secText))
+                        {
+                            <a href="@secUrl" class="btn btn-outline-primary w-100 mb-3"
+                               style="color:#2d4199;border-color:#2d4199">
+                                @secText
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(card.ContactValue))
+                        {
+                            <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                                @if (!string.IsNullOrEmpty(card.ContactIconUrl))
+                                {
+                                    <i class="@card.ContactIconUrl" style="color:#2d4199;font-size:1.1rem"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-telephone-fill" style="color:#2d4199"></i>
+                                }
+                                <div>
+                                    @if (!string.IsNullOrEmpty(ctLabel))
+                                    {
+                                        <div class="contact-label">@ctLabel</div>
+                                    }
+                                    <div class="fw-semibold small" style="color:#1a2b6b">@card.ContactValue</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                @* Default CTA sidebar when no contact cards are configured *@
+                <div class="service-contact-card reveal">
+                    <h5 class="fw-bold mb-2" style="color:#1a2b6b">
+                        @(lang == "th" ? "ต้องการบริการนี้?" : "Need this service?")
+                    </h5>
+                    <p class="text-muted small mb-3">
+                        @(lang == "th"
+                            ? "ติดต่อทีมผู้เชี่ยวชาญของเราเพื่อรับข้อมูลและใบเสนอราคา"
+                            : "Contact our specialist team for information and a quotation.")
+                    </p>
+                    <a asp-controller="Contact" asp-action="Index"
+                       class="btn btn-primary w-100 mb-2"
+                       style="background:#2d4199;border-color:#2d4199">
+                        @(lang == "th" ? "ติดต่อทีมสนับสนุน" : "Contact Support")
+                    </a>
+                    <a href="@($"/Quotation/Create?serviceSlug={svc.ServiceSlug}")"
+                       class="btn btn-outline-primary w-100 mb-2"
+                       style="color:#2d4199;border-color:#2d4199">
+                        @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
+                    </a>
+                    @* Add to Quote Cart *@
+                    <form asp-controller="QuotationCart" asp-action="AddService" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="serviceId" value="@svc.Id" />
+                        <input type="hidden" name="quantity" value="1" />
+                        <input type="hidden" name="returnUrl" value="/Services/Detail/@svc.ServiceSlug" />
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-cart-plus me-1"></i>
+                            @(lang == "th" ? "เพิ่มบริการในรายการขอราคา" : "Add Service to Quote")
+                        </button>
+                    </form>
+                    <div class="mt-2 text-center">
+                        <a asp-controller="QuotationCart" asp-action="Index"
+                           class="small text-decoration-none" style="color:#2d4199">
+                            <i class="bi bi-cart3 me-1"></i>
+                            @(lang == "th" ? "ดูรายการขอใบเสนอราคา" : "View Quote Cart")
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* ── F. Related Services ───────────────────────────────────────────────────── *@
+@if (Model.RelatedServices.Any())
+{
+    <section class="py-5" style="background:#f8f9fc">
+        <div class="container">
+            <h4 class="fw-bold mb-4 reveal" style="color:#1a2b6b">
+                @(lang == "th" ? "บริการอื่น ๆ ที่เกี่ยวข้อง" : "Related Services")
+            </h4>
+            <div class="row g-4">
+                @foreach (var (rel, ri) in Model.RelatedServices.Select((r, i) => (r, i)))
+                {
+                    var rDelay = (ri % 3) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+                    <div class="col-md-4 reveal @rDelay">
+                        <div class="service-related-card card shadow-sm">
+                            @if (!string.IsNullOrEmpty(rel.CoverImageUrl))
+                            {
+                                <img src="@rel.CoverImageUrl"
+                                     alt="@L(rel.ServiceNameTH, rel.ServiceNameEN)"
+                                     class="card-img-top"
+                                     style="height:140px;object-fit:cover" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center"
+                                     style="height:140px;background:linear-gradient(135deg,#e8ecf8 0%,#c5cde8 100%)">
+                                    <i class="bi bi-tools fs-2 text-muted"></i>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                    @L(rel.ServiceNameTH, rel.ServiceNameEN)
+                                </h6>
+                                @if (!string.IsNullOrEmpty(L(rel.ShortDescriptionTH, rel.ShortDescriptionEN)))
+                                {
+                                    <p class="small text-muted mb-2">
+                                        @(L(rel.ShortDescriptionTH, rel.ShortDescriptionEN) is { Length: > 70 } sd
+                                            ? sd[..70] + "…"
+                                            : L(rel.ShortDescriptionTH, rel.ShortDescriptionEN))
+                                    </p>
+                                }
+                                <a asp-controller="Services" asp-action="Detail"
+                                   asp-route-slug="@rel.ServiceSlug"
+                                   class="btn btn-sm btn-outline-primary"
+                                   style="color:#2d4199;border-color:#2d4199">
+                                    @(lang == "th" ? "ดูรายละเอียด" : "Learn More")
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

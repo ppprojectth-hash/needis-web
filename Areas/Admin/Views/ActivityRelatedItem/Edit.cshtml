@@ -1,0 +1,59 @@
+@model Needis.Web.ViewModels.Admin.ActivityRelatedItemViewModel
+@{
+    var activity = ViewBag.Activity as Needis.Web.Models.Activity;
+    var activities = ViewBag.Activities as List<Needis.Web.Models.Activity> ?? new();
+    ViewData["Title"] = "Edit Related Activity";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Activity" asp-action="Index">Activities</a></li>
+        <li class="breadcrumb-item">
+            <a asp-action="Index" asp-route-activityId="@activity?.Id">@(activity?.ActivityTitleEN ?? "Activity")</a>
+        </li>
+        <li class="breadcrumb-item active">Edit Related</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:540px">
+    <div class="card-body p-4">
+        <a asp-action="Index" asp-route-activityId="@Model.ActivityId" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ActivityId" />
+            <div class="row g-3">
+                <div class="col-12">
+                    <label asp-for="RelatedActivityId" class="form-label fw-medium">Related Activity <span class="text-danger">*</span></label>
+                    <select asp-for="RelatedActivityId" class="form-select">
+                        <option value="">— Select activity —</option>
+                        @foreach (var a in activities)
+                        {
+                            <option value="@a.Id" selected="@(Model.RelatedActivityId == a.Id ? "selected" : null)">
+                                @a.ActivityTitleEN
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="RelatedActivityId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" asp-route-activityId="@Model.ActivityId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

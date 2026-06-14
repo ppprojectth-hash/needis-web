@@ -1,0 +1,895 @@
+@model HomeIndexViewModel
+@using Needis.Web.ViewModels.Home
+@{
+    ViewData["Title"] = "Home";
+    ViewData["FullWidth"] = true;
+
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+
+    // Default service icons by position
+    string[] svcIcons = ["bi-tools", "bi-shield-check", "bi-graph-up-arrow", "bi-headset"];
+
+    // Helper: extract YouTube video ID from various URL formats
+    string GetYouTubeId(string? url)
+    {
+        if (string.IsNullOrEmpty(url)) return "";
+        var u = url.Trim();
+        // youtu.be/ID
+        var idx = u.IndexOf("youtu.be/", StringComparison.OrdinalIgnoreCase);
+        if (idx >= 0) { var id = u[(idx + 9)..]; var q = id.IndexOf('?'); return q >= 0 ? id[..q] : id; }
+        // youtube.com/watch?v=ID
+        idx = u.IndexOf("v=", StringComparison.OrdinalIgnoreCase);
+        if (idx >= 0) { var id = u[(idx + 2)..]; var q = id.IndexOf('&'); return q >= 0 ? id[..q] : id; }
+        // youtube.com/embed/ID
+        idx = u.IndexOf("/embed/", StringComparison.OrdinalIgnoreCase);
+        if (idx >= 0) { var id = u[(idx + 7)..]; var q = id.IndexOf('?'); return q >= 0 ? id[..q] : id; }
+        return "";
+    }
+}
+
+@* ══════════════════════════════════════════════════════════════
+   1. HERO — carousel with Image / Video / YouTube support
+   ══════════════════════════════════════════════════════════════ *@
+@if (Model.Banners.Any())
+{
+    var hasManySlides = Model.Banners.Count > 1;
+    <section class="hero-section-v2" id="home-hero">
+        <div id="heroCarousel" class="carousel slide"
+             @(hasManySlides ? "data-bs-ride=\"carousel\"" : "")>
+
+            @* Indicators *@
+            @if (hasManySlides)
+            {
+                <div class="carousel-indicators hero-carousel-indicators">
+                    @for (var i = 0; i < Model.Banners.Count; i++)
+                    {
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i"
+                                class="@(i == 0 ? "active" : "")"
+                                aria-current="@(i == 0 ? "true" : "false")"
+                                aria-label="Slide @(i + 1)"></button>
+                    }
+                </div>
+            }
+
+            <div class="carousel-inner">
+                @for (var bIdx = 0; bIdx < Model.Banners.Count; bIdx++)
+                {
+                    var b  = Model.Banners[bIdx];
+                    var mt = string.IsNullOrEmpty(b.MediaType) ? "Image" : b.MediaType;
+                    var bTitle    = L(b.TitleTH,    b.TitleEN);
+                    var bSubtitle = L(b.SubtitleTH, b.SubtitleEN);
+                    var bBtnText  = L(b.ButtonTextTH, b.ButtonTextEN);
+                    var bBtnUrl   = string.IsNullOrEmpty(b.ButtonUrl) ? "/Product" : b.ButtonUrl;
+                    var textAlign = b.TextPosition switch { "center" => "text-center", "right" => "text-end", _ => "" };
+                    var contentCol = mt == "YouTube" ? "col-lg-5" : "col-lg-7 col-xl-6";
+                    var ytId      = mt == "YouTube" ? GetYouTubeId(b.VideoUrl) : "";
+                    var overlayClass = b.OverlayStyle switch
+                    {
+                        "light"    => "hero-overlay-light",
+                        "gradient" => "hero-overlay-gradient",
+                        "none"     => "",
+                        _          => "hero-overlay-dark",
+                    };
+                    var interval = b.SlideDurationSeconds * 1000;
+
+                    <div class="carousel-item @(bIdx == 0 ? "active" : "")"
+                         data-bs-interval="@interval" data-media-type="@mt" data-slide-idx="@bIdx">
+
+                        <div class="hero-slide-wrapper">
+
+                            @* ── Background media ─────────────────────────── *@
+                            @if (mt == "Video")
+                            {
+                                var videoSrc = !string.IsNullOrEmpty(b.VideoFileUrl) ? b.VideoFileUrl : b.VideoUrl;
+                                <video class="hero-slide-bg-video"
+                                       data-slide-video="@bIdx"
+                                       @(b.IsAutoplay ? "autoplay" : "")
+                                       @(b.IsMuted    ? "muted"    : "")
+                                       @(b.IsLoop     ? "loop"     : "")
+                                       @(b.ShowControls ? "controls" : "")
+                                       playsinline
+                                       poster="@(b.ImagePath ?? "")">
+                                    @if (!string.IsNullOrEmpty(videoSrc))
+                                    {
+                                        var ext = System.IO.Path.GetExtension(videoSrc ?? "").ToLowerInvariant();
+                                        var mime = ext == ".webm" ? "video/webm" : ext == ".mov" ? "video/quicktime" : "video/mp4";
+                                        <source src="@videoSrc" type="@mime" />
+                                    }
+                                </video>
+                            }
+                            else if (mt == "YouTube")
+                            {
+                                @* YouTube: no background — iframe shown in content column *@
+                            }
+                            else
+                            {
+                                @* Image banner *@
+                                @if (!string.IsNullOrEmpty(b.ImagePath))
+                                {
+                                    <picture>
+                                        @if (!string.IsNullOrEmpty(b.MobileImageUrl))
+                                        {
+                                            <source media="(max-width:767px)" srcset="@b.MobileImageUrl" />
+                                        }
+                                        <img src="@b.ImagePath" alt="@bTitle" class="hero-slide-bg-img" />
+                                    </picture>
+                                }
+                                else
+                                {
+                                    <div class="hero-slide-bg-placeholder"></div>
+                                }
+                            }
+
+                            @* ── Overlay ──────────────────────────────────── *@
+                            @if (!string.IsNullOrEmpty(overlayClass))
+                            {
+                                <div class="@overlayClass" aria-hidden="true"></div>
+                            }
+
+                            @* ── Slide content ────────────────────────────── *@
+                            <div class="hero-slide-content">
+                                <div class="container h-100">
+                                    <div class="row align-items-center h-100 g-4">
+
+                                        @* Text column *@
+                                        <div class="@contentCol @textAlign">
+                                            <div class="hero-trust-badge mb-3">
+                                                <i class="bi bi-shield-check me-2"></i>
+                                                @(lang == "th" ? "ที่เชื่อถือโดยห้องปฏิบัติการและอุตสาหกรรมกว่า 500 แห่ง"
+                                                               : "Trusted by 500+ Laboratories & Industries")
+                                            </div>
+                                            <h1 class="hero-title-v2">@bTitle</h1>
+                                            @if (!string.IsNullOrEmpty(bSubtitle))
+                                            {
+                                                <p class="hero-subtitle-v2">@bSubtitle</p>
+                                            }
+                                            <div class="d-flex flex-wrap gap-3 mb-4
+                                                @(b.TextPosition == "center" ? "justify-content-center" : b.TextPosition == "right" ? "justify-content-end" : "")">
+                                                <a asp-controller="Product" asp-action="Index" class="btn-hero-primary">
+                                                    <i class="bi bi-grid me-2"></i>
+                                                    @(lang == "th" ? "สำรวจสินค้า" : "Explore Products")
+                                                </a>
+                                                @if (!string.IsNullOrEmpty(bBtnText))
+                                                {
+                                                    <a href="@bBtnUrl" class="btn-hero-ghost">
+                                                        @bBtnText <i class="bi bi-arrow-right ms-1"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-controller="Contact" asp-action="Index" class="btn-hero-ghost">
+                                                        @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                                                        <i class="bi bi-arrow-right ms-2"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                            @* Stats (first slide only to avoid repetition) *@
+                                            @if (bIdx == 0)
+                                            {
+                                                <div class="hero-stats-row">
+                                                    <div class="hero-stat">
+                                                        <span class="hero-stat-value">20<span class="hero-stat-accent">+</span></span>
+                                                        <span class="hero-stat-label">@(lang == "th" ? "ปีประสบการณ์" : "Years Experience")</span>
+                                                    </div>
+                                                    <div class="hero-stat-sep" aria-hidden="true"></div>
+                                                    <div class="hero-stat">
+                                                        <span class="hero-stat-value">500<span class="hero-stat-accent">+</span></span>
+                                                        <span class="hero-stat-label">@(lang == "th" ? "ลูกค้าที่ไว้วางใจ" : "Clients Served")</span>
+                                                    </div>
+                                                    <div class="hero-stat-sep" aria-hidden="true"></div>
+                                                    <div class="hero-stat">
+                                                        <span class="hero-stat-value">1000<span class="hero-stat-accent">+</span></span>
+                                                        <span class="hero-stat-label">@(lang == "th" ? "ผลิตภัณฑ์ที่ติดตั้ง" : "Products Installed")</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        @* YouTube iframe column *@
+                                        @if (mt == "YouTube" && !string.IsNullOrEmpty(ytId))
+                                        {
+                                            <div class="col-lg-7 d-none d-lg-flex align-items-center justify-content-center">
+                                                <div class="ratio ratio-16x9 w-100 rounded-3 overflow-hidden shadow-lg"
+                                                     style="max-width:600px">
+                                                    @{
+                                                        var ytParams = new System.Text.StringBuilder("?rel=0&modestbranding=1");
+                                                        if (b.IsAutoplay) ytParams.Append("&autoplay=1");
+                                                        if (b.IsMuted)    ytParams.Append("&mute=1");
+                                                        if (b.IsLoop)     ytParams.Append($"&loop=1&playlist={ytId}");
+                                                    }
+                                                    <iframe src="https://www.youtube.com/embed/@ytId@ytParams"
+                                                            title="@bTitle"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowfullscreen
+                                                            loading="lazy"></iframe>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* Prev / Next controls *@
+            @if (hasManySlides)
+            {
+                <button class="carousel-control-prev hero-carousel-prev" type="button"
+                        data-bs-target="#heroCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next hero-carousel-next" type="button"
+                        data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            }
+        </div>
+    </section>
+}
+else
+{
+    @* ── Static fallback hero when no banners configured ── *@
+    <section class="home-hero">
+        <div class="home-hero-grid" aria-hidden="true"></div>
+        <div class="home-hero-glow" aria-hidden="true"></div>
+        <div class="container position-relative" style="z-index:2">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 reveal">
+                    <div class="hero-trust-badge mb-4">
+                        <i class="bi bi-shield-check me-2"></i>
+                        @(lang == "th" ? "ที่เชื่อถือโดยห้องปฏิบัติการและอุตสาหกรรมกว่า 500 แห่ง"
+                                       : "Trusted by 500+ Laboratories & Industries")
+                    </div>
+                    <h1 class="hero-title-v2">
+                        @L("เครื่องมือวัดและวิทยาศาสตร์เพื่อความแม่นยำระดับมืออาชีพ",
+                           "Precision Instruments for Scientific Excellence")
+                    </h1>
+                    <p class="hero-subtitle-v2">
+                        @L("สนับสนุนงานวิจัยและอุตสาหกรรมด้วยเครื่องมือวิเคราะห์ ทดสอบ และตรวจวัดที่มีประสิทธิภาพสูง",
+                           "Empowering research and industry with cutting-edge analytical, testing, and measurement instruments.")
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 mb-5">
+                        <a asp-controller="Product" asp-action="Index" class="btn-hero-primary">
+                            <i class="bi bi-grid me-2"></i>@(lang == "th" ? "สำรวจสินค้า" : "Explore Products")
+                        </a>
+                        <a asp-controller="Contact" asp-action="Index" class="btn-hero-ghost">
+                            @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="hero-stats-row">
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">20<span class="hero-stat-accent">+</span></span>
+                            <span class="hero-stat-label">@(lang == "th" ? "ปีประสบการณ์" : "Years Experience")</span>
+                        </div>
+                        <div class="hero-stat-sep" aria-hidden="true"></div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">500<span class="hero-stat-accent">+</span></span>
+                            <span class="hero-stat-label">@(lang == "th" ? "ลูกค้าที่ไว้วางใจ" : "Clients Served")</span>
+                        </div>
+                        <div class="hero-stat-sep" aria-hidden="true"></div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">1000<span class="hero-stat-accent">+</span></span>
+                            <span class="hero-stat-label">@(lang == "th" ? "ผลิตภัณฑ์ที่ติดตั้ง" : "Products Installed")</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-flex justify-content-center reveal reveal-delay-2">
+                    <div class="hero-visual-panel">
+                        <div class="hero-visual-abstract">
+                            <div class="hero-vis-ring hero-vis-ring-1" aria-hidden="true"></div>
+                            <div class="hero-vis-ring hero-vis-ring-2" aria-hidden="true"></div>
+                            <div class="hero-vis-ring hero-vis-ring-3" aria-hidden="true"></div>
+                            <div class="hero-vis-center"><i class="bi bi-activity"></i></div>
+                            <div class="hero-vis-dot" style="top:18%;left:3%" aria-hidden="true"></div>
+                            <div class="hero-vis-dot" style="top:72%;left:8%" aria-hidden="true"></div>
+                            <div class="hero-vis-dot" style="top:8%;right:12%" aria-hidden="true"></div>
+                            <div class="hero-vis-dot" style="top:80%;right:6%" aria-hidden="true"></div>
+                        </div>
+                        <div class="hero-visual-badge hero-visual-badge-tl">
+                            <i class="bi bi-patch-check-fill text-info me-1"></i>ISO 17025
+                        </div>
+                        <div class="hero-visual-badge hero-visual-badge-br">
+                            <i class="bi bi-graph-up-arrow text-success me-1"></i>±0.1°C Accuracy
+                        </div>
+                        <div class="hero-visual-badge hero-visual-badge-tr">
+                            <i class="bi bi-award-fill text-warning me-1"></i>
+                            @(lang == "th" ? "มาตรฐานระดับโลก" : "World-class Standards")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+
+@* ══════════════════════════════════════════════════════════════
+   2. PRODUCT CATEGORIES
+   ══════════════════════════════════════════════════════════════ *@
+<section class="py-5 bg-white" id="categories">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-eyebrow">@(lang == "th" ? "หมวดหมู่สินค้า" : "CATEGORIES")</p>
+            <h2 class="section-title">
+                @(lang == "th" ? "สำรวจกลุ่มผลิตภัณฑ์ของเรา" : "Explore Our Product Lines")
+            </h2>
+            <p class="section-subtitle">
+                @(lang == "th"
+                    ? "เครื่องมือและอุปกรณ์จากแบรนด์ชั้นนำสำหรับทุกอุตสาหกรรมและการวิจัย"
+                    : "Precision instruments and equipment from leading brands, serving every industry and research need.")
+            </p>
+        </div>
+
+        @if (Model.Categories.Any())
+        {
+            <div class="row g-4">
+                @foreach (var (cat, catIdx) in Model.Categories.Take(8).Select((c, i) => (c, i)))
+                {
+                    var catName = L(cat.NameTH, cat.NameEN);
+                    var catDesc = L(cat.ShortDescriptionTH, cat.ShortDescriptionEN);
+                    var delay   = catIdx switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+
+                    <div class="col-xl-3 col-lg-4 col-md-6 reveal @delay">
+                        <a asp-controller="Product" asp-action="Index"
+                           asp-route-category="@cat.Slug"
+                           class="text-decoration-none">
+                            <div class="home-cat-card h-100">
+                                <div class="home-cat-img-wrap">
+                                    @if (!string.IsNullOrEmpty(cat.ImagePath))
+                                    {
+                                        <img src="@cat.ImagePath" alt="@catName" class="home-cat-img" />
+                                    }
+                                    else
+                                    {
+                                        <div class="home-cat-img-placeholder">
+                                            <i class="bi bi-grid-3x3-gap"></i>
+                                        </div>
+                                    }
+                                    <div class="home-cat-overlay">
+                                        <span class="home-cat-link-btn">
+                                            @(lang == "th" ? "ดูสินค้า" : "View Products")
+                                            <i class="bi bi-arrow-right ms-1"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="home-cat-body">
+                                    <h6 class="home-cat-title">@catName</h6>
+                                    @if (!string.IsNullOrEmpty(catDesc))
+                                    {
+                                        <p class="home-cat-desc">
+                                            @(catDesc.Length > 65 ? catDesc[..65] + "…" : catDesc)
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+
+            @if (Model.Categories.Count > 8)
+            {
+                <div class="text-center mt-4">
+                    <a asp-controller="Product" asp-action="Index"
+                       class="btn btn-outline-primary px-4" style="border-color:#2d4199;color:#2d4199">
+                        @(lang == "th" ? "ดูหมวดหมู่ทั้งหมด" : "View All Categories")
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-grid fs-1 d-block mb-3" style="color:#c5cde8"></i>
+                <p>@(lang == "th" ? "ยังไม่มีหมวดหมู่สินค้า" : "No product categories yet.")</p>
+            </div>
+        }
+    </div>
+</section>
+
+
+@* ══════════════════════════════════════════════════════════════
+   3. FEATURED PRODUCTS (grouped by category)
+   ══════════════════════════════════════════════════════════════ *@
+<section class="py-5" style="background:#f8fafc" id="featured">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
+            <div>
+                <p class="section-eyebrow mb-1">@(lang == "th" ? "สินค้าแนะนำ" : "PRODUCTS")</p>
+                <h2 class="section-title mb-1">
+                    @(lang == "th" ? "สำรวจเครื่องมือของเรา" : "Explore Our Instruments")
+                </h2>
+                <p class="section-subtitle mb-0 text-start">
+                    @(lang == "th"
+                        ? "เครื่องมือวัดและอุปกรณ์วิทยาศาสตร์ที่ผ่านการคัดสรร พร้อมบริการครบวงจร"
+                        : "Hand-picked measuring instruments and scientific equipment, backed by complete support.")
+                </p>
+            </div>
+            <a asp-controller="Product" asp-action="Index"
+               class="btn btn-outline-primary flex-shrink-0"
+               style="border-color:#2d4199;color:#2d4199">
+                @(lang == "th" ? "ดูสินค้าทั้งหมด" : "View All Products")
+                <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        @if (Model.ProductGroups.Any())
+        {
+            @foreach (var grp in Model.ProductGroups)
+            {
+                var grpName = L(grp.CategoryNameTH, grp.CategoryNameEN);
+                var grpDesc = L(grp.CategoryDescriptionTH, grp.CategoryDescriptionEN);
+
+                <div class="mb-5 reveal">
+                    @* Group header *@
+                    <div class="product-group-header">
+                        @if (!string.IsNullOrEmpty(grp.CategoryImagePath))
+                        {
+                            <img src="@grp.CategoryImagePath" alt="@grpName" class="product-group-cat-img" />
+                        }
+                        else
+                        {
+                            <div class="product-group-cat-placeholder">
+                                <i class="bi bi-grid-3x3-gap"></i>
+                            </div>
+                        }
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold mb-0" style="color:#1a2b6b;font-size:1.15rem">@grpName</h4>
+                            @if (!string.IsNullOrEmpty(grpDesc))
+                            {
+                                <p class="text-muted small mb-0 mt-1">@grpDesc</p>
+                            }
+                        </div>
+                        <a asp-controller="Product" asp-action="Index"
+                           asp-route-category="@grp.CategorySlug"
+                           class="btn btn-sm btn-outline-secondary flex-shrink-0">
+                            @(lang == "th" ? "ดูทั้งหมด" : "View All")
+                            <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    @* Product cards *@
+                    <div class="row g-4">
+                        @foreach (var (product, pIdx) in grp.Products.Select((p, i) => (p, i)))
+                        {
+                            var pName  = L(product.NameTH, product.NameEN);
+                            var pDesc  = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
+                            var pDelay = pIdx switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+
+                            <div class="col-lg-4 col-md-6 reveal @pDelay">
+                                <div class="home-product-card h-100">
+                                    <a asp-controller="Product" asp-action="Detail"
+                                       asp-route-slug="@product.Slug"
+                                       class="text-decoration-none d-block">
+                                        @if (!string.IsNullOrEmpty(product.MainImagePath))
+                                        {
+                                            <img src="@product.MainImagePath" alt="@pName"
+                                                 class="home-product-img" />
+                                        }
+                                        else
+                                        {
+                                            <div class="home-product-img-placeholder">
+                                                <i class="bi bi-box-seam"></i>
+                                            </div>
+                                        }
+                                    </a>
+                                    <div class="home-product-body">
+                                        @if (!string.IsNullOrEmpty(product.Brand))
+                                        {
+                                            <span class="home-product-brand">@product.Brand</span>
+                                        }
+                                        <h6 class="home-product-name mt-1">
+                                            <a asp-controller="Product" asp-action="Detail"
+                                               asp-route-slug="@product.Slug"
+                                               class="text-decoration-none text-dark">@pName</a>
+                                        </h6>
+                                        @if (!string.IsNullOrEmpty(product.Model))
+                                        {
+                                            <p class="home-product-model">@product.Model</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(pDesc))
+                                        {
+                                            <p class="home-product-desc">
+                                                @(pDesc.Length > 80 ? pDesc[..80] + "…" : pDesc)
+                                            </p>
+                                        }
+                                        <div class="home-product-footer">
+                                            @if (product.IsPriceVisible && product.Price.HasValue)
+                                            {
+                                                <span class="home-product-price">
+                                                    @product.Price.Value.ToString("N2") ฿
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="home-product-price-na">
+                                                    @(lang == "th" ? "ติดต่อสอบถามราคา" : "Contact for pricing")
+                                                </span>
+                                            }
+                                            <a asp-controller="Product" asp-action="Detail"
+                                               asp-route-slug="@product.Slug"
+                                               class="home-product-link">
+                                                @(lang == "th" ? "ดูรายละเอียด" : "View Details")
+                                                <i class="bi bi-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else if (Model.FeaturedProducts.Any())
+        {
+            @* Fallback: flat grid if no grouped data *@
+            <div class="row g-4">
+                @foreach (var (product, pIdx) in Model.FeaturedProducts.Take(8).Select((p, i) => (p, i)))
+                {
+                    var pName  = L(product.NameTH, product.NameEN);
+                    var pDesc  = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
+                    var pDelay = (pIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+
+                    <div class="col-xl-3 col-lg-4 col-md-6 reveal @pDelay">
+                        <div class="home-product-card h-100">
+                            <a asp-controller="Product" asp-action="Detail"
+                               asp-route-slug="@product.Slug"
+                               class="text-decoration-none d-block">
+                                @if (!string.IsNullOrEmpty(product.MainImagePath))
+                                {
+                                    <img src="@product.MainImagePath" alt="@pName"
+                                         class="home-product-img" />
+                                }
+                                else
+                                {
+                                    <div class="home-product-img-placeholder">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
+                                }
+                            </a>
+                            <div class="home-product-body">
+                                @if (!string.IsNullOrEmpty(product.Brand))
+                                {
+                                    <span class="home-product-brand">@product.Brand</span>
+                                }
+                                <h6 class="home-product-name mt-1">
+                                    <a asp-controller="Product" asp-action="Detail"
+                                       asp-route-slug="@product.Slug"
+                                       class="text-decoration-none text-dark">@pName</a>
+                                </h6>
+                                @if (!string.IsNullOrEmpty(product.Model))
+                                {
+                                    <p class="home-product-model">@product.Model</p>
+                                }
+                                @if (!string.IsNullOrEmpty(pDesc))
+                                {
+                                    <p class="home-product-desc">
+                                        @(pDesc.Length > 80 ? pDesc[..80] + "…" : pDesc)
+                                    </p>
+                                }
+                                <div class="home-product-footer">
+                                    <a asp-controller="Product" asp-action="Detail"
+                                       asp-route-slug="@product.Slug"
+                                       class="home-product-link">
+                                        @(lang == "th" ? "ดูรายละเอียด" : "View Details")
+                                        <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-box-seam fs-1 d-block mb-3" style="color:#c5cde8"></i>
+                <p>@(lang == "th" ? "ยังไม่มีสินค้าแนะนำ" : "No featured products yet.")</p>
+            </div>
+        }
+    </div>
+</section>
+
+
+@* ══════════════════════════════════════════════════════════════
+   4. SERVICES
+   ══════════════════════════════════════════════════════════════ *@
+<section class="py-5 bg-white" id="services">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-eyebrow">@(lang == "th" ? "บริการของเรา" : "SERVICES")</p>
+            <h2 class="section-title">
+                @(lang == "th" ? "บริการและการสนับสนุนอย่างครบวงจร" : "Comprehensive Support & Services")
+            </h2>
+            <p class="section-subtitle">
+                @(lang == "th"
+                    ? "เราให้บริการครบวงจรตั้งแต่การจำหน่ายจนถึงการสอบเทียบและบำรุงรักษา"
+                    : "From procurement and installation to calibration and maintenance — we support you end-to-end.")
+            </p>
+        </div>
+
+        @if (Model.FeaturedServices.Any())
+        {
+            <div class="row g-4">
+                @foreach (var (svc, sIdx) in Model.FeaturedServices.Select((s, i) => (s, i)))
+                {
+                    var sName = L(svc.ServiceNameTH, svc.ServiceNameEN);
+                    var sDesc = L(svc.ShortDescriptionTH, svc.ShortDescriptionEN);
+                    var sDelay = sIdx switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    var sIcon = (!string.IsNullOrEmpty(svc.IconUrl) && !svc.IconUrl.Contains('/'))
+                                ? svc.IconUrl : svcIcons[sIdx % svcIcons.Length];
+
+                    <div class="col-lg-3 col-md-6 reveal @sDelay">
+                        <div class="home-service-card">
+                            <div class="home-service-icon mb-3">
+                                <i class="bi @sIcon"></i>
+                            </div>
+                            <h6 class="fw-bold mb-2" style="color:#1a2b6b;font-size:.98rem">@sName</h6>
+                            @if (!string.IsNullOrEmpty(sDesc))
+                            {
+                                <p class="small text-muted mb-3 lh-lg">
+                                    @(sDesc.Length > 100 ? sDesc[..100] + "…" : sDesc)
+                                </p>
+                            }
+                            <a asp-controller="Services" asp-action="Detail"
+                               asp-route-slug="@svc.ServiceSlug"
+                               class="home-service-link">
+                                @(lang == "th" ? "ดูเพิ่มเติม" : "Learn More")
+                                <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            @* Fallback static cards when no services in DB yet *@
+            <div class="row g-4">
+                @{
+                    var staticServices = new[]
+                    {
+                        new { Icon = "bi-tools",                  TH = "จำหน่ายเครื่องมือ",   EN = "Instrument Sales",     DescTH = "จำหน่ายเครื่องมือวัดและอุปกรณ์วิทยาศาสตร์จากแบรนด์ชั้นนำ", DescEN = "Wide range of instruments from leading global brands for every application." },
+                        new { Icon = "bi-shield-check",           TH = "บริการสอบเทียบ",       EN = "Calibration Service",  DescTH = "บริการสอบเทียบตามมาตรฐาน ISO ด้วยทีมผู้เชี่ยวชาญ",         DescEN = "ISO-traceable calibration services performed by certified technicians." },
+                        new { Icon = "bi-wrench-adjustable-circle",TH = "ซ่อมบำรุงเครื่องมือ", EN = "Maintenance & Repair", DescTH = "บริการซ่อมบำรุงและบำรุงรักษาเชิงป้องกันครบวงจร",           DescEN = "Comprehensive repair and preventive maintenance programs for your instruments." },
+                        new { Icon = "bi-headset",                TH = "ให้คำปรึกษา",          EN = "Technical Consulting",  DescTH = "ทีมวิศวกรผู้เชี่ยวชาญพร้อมให้คำปรึกษาและแนะนำการเลือกใช้", DescEN = "Expert engineers advise you on instrument selection and application setup." },
+                    };
+                }
+                @foreach (var (ss, ssi) in staticServices.Select((s, i) => (s, i)))
+                {
+                    var ssDelay = ssi switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    <div class="col-lg-3 col-md-6 reveal @ssDelay">
+                        <div class="home-service-card">
+                            <div class="home-service-icon mb-3">
+                                <i class="bi @ss.Icon"></i>
+                            </div>
+                            <h6 class="fw-bold mb-2" style="color:#1a2b6b;font-size:.98rem">
+                                @(lang == "th" ? ss.TH : ss.EN)
+                            </h6>
+                            <p class="small text-muted mb-3 lh-lg">
+                                @(lang == "th" ? ss.DescTH : ss.DescEN)
+                            </p>
+                            <a asp-controller="Services" asp-action="Index"
+                               class="home-service-link">
+                                @(lang == "th" ? "ดูเพิ่มเติม" : "Learn More")
+                                <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="text-center mt-4">
+            <a asp-controller="Services" asp-action="Index"
+               class="btn btn-outline-primary px-4" style="border-color:#2d4199;color:#2d4199">
+                @(lang == "th" ? "ดูบริการทั้งหมด" : "View All Services")
+                <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+
+@* ══════════════════════════════════════════════════════════════
+   5. ACTIVITY / NEWS
+   ══════════════════════════════════════════════════════════════ *@
+@if (Model.LatestActivities.Any())
+{
+    <section class="py-5" style="background:#f8fafc" id="activity">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
+                <div>
+                    <p class="section-eyebrow mb-1">@(lang == "th" ? "กิจกรรม" : "ACTIVITY")</p>
+                    <h2 class="section-title mb-1">
+                        @(lang == "th" ? "ข่าวสารและอัปเดต" : "News & Updates")
+                    </h2>
+                    <p class="section-subtitle mb-0 text-start">
+                        @(lang == "th"
+                            ? "ติดตามข่าวสาร กิจกรรม และนวัตกรรมล่าสุดจากทีมงานของเรา"
+                            : "Stay updated with our latest news, events, and innovations.")
+                    </p>
+                </div>
+                <a asp-controller="Activity" asp-action="Index"
+                   class="btn btn-outline-primary flex-shrink-0"
+                   style="border-color:#2d4199;color:#2d4199">
+                    @(lang == "th" ? "ดูกิจกรรมทั้งหมด" : "View All Activity")
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var (act, aIdx) in Model.LatestActivities.Select((a, i) => (a, i)))
+                {
+                    var aTitle   = L(act.ActivityTitleTH, act.ActivityTitleEN);
+                    var aDesc    = L(act.ShortDescriptionTH, act.ShortDescriptionEN);
+                    var aDate    = act.ActivityDate ?? act.PublishedDate ?? act.CreatedAt;
+                    var aDelay   = aIdx switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+
+                    <div class="col-lg-4 col-md-6 reveal @aDelay">
+                        <div class="home-activity-card">
+                            <a asp-controller="Activity" asp-action="Detail"
+                               asp-route-slug="@act.ActivitySlug"
+                               class="d-block overflow-hidden">
+                                @if (!string.IsNullOrEmpty(act.CoverImageUrl))
+                                {
+                                    <img src="@act.CoverImageUrl" alt="@aTitle"
+                                         class="home-activity-img" />
+                                }
+                                else
+                                {
+                                    <div class="home-activity-img-placeholder">
+                                        <i class="bi bi-newspaper"></i>
+                                    </div>
+                                }
+                            </a>
+                            <div class="home-activity-body">
+                                <div class="home-activity-date">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    @aDate.ToString("d MMM yyyy")
+                                </div>
+                                <h6 class="home-activity-title">
+                                    <a asp-controller="Activity" asp-action="Detail"
+                                       asp-route-slug="@act.ActivitySlug"
+                                       class="text-decoration-none text-dark">
+                                        @aTitle
+                                    </a>
+                                </h6>
+                                @if (!string.IsNullOrEmpty(aDesc))
+                                {
+                                    <p class="home-activity-desc">
+                                        @(aDesc.Length > 90 ? aDesc[..90] + "…" : aDesc)
+                                    </p>
+                                }
+                                <a asp-controller="Activity" asp-action="Detail"
+                                   asp-route-slug="@act.ActivitySlug"
+                                   class="home-activity-link">
+                                    @(lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+
+@* ══════════════════════════════════════════════════════════════
+   6. CTA SECTION
+   ══════════════════════════════════════════════════════════════ *@
+<section class="home-cta-section py-5" id="contact-cta">
+    <div class="home-cta-grid" aria-hidden="true"></div>
+    <div class="container position-relative" style="z-index:2;padding-top:2rem;padding-bottom:2rem">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7 reveal">
+                <p class="section-eyebrow" style="color:rgba(30,167,255,.85)">
+                    @(lang == "th" ? "ติดต่อเรา" : "GET IN TOUCH")
+                </p>
+                <h2 class="text-white fw-bold mb-3" style="font-size:clamp(1.6rem,3vw,2.25rem)">
+                    @(lang == "th" ? "พร้อมค้นหาเครื่องมือที่เหมาะกับงานของคุณหรือยัง?"
+                                   : "Ready to Find the Right Instrument?")
+                </h2>
+                <p class="mb-4" style="color:rgba(255,255,255,.7);line-height:1.75;max-width:520px">
+                    @(lang == "th"
+                        ? "ทีมผู้เชี่ยวชาญของเราพร้อมให้คำปรึกษาและจัดทำใบเสนอราคาให้ฟรีภายใน 24 ชั่วโมง"
+                        : "Our specialists will help you select the ideal instruments and provide a free quotation within 24 hours.")
+                </p>
+
+                @* Contact info inline *@
+                @if (Model.SiteSetting != null)
+                {
+                    <div class="d-flex flex-wrap gap-4 mb-4">
+                        @if (!string.IsNullOrEmpty(Model.SiteSetting.ContactPhone))
+                        {
+                            <a href="tel:@Model.SiteSetting.ContactPhone"
+                               class="d-flex align-items-center gap-2 text-decoration-none"
+                               style="color:rgba(255,255,255,.8)">
+                                <span class="home-cta-icon-circle">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </span>
+                                <span>@Model.SiteSetting.ContactPhone</span>
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.SiteSetting.ContactEmail))
+                        {
+                            <a href="mailto:@Model.SiteSetting.ContactEmail"
+                               class="d-flex align-items-center gap-2 text-decoration-none"
+                               style="color:rgba(255,255,255,.8)">
+                                <span class="home-cta-icon-circle">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+                                <span>@Model.SiteSetting.ContactEmail</span>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="col-lg-5 reveal reveal-delay-1">
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-lg-end">
+                    <a asp-controller="Quotation" asp-action="Create"
+                       class="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-file-earmark-text"></i>
+                        @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
+                    </a>
+                    <a asp-controller="Contact" asp-action="Index"
+                       class="btn btn-outline-light px-4 py-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-chat-dots"></i>
+                        @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+(function () {
+    var carousel = document.getElementById('heroCarousel');
+    if (!carousel) return;
+
+    function getActiveVideo() {
+        var active = carousel.querySelector('.carousel-item.active');
+        return active ? active.querySelector('video[data-slide-video]') : null;
+    }
+
+    // Pause all videos; play the one in the active slide
+    function syncVideo(newItem) {
+        carousel.querySelectorAll('video[data-slide-video]').forEach(function (v) {
+            v.pause();
+        });
+        var vid = newItem ? newItem.querySelector('video[data-slide-video]') : getActiveVideo();
+        if (vid) {
+            vid.currentTime = 0;
+            vid.play().catch(function () { /* autoplay policy */ });
+        }
+    }
+
+    // When carousel transitions, sync video
+    carousel.addEventListener('slide.bs.carousel', function (e) {
+        // e.relatedTarget = incoming slide element
+    });
+    carousel.addEventListener('slid.bs.carousel', function (e) {
+        syncVideo(e.relatedTarget);
+    });
+
+    // Initial play for first slide if it has a video
+    syncVideo(null);
+})();
+</script>
+}

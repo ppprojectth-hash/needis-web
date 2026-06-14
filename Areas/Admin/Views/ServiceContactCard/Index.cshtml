@@ -1,0 +1,104 @@
+@model List<Needis.Web.Models.ServiceContactCard>
+@{
+    var svc = ViewBag.Service as Needis.Web.Models.Service;
+    ViewData["Title"] = $"Contact Cards — {svc?.ServiceNameEN ?? "Service"}";
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Service" asp-action="Index">Services</a></li>
+        <li class="breadcrumb-item">
+            <a asp-controller="Service" asp-action="Details" asp-route-id="@svc?.Id">@(svc?.ServiceNameEN ?? "Service")</a>
+        </li>
+        <li class="breadcrumb-item active">Contact Cards</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="text-muted mb-0">Contact cards for <strong>@(svc?.ServiceNameEN ?? "—")</strong></h6>
+    <a asp-action="Create" asp-route-serviceId="@svc?.Id" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Card
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Title EN</th>
+                    <th>Primary Button</th>
+                    <th>Secondary Button</th>
+                    <th>Contact</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var card in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            <div class="fw-medium">@card.TitleEN</div>
+                            <div class="text-muted small">@card.TitleTH</div>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(card.PrimaryButtonTextEN))
+                            {
+                                <span class="badge bg-primary">@card.PrimaryButtonTextEN</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(card.SecondaryButtonTextEN))
+                            {
+                                <span class="badge bg-secondary">@card.SecondaryButtonTextEN</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td class="small text-muted">@card.ContactValue</td>
+                        <td class="text-center">@card.DisplayOrder</td>
+                        <td class="text-center">
+                            @if (card.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end pe-3 text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@card.Id"
+                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@card.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this contact card?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No contact cards found. Add the first one.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

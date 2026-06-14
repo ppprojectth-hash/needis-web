@@ -1,0 +1,93 @@
+@model Needis.Web.ViewModels.Admin.ActivityImageViewModel
+@{
+    var activity = ViewBag.Activity as Needis.Web.Models.Activity;
+    ViewData["Title"] = "Edit Image";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Activity" asp-action="Index">Activities</a></li>
+        <li class="breadcrumb-item">
+            <a asp-action="Index" asp-route-activityId="@activity?.Id" asp-route-blockId="@Model.ActivityDetailBlockId">
+                @(activity?.ActivityTitleEN ?? "Activity") — Images
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:720px">
+    <div class="card-body p-4">
+        <a asp-action="Index" asp-route-activityId="@Model.ActivityId" asp-route-blockId="@Model.ActivityDetailBlockId"
+           class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ActivityId" />
+            <input type="hidden" asp-for="ActivityDetailBlockId" />
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-medium">Image</label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.ExistingImageUrl" alt="Current image" class="img-thumbnail" style="max-height:150px" />
+                        </div>
+                    }
+                    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div class="form-text">Max 3 MB. Leave empty to keep current image.</div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ImageTitleEN" class="form-label fw-medium">Image Title EN</label>
+                    <input asp-for="ImageTitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ImageTitleTH" class="form-label fw-medium">Image Title TH</label>
+                    <input asp-for="ImageTitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CaptionEN" class="form-label fw-medium">Caption EN</label>
+                    <textarea asp-for="CaptionEN" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CaptionTH" class="form-label fw-medium">Caption TH</label>
+                    <textarea asp-for="CaptionTH" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="AltTextEN" class="form-label fw-medium">Alt Text EN</label>
+                    <input asp-for="AltTextEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="AltTextTH" class="form-label fw-medium">Alt Text TH</label>
+                    <input asp-for="AltTextTH" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ImageType" class="form-label fw-medium">Image Type</label>
+                    <input asp-for="ImageType" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-3">
+                    <div class="form-check">
+                        <input asp-for="IsCover" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsCover" class="form-check-label fw-medium">Cover</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" asp-route-activityId="@Model.ActivityId" asp-route-blockId="@Model.ActivityDetailBlockId"
+                   class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

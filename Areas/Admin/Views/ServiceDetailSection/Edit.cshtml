@@ -1,0 +1,99 @@
+@model Needis.Web.ViewModels.Admin.ServiceDetailSectionViewModel
+@{
+    var svc = ViewBag.Service as Needis.Web.Models.Service;
+    ViewData["Title"] = "Edit Section";
+    string[] layoutTypes = ["text", "bullet", "cards", "image_left", "image_right"];
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Service" asp-action="Index">Services</a></li>
+        <li class="breadcrumb-item">
+            <a asp-controller="ServiceDetailSection" asp-action="Index" asp-route-serviceId="@Model.ServiceId">
+                @(svc?.ServiceNameEN ?? "Service")
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Edit Section</li>
+    </ol>
+</nav>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:760px">
+    <div class="card-body p-4">
+        <a asp-action="Index" asp-route-serviceId="@Model.ServiceId" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ServiceId" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="SectionKey" class="form-label fw-medium">Section Key <span class="text-danger">*</span></label>
+                    <input asp-for="SectionKey" class="form-control" />
+                    <span asp-validation-for="SectionKey" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="LayoutType" class="form-label fw-medium">Layout Type</label>
+                    <select asp-for="LayoutType" class="form-select">
+                        <option value="">— Select —</option>
+                        @foreach (var lt in layoutTypes)
+                        {
+                            <option value="@lt" selected="@(Model.LayoutType == lt ? "selected" : null)">@lt</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SectionTitleEN" class="form-label fw-medium">Title EN <span class="text-danger">*</span></label>
+                    <input asp-for="SectionTitleEN" class="form-control" />
+                    <span asp-validation-for="SectionTitleEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SectionTitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="SectionTitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SectionSubtitleEN" class="form-label fw-medium">Subtitle EN</label>
+                    <input asp-for="SectionSubtitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SectionSubtitleTH" class="form-label fw-medium">Subtitle TH</label>
+                    <input asp-for="SectionSubtitleTH" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="SectionDescriptionEN" class="form-label fw-medium">Description EN</label>
+                    <textarea asp-for="SectionDescriptionEN" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="SectionDescriptionTH" class="form-label fw-medium">Description TH</label>
+                    <textarea asp-for="SectionDescriptionTH" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SectionImageFile" class="form-label fw-medium">Section Image</label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.ExistingImageUrl" alt="current" class="img-thumbnail" style="max-height:80px" />
+                        </div>
+                    }
+                    <input asp-for="SectionImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <span asp-validation-for="SectionImageFile" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" asp-route-serviceId="@Model.ServiceId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

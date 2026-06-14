@@ -1,0 +1,73 @@
+@model List<Needis.Web.Models.AboutStatCard>
+@{
+    ViewData["Title"] = "Stat Cards";
+    int brandCount     = ViewBag.BrandCount ?? 0;
+    int expertCount    = ViewBag.ExpertCount ?? 0;
+    int productSoldSum = ViewBag.ProductSoldSum ?? 0;
+
+    string GetPreview(Needis.Web.Models.AboutStatCard c) => c.SourceType switch
+    {
+        "GlobalBrandCount"  => $"{brandCount}",
+        "ExpertStaffCount"  => $"{expertCount}",
+        "ProductSoldCount"  => $"{productSoldSum}",
+        _                   => c.ManualValue?.ToString() ?? "—",
+    };
+}
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-action="Create" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Stat Card</a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Stat Key</th>
+                    <th>Label EN</th>
+                    <th>Source Type</th>
+                    <th class="text-center">Preview Value</th>
+                    <th>Prefix / Suffix</th>
+                    <th class="text-center">Order</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="ps-3"><code>@c.StatKey</code></td>
+                        <td>@c.LabelEN</td>
+                        <td><span class="badge bg-light text-dark border small">@c.SourceType</span></td>
+                        <td class="text-center fw-bold" style="color:#2d4199">
+                            @(c.Prefix)@GetPreview(c)@(c.Suffix)
+                        </td>
+                        <td class="text-muted small">@(c.Prefix ?? "—") / @(c.Suffix ?? "—")</td>
+                        <td class="text-center">@c.DisplayOrder</td>
+                        <td class="text-center">
+                            <span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">@(c.IsActive ? "Active" : "Inactive")</span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this stat card?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any()) { <tr><td colspan="8" class="text-center text-muted py-4">No stat cards found.</td></tr> }
+            </tbody>
+        </table>
+    </div>
+</div>

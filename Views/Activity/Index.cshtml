@@ -1,0 +1,292 @@
+@model ActivityIndexViewModel
+@{
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+
+    var heroTitle = L(Model.ActivityPage?.TitleTH, Model.ActivityPage?.TitleEN) is { Length: > 0 } ht
+        ? ht : (lang == "th" ? "กิจกรรมและข่าวสาร" : "Activity");
+    var heroSub = L(Model.ActivityPage?.SubtitleTH, Model.ActivityPage?.SubtitleEN) is { Length: > 0 } hs
+        ? hs : (lang == "th" ? "ข่าวสาร กิจกรรม บทความ และโปรโมชั่นล่าสุด" : "Latest news, events, articles, and promotions.");
+    var heroBg  = Model.ActivityPage?.BackgroundImageUrl;
+    var hasFilter = !string.IsNullOrEmpty(Model.SelectedTagKey) || !string.IsNullOrEmpty(Model.Search);
+
+    ViewData["Title"] = heroTitle;
+
+    string DateStr(Needis.Web.Models.Activity act) {
+        var d = act.PublishedDate ?? act.ActivityDate;
+        return d.HasValue ? d.Value.ToString("dd MMM yyyy") : "";
+    }
+}
+
+@* ── Hero ──────────────────────────────────────────────────────────────────── *@
+<div class="activity-banner">
+    @if (!string.IsNullOrEmpty(heroBg))
+    {
+        <img src="@heroBg" alt="" class="activity-banner-bg" />
+    }
+    <div class="activity-banner-overlay"></div>
+    <div class="activity-banner-content">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb breadcrumb-dark mb-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Home" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "หน้าหลัก" : "Home")
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">@heroTitle</li>
+                </ol>
+            </nav>
+            <h1 class="fw-bold text-white mb-2" style="font-size:clamp(1.75rem,4vw,2.75rem)">@heroTitle</h1>
+            <p class="mb-0 lh-lg" style="color:rgba(255,255,255,.8);max-width:600px">@heroSub</p>
+        </div>
+    </div>
+</div>
+
+@* ── Filter + Search ──────────────────────────────────────────────────────── *@
+<section class="py-4" style="background:#f8f9fc;border-bottom:1px solid #e5e7eb">
+    <div class="container">
+        <div class="row g-3 align-items-center">
+            @* Tag filter pills *@
+            <div class="col-lg-8">
+                <div class="activity-tag-filter">
+                    <a href="@Url.Action("Index", "Activity")"
+                       class="tag-filter-pill @(string.IsNullOrEmpty(Model.SelectedTagKey) ? "active" : "")">
+                        @(lang == "th" ? "ทั้งหมด" : "All")
+                    </a>
+                    @foreach (var t in Model.Tags)
+                    {
+                        var tName = L(t.TagNameTH, t.TagNameEN);
+                        var isActive = Model.SelectedTagKey == t.TagKey;
+                        var href = Url.Action("Index", "Activity", new { tag = t.TagKey });
+                        <a href="@href"
+                           class="tag-filter-pill @(isActive ? "active" : "")"
+                           style="@(isActive ? $"background:{t.TagColor ?? "#2d4199"};border-color:{t.TagColor ?? "#2d4199"}" : $"border-color:{t.TagColor ?? "#e5e7eb"}")">
+                            @tName
+                        </a>
+                    }
+                </div>
+            </div>
+
+            @* Search bar *@
+            <div class="col-lg-4">
+                <form method="get" asp-controller="Activity" asp-action="Index" class="d-flex gap-2">
+                    @if (!string.IsNullOrEmpty(Model.SelectedTagKey))
+                    {
+                        <input type="hidden" name="tag" value="@Model.SelectedTagKey" />
+                    }
+                    <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm"
+                           placeholder="@(lang == "th" ? "ค้นหา..." : "Search...")" />
+                    <button type="submit" class="btn btn-sm btn-primary px-3" style="background:#2d4199;border-color:#2d4199">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    @if (hasFilter)
+                    {
+                        <a asp-controller="Activity" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    }
+                </form>
+            </div>
+        </div>
+
+        @* Selected tag info *@
+        @if (Model.SelectedTag is not null)
+        {
+            <div class="mt-3 d-flex align-items-center gap-2">
+                <span class="activity-tag-badge" style="background:@(Model.SelectedTag.TagColor ?? "#2d4199")">
+                    @L(Model.SelectedTag.TagNameTH, Model.SelectedTag.TagNameEN)
+                </span>
+                @if (!string.IsNullOrEmpty(L(Model.SelectedTag.TagDescriptionTH, Model.SelectedTag.TagDescriptionEN)))
+                {
+                    <span class="text-muted small">@L(Model.SelectedTag.TagDescriptionTH, Model.SelectedTag.TagDescriptionEN)</span>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@* ── Featured Activities ──────────────────────────────────────────────────── *@
+@if (Model.FeaturedActivities.Any())
+{
+    <section class="py-5" style="background:#f8f9fc">
+        <div class="container">
+            <div class="text-center mb-4 reveal">
+                <p class="section-eyebrow">@(lang == "th" ? "แนะนำ" : "Featured")</p>
+                <h2 class="section-title">@(lang == "th" ? "กิจกรรมแนะนำ" : "Featured Activity")</h2>
+            </div>
+            <div class="row g-4">
+                @foreach (var (feat, fi) in Model.FeaturedActivities.Select((a, i) => (a, i)))
+                {
+                    var fDelay = (fi % 3) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+                    var fDate  = DateStr(feat);
+                    <div class="col-md-6 col-lg-4 reveal @fDelay">
+                        <div class="activity-card card shadow-sm">
+                            @if (!string.IsNullOrEmpty(feat.CoverImageUrl))
+                            {
+                                <a asp-controller="Activity" asp-action="Detail" asp-route-slug="@feat.ActivitySlug">
+                                    <img src="@feat.CoverImageUrl" alt="@L(feat.ActivityTitleTH, feat.ActivityTitleEN)"
+                                         class="activity-card-img" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="activity-card-img-placeholder">
+                                    <i class="bi bi-newspaper"></i>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @foreach (var m in feat.ActivityTagMaps.Where(m => m.ActivityTag?.IsActive == true).OrderBy(m => m.DisplayOrder).Take(2))
+                                    {
+                                        <span class="activity-tag-badge"
+                                              style="background:@(m.ActivityTag?.TagColor ?? "#2d4199")">
+                                            @L(m.ActivityTag?.TagNameTH, m.ActivityTag?.TagNameEN)
+                                        </span>
+                                    }
+                                </div>
+                                <h5 class="fw-bold mb-2" style="color:#1a2b6b">
+                                    @L(feat.ActivityTitleTH, feat.ActivityTitleEN)
+                                </h5>
+                                @if (!string.IsNullOrEmpty(L(feat.ShortDescriptionTH, feat.ShortDescriptionEN)))
+                                {
+                                    <p class="text-muted small mb-3 flex-grow-1">
+                                        @(L(feat.ShortDescriptionTH, feat.ShortDescriptionEN) is { Length: > 100 } sd
+                                            ? sd[..100] + "…"
+                                            : L(feat.ShortDescriptionTH, feat.ShortDescriptionEN))
+                                    </p>
+                                }
+                                <div class="d-flex align-items-center justify-content-between mt-auto">
+                                    @if (!string.IsNullOrEmpty(fDate))
+                                    {
+                                        <span class="activity-date"><i class="bi bi-calendar3"></i> @fDate</span>
+                                    }
+                                    <a asp-controller="Activity" asp-action="Detail"
+                                       asp-route-slug="@feat.ActivitySlug"
+                                       class="btn btn-sm btn-primary"
+                                       style="background:#2d4199;border-color:#2d4199">
+                                        @(lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── All Activities Grid ──────────────────────────────────────────────────── *@
+<section class="py-5 bg-white">
+    <div class="container">
+        @if (!Model.FeaturedActivities.Any() || hasFilter)
+        {
+            <div class="text-center mb-5 reveal">
+                <h2 class="section-title">
+                    @if (Model.SelectedTag is not null)
+                    {
+                        @L(Model.SelectedTag.TagNameTH, Model.SelectedTag.TagNameEN)
+                    }
+                    else if (!string.IsNullOrEmpty(Model.Search))
+                    {
+                        @(lang == "th" ? "ผลการค้นหา" : "Search Results")
+                    }
+                    else
+                    {
+                        @(lang == "th" ? "กิจกรรมและข่าวสารทั้งหมด" : "All Activity")
+                    }
+                </h2>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="fw-bold mb-0" style="color:#1a2b6b">
+                    @(lang == "th" ? "กิจกรรมและข่าวสารล่าสุด" : "Latest Activity")
+                </h4>
+                <span class="text-muted small">@Model.Activities.Count @(lang == "th" ? "รายการ" : "items")</span>
+            </div>
+        }
+
+        @if (Model.Activities.Any())
+        {
+            <div class="row g-4">
+                @foreach (var (act, ai) in Model.Activities.Select((a, i) => (a, i)))
+                {
+                    var aDelay = (ai % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    var aDate  = DateStr(act);
+                    <div class="col-md-6 col-lg-3 reveal @aDelay">
+                        <div class="activity-card card shadow-sm">
+                            @if (!string.IsNullOrEmpty(act.CoverImageUrl))
+                            {
+                                <a asp-controller="Activity" asp-action="Detail" asp-route-slug="@act.ActivitySlug">
+                                    <img src="@act.CoverImageUrl" alt="@L(act.ActivityTitleTH, act.ActivityTitleEN)"
+                                         class="activity-card-img" />
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="activity-card-img-placeholder" style="height:160px">
+                                    <i class="bi bi-newspaper fs-2"></i>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column p-3">
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @foreach (var m in act.ActivityTagMaps.Where(m => m.ActivityTag?.IsActive == true).OrderBy(m => m.IsPrimary ? 0 : 1).Take(2))
+                                    {
+                                        <span class="activity-tag-badge"
+                                              style="background:@(m.ActivityTag?.TagColor ?? "#2d4199");font-size:.65rem">
+                                            @L(m.ActivityTag?.TagNameTH, m.ActivityTag?.TagNameEN)
+                                        </span>
+                                    }
+                                </div>
+                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                    @L(act.ActivityTitleTH, act.ActivityTitleEN)
+                                </h6>
+                                @if (!string.IsNullOrEmpty(L(act.ShortDescriptionTH, act.ShortDescriptionEN)))
+                                {
+                                    <p class="small text-muted mb-2 flex-grow-1">
+                                        @(L(act.ShortDescriptionTH, act.ShortDescriptionEN) is { Length: > 80 } sd
+                                            ? sd[..80] + "…"
+                                            : L(act.ShortDescriptionTH, act.ShortDescriptionEN))
+                                    </p>
+                                }
+                                <div class="d-flex align-items-center justify-content-between mt-auto">
+                                    @if (!string.IsNullOrEmpty(aDate))
+                                    {
+                                        <span class="activity-date"><i class="bi bi-calendar3"></i> @aDate</span>
+                                    }
+                                    <a asp-controller="Activity" asp-action="Detail"
+                                       asp-route-slug="@act.ActivitySlug"
+                                       class="btn btn-sm btn-outline-primary"
+                                       style="color:#2d4199;border-color:#2d4199;font-size:.78rem">
+                                        @(lang == "th" ? "อ่านต่อ" : "Read")
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-newspaper fs-1 d-block mb-3" style="color:#c5cde8"></i>
+                <h5 class="text-muted fw-semibold">
+                    @(lang == "th" ? "ไม่พบข้อมูลกิจกรรมหรือข่าวสาร" : "No activity found.")
+                </h5>
+                @if (hasFilter)
+                {
+                    <a asp-controller="Activity" asp-action="Index"
+                       class="btn btn-outline-primary mt-3"
+                       style="color:#2d4199;border-color:#2d4199">
+                        <i class="bi bi-x-circle me-1"></i>
+                        @(lang == "th" ? "ล้างตัวกรอง" : "Clear Filter")
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</section>

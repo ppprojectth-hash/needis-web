@@ -1,0 +1,96 @@
+@model List<Needis.Web.Models.ProductSale>
+@{ ViewData["Title"] = "Product Sales"; }
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3">
+        <i class="bi bi-check-circle me-2"></i>@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm rounded-3 mb-3">
+    <div class="card-body p-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-1">Date From</label>
+                <input type="date" name="dateFrom" value="@ViewBag.DateFrom" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-1">Date To</label>
+                <input type="date" name="dateTo" value="@ViewBag.DateTo" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-5">
+                <label class="form-label small fw-semibold text-muted mb-1">Keyword</label>
+                <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control form-control-sm"
+                       placeholder="Product, customer, reference..." />
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Search</button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Clear</a>
+                <a asp-action="Create" class="btn btn-success btn-sm"><i class="bi bi-plus-lg"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <span class="text-muted small"><strong>@Model.Count</strong> record@(Model.Count == 1 ? "" : "s") found</span>
+    <span class="fw-bold small" style="color:#2d4199">
+        Total Qty: @Model.Where(ps => ps.CountInAboutStats && ps.IsActive).Sum(ps => ps.Quantity)
+        (counted in stats)
+    </span>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle" style="font-size:.875rem">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Product</th>
+                    <th>Sale Date</th>
+                    <th class="text-center">Qty</th>
+                    <th>Customer</th>
+                    <th>Reference</th>
+                    <th class="text-center">Counts in Stats</th>
+                    <th class="text-center">Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ps in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            <div class="fw-semibold">@(ps.Product?.NameEN ?? "—")</div>
+                            @if (!string.IsNullOrEmpty(ps.Product?.Brand))
+                            {
+                                <div class="text-muted small">@ps.Product.Brand@(!string.IsNullOrEmpty(ps.Product.Model) ? " · " + ps.Product.Model : "")</div>
+                            }
+                        </td>
+                        <td>@ps.SaleDate.ToString("dd MMM yyyy")</td>
+                        <td class="text-center fw-bold">@ps.Quantity</td>
+                        <td>@(ps.CustomerName ?? "—")</td>
+                        <td><code class="small">@(ps.ReferenceNo ?? "—")</code></td>
+                        <td class="text-center">
+                            @if (ps.CountInAboutStats) { <i class="bi bi-check-circle-fill text-success"></i> }
+                            else { <i class="bi bi-dash text-muted"></i> }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @(ps.IsActive ? "bg-success" : "bg-secondary")">@(ps.IsActive ? "Active" : "Inactive")</span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a asp-action="Edit" asp-route-id="@ps.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@ps.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this sale record?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any()) { <tr><td colspan="8" class="text-center text-muted py-4">No product sales found.</td></tr> }
+            </tbody>
+        </table>
+    </div>
+</div>

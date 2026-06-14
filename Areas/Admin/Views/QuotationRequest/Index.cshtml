@@ -1,0 +1,169 @@
+@model List<QuotationRequestListItemViewModel>
+@{
+    ViewData["Title"] = "Quotation Requests";
+    var validStatuses     = ViewBag.ValidStatuses     as string[] ?? Array.Empty<string>();
+    var validRequestTypes = ViewBag.ValidRequestTypes as string[] ?? Array.Empty<string>();
+
+    string StatusBadge(string s) => s switch
+    {
+        "New"       => "bg-primary",
+        "Contacted" => "bg-info text-dark",
+        "Quoted"    => "bg-warning text-dark",
+        "Closed"    => "bg-success",
+        "Cancelled" => "bg-secondary",
+        _           => "bg-light text-dark",
+    };
+
+    string TypeBadge(string t) => t switch
+    {
+        "Product" => "bg-primary",
+        "Service" => "bg-purple",
+        "Mixed"   => "bg-warning text-dark",
+        _         => "bg-secondary",
+    };
+}
+
+<style>.bg-purple { background-color: #6f42c1 !important; }</style>
+
+@* ── Filter Form ─────────────────────────────────────────────────────────── *@
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-body p-3">
+        <form method="get" asp-area="Admin" asp-controller="QuotationRequest" asp-action="Index"
+              class="row g-2 align-items-end">
+            <div class="col-sm-4 col-lg-2">
+                <label class="form-label small fw-semibold text-muted mb-1">Date From</label>
+                <input type="date" name="dateFrom" value="@ViewBag.DateFrom" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4 col-lg-2">
+                <label class="form-label small fw-semibold text-muted mb-1">Date To</label>
+                <input type="date" name="dateTo" value="@ViewBag.DateTo" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4 col-lg-1">
+                <label class="form-label small fw-semibold text-muted mb-1">Status</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    @foreach (var s in validStatuses)
+                    {
+                        <option value="@s" selected="@(ViewBag.Status == s ? "selected" : null)">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-4 col-lg-1">
+                <label class="form-label small fw-semibold text-muted mb-1">Type</label>
+                <select name="requestType" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    @foreach (var t in validRequestTypes)
+                    {
+                        <option value="@t" selected="@(ViewBag.RequestType == t ? "selected" : null)">@t</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-8 col-lg-4">
+                <label class="form-label small fw-semibold text-muted mb-1">Keyword</label>
+                <input type="text" name="keyword" value="@ViewBag.Keyword"
+                       class="form-control form-control-sm"
+                       placeholder="Request No, customer, product, service..." />
+            </div>
+            <div class="col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-search me-1"></i>Search
+                </button>
+                <a asp-area="Admin" asp-controller="QuotationRequest" asp-action="Index"
+                   class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* ── Summary ──────────────────────────────────────────────────────────────── *@
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <span class="text-muted small">
+        Found <strong>@Model.Count</strong> request@(Model.Count == 1 ? "" : "s")
+    </span>
+    <div class="d-flex gap-2">
+        @foreach (var s in validStatuses)
+        {
+            var cnt = Model.Count(r => r.Status == s);
+            if (cnt > 0) { <span class="badge @StatusBadge(s)">@s: @cnt</span> }
+        }
+    </div>
+</div>
+
+@* ── Table ────────────────────────────────────────────────────────────────── *@
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle" style="font-size:.875rem">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3" style="width:145px">Request No</th>
+                    <th style="width:120px">Date</th>
+                    <th>Customer</th>
+                    <th>Subject / Item</th>
+                    <th class="text-center" style="width:80px">Type</th>
+                    <th class="text-center" style="width:55px">Items</th>
+                    <th class="text-center" style="width:100px">Status</th>
+                    <th style="width:75px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                            No quotation requests found.
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            <code class="small fw-semibold text-primary">@item.RequestNo</code>
+                        </td>
+                        <td>
+                            <span class="small">@item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span><br />
+                            <span class="text-muted" style="font-size:.72rem">@item.CreatedAt.ToLocalTime().ToString("HH:mm")</span>
+                        </td>
+                        <td>
+                            <div class="fw-semibold small">@(item.CustomerName ?? "—")</div>
+                            @if (!string.IsNullOrEmpty(item.CompanyName))
+                            {
+                                <div class="text-muted" style="font-size:.75rem">@item.CompanyName</div>
+                            }
+                        </td>
+                        <td>
+                            <div class="small text-truncate" style="max-width:200px" title="@item.Subject">
+                                @item.Subject
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.ItemSummary))
+                            {
+                                <div class="text-muted" style="font-size:.72rem">
+                                    <i class="bi bi-box-seam me-1"></i>@item.ItemSummary
+                                </div>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @TypeBadge(item.RequestType)" style="font-size:.7rem">
+                                @item.RequestType
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border">@item.ItemCount</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @StatusBadge(item.Status)">@item.Status</span>
+                        </td>
+                        <td>
+                            <a asp-area="Admin" asp-controller="QuotationRequest" asp-action="Detail"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

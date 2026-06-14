@@ -1,0 +1,158 @@
+@model Needis.Web.ViewModels.Admin.MediaUploadViewModel
+@{
+    ViewData["Title"] = "Upload File";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <h4 class="fw-bold mb-0" style="color:#1a2b6b">
+        <i class="bi bi-upload me-2"></i>Upload File
+    </h4>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    @* File *@
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            File <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="File" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" />
+                        <span asp-validation-for="File" class="text-danger small"></span>
+                    </div>
+
+                    @* Usage / Module *@
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Usage Type</label>
+                            <select asp-for="UsageType" class="form-select">
+                                <option value="General">General</option>
+                                <option value="Logo">Logo</option>
+                                <option value="Banner">Banner</option>
+                                <option value="Product">Product</option>
+                                <option value="ProductBrochure">Product Brochure</option>
+                                <option value="Category">Category</option>
+                                <option value="About">About</option>
+                                <option value="Service">Service</option>
+                                <option value="Activity">Activity</option>
+                                <option value="SEO">SEO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Related Module</label>
+                            <select asp-for="RelatedModule" class="form-select">
+                                <option value="">— None —</option>
+                                <option value="General">General</option>
+                                <option value="SiteSetting">Site Setting</option>
+                                <option value="HomeBanner">Home Banner</option>
+                                <option value="Product">Product</option>
+                                <option value="ProductCategory">Product Category</option>
+                                <option value="About">About</option>
+                                <option value="Service">Service</option>
+                                <option value="Activity">Activity</option>
+                                <option value="SEO">SEO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Related Entity ID</label>
+                            <input asp-for="RelatedEntityId" type="number" class="form-control" placeholder="e.g. 42" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                Folder <span class="text-muted small fw-normal">(optional override)</span>
+                            </label>
+                            <input asp-for="Folder" class="form-control" placeholder="e.g. media/2026/06" />
+                        </div>
+                    </div>
+
+                    @* Title *@
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3" style="color:#2d4199">Title</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small">Title (TH)</label>
+                            <input asp-for="TitleTH" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">Title (EN)</label>
+                            <input asp-for="TitleEN" class="form-control" />
+                        </div>
+                    </div>
+
+                    @* Alt Text *@
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3" style="color:#2d4199">Alt Text (for images)</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small">Alt Text (TH)</label>
+                            <input asp-for="AltTextTH" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">Alt Text (EN)</label>
+                            <input asp-for="AltTextEN" class="form-control" />
+                        </div>
+                    </div>
+
+                    @* Caption *@
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3" style="color:#2d4199">Caption</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small">Caption (TH)</label>
+                            <input asp-for="CaptionTH" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">Caption (EN)</label>
+                            <input asp-for="CaptionEN" class="form-control" />
+                        </div>
+                    </div>
+
+                    @* Visibility *@
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3" style="color:#2d4199">Visibility</h6>
+                    <div class="d-flex gap-4 mb-4">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsPublic" class="form-check-input" role="switch" />
+                            <label asp-for="IsPublic" class="form-check-label">Public</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label">Active</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" style="background:#2d4199;border-color:#2d4199">
+                            <i class="bi bi-upload me-1"></i> Upload
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-transparent border-0 pt-3 pb-1 px-4">
+                <h6 class="fw-bold mb-0" style="color:#2d4199">
+                    <i class="bi bi-info-circle me-1"></i> Allowed Files
+                </h6>
+            </div>
+            <div class="card-body px-4 pb-3">
+                <p class="small text-muted mb-2 fw-semibold">Images (max 5 MB)</p>
+                <p class="small text-muted mb-3">.jpg, .jpeg, .png, .webp, .svg, .gif, .ico</p>
+                <p class="small text-muted mb-2 fw-semibold">Documents (max 20 MB)</p>
+                <p class="small text-muted mb-0">.pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,118 @@
+@model Needis.Web.ViewModels.Admin.ServiceViewModel
+@{
+    ViewData["Title"] = "Create Service";
+    string[] layoutTypes = ["text", "bullet", "cards", "image_left", "image_right"];
+}
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:860px">
+    <div class="card-body p-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back to Services
+        </a>
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <h6 class="fw-bold text-primary mb-3">Basic Info</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label asp-for="ServiceCode" class="form-label fw-medium">Service Code <span class="text-danger">*</span></label>
+                    <input asp-for="ServiceCode" class="form-control text-uppercase" placeholder="e.g. CALIBRATION" />
+                    <span asp-validation-for="ServiceCode" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ServiceSlug" class="form-label fw-medium">Slug <span class="text-danger">*</span></label>
+                    <input asp-for="ServiceSlug" class="form-control" placeholder="e.g. calibration-certification" />
+                    <span asp-validation-for="ServiceSlug" class="text-danger small"></span>
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2 d-flex flex-column justify-content-end gap-2 pb-1">
+                    <div class="form-check">
+                        <input asp-for="IsFeatured" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsFeatured" class="form-check-label">Featured</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label">Active</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ServiceNameEN" class="form-label fw-medium">Name EN <span class="text-danger">*</span></label>
+                    <input asp-for="ServiceNameEN" class="form-control" />
+                    <span asp-validation-for="ServiceNameEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ServiceNameTH" class="form-label fw-medium">Name TH</label>
+                    <input asp-for="ServiceNameTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ShortDescriptionEN" class="form-label fw-medium">Short Description EN</label>
+                    <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ShortDescriptionTH" class="form-label fw-medium">Short Description TH</label>
+                    <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="FullDescriptionEN" class="form-label fw-medium">Full Description EN</label>
+                    <textarea asp-for="FullDescriptionEN" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="FullDescriptionTH" class="form-label fw-medium">Full Description TH</label>
+                    <textarea asp-for="FullDescriptionTH" class="form-control" rows="4"></textarea>
+                </div>
+            </div>
+
+            <h6 class="fw-bold text-primary mb-3">Detail Page Header</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="DetailTitleEN" class="form-label fw-medium">Detail Title EN</label>
+                    <input asp-for="DetailTitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DetailTitleTH" class="form-label fw-medium">Detail Title TH</label>
+                    <input asp-for="DetailTitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DetailSubtitleEN" class="form-label fw-medium">Detail Subtitle EN</label>
+                    <input asp-for="DetailSubtitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DetailSubtitleTH" class="form-label fw-medium">Detail Subtitle TH</label>
+                    <input asp-for="DetailSubtitleTH" class="form-control" />
+                </div>
+            </div>
+
+            <h6 class="fw-bold text-primary mb-3">Images</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label asp-for="CoverImageFile" class="form-label fw-medium">Cover Image</label>
+                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <span asp-validation-for="CoverImageFile" class="text-danger small"></span>
+                    <div class="form-text">Used in listing cards. Max 3 MB.</div>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="BannerImageFile" class="form-label fw-medium">Banner Image</label>
+                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <span asp-validation-for="BannerImageFile" class="text-danger small"></span>
+                    <div class="form-text">Used as page hero/banner. Max 3 MB.</div>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="IconFile" class="form-label fw-medium">Icon Image</label>
+                    <input asp-for="IconFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <span asp-validation-for="IconFile" class="text-danger small"></span>
+                    <div class="form-text">Small icon. Max 3 MB.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

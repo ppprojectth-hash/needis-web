@@ -1,0 +1,211 @@
+@model ServicesIndexViewModel
+@{
+    var lang = Model.CurrentLanguage;
+    string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
+
+    var heroTitle = L(Model.ServicePage?.TitleTH, Model.ServicePage?.TitleEN) is { Length: > 0 } ht
+        ? ht : (lang == "th" ? "บริการของเรา" : "Our Services");
+    var heroSubtitle = L(Model.ServicePage?.SubtitleTH, Model.ServicePage?.SubtitleEN) is { Length: > 0 } hs
+        ? hs : (lang == "th" ? "บริการสนับสนุน สอบเทียบ ติดตั้ง และบำรุงรักษาเครื่องมืออย่างครบวงจร" : "Comprehensive support, calibration, and maintenance for all your instruments.");
+    var heroDesc  = L(Model.ServicePage?.DescriptionTH, Model.ServicePage?.DescriptionEN);
+    var heroBgUrl = Model.ServicePage?.BackgroundImageUrl;
+
+    ViewData["Title"] = heroTitle;
+}
+
+@* ── A. Hero ───────────────────────────────────────────────────────────────── *@
+<div class="service-banner">
+    @if (!string.IsNullOrEmpty(heroBgUrl))
+    {
+        <img src="@heroBgUrl" alt="" class="service-banner-bg" />
+    }
+    <div class="service-banner-overlay"></div>
+    <div class="service-banner-content">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb breadcrumb-dark mb-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Home" asp-action="Index" class="text-white-50">
+                            @(lang == "th" ? "หน้าหลัก" : "Home")
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">@heroTitle</li>
+                </ol>
+            </nav>
+            <h1 class="fw-bold text-white mb-2" style="font-size:clamp(1.75rem,4vw,2.75rem)">@heroTitle</h1>
+            <p class="text-white-75 mb-0 lh-lg" style="max-width:600px;color:rgba(255,255,255,.8)">@heroSubtitle</p>
+            @if (!string.IsNullOrEmpty(heroDesc))
+            {
+                <p class="mt-2 mb-0" style="color:rgba(255,255,255,.65);font-size:.95rem">@heroDesc</p>
+            }
+        </div>
+    </div>
+</div>
+
+@* ── B. Featured Services ──────────────────────────────────────────────────── *@
+@if (Model.FeaturedServices.Any())
+{
+    <section class="py-5" style="background:#f8f9fc">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-eyebrow">@(lang == "th" ? "บริการของเรา" : "Our Services")</p>
+                <h2 class="section-title">@(lang == "th" ? "บริการแนะนำ" : "Featured Services")</h2>
+            </div>
+            <div class="row g-4">
+                @foreach (var (svc, idx) in Model.FeaturedServices.Select((s, i) => (s, i)))
+                {
+                    var delay = (idx % 3) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
+                    <div class="col-md-6 col-lg-4 reveal @delay">
+                        <div class="service-card card shadow-sm">
+                            @if (!string.IsNullOrEmpty(svc.CoverImageUrl))
+                            {
+                                <img src="@svc.CoverImageUrl" alt="@L(svc.ServiceNameTH, svc.ServiceNameEN)"
+                                     class="service-card-img" />
+                            }
+                            else
+                            {
+                                <div class="service-card-img-placeholder">
+                                    @if (!string.IsNullOrEmpty(svc.IconUrl))
+                                    {
+                                        <i class="@svc.IconUrl" style="font-size:3.5rem;color:#9aabd4"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-tools"></i>
+                                    }
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                @if (!string.IsNullOrEmpty(svc.IconUrl))
+                                {
+                                    <div class="service-icon-badge mb-3">
+                                        <i class="@svc.IconUrl"></i>
+                                    </div>
+                                }
+                                <h5 class="fw-bold mb-2" style="color:#1a2b6b">
+                                    @L(svc.ServiceNameTH, svc.ServiceNameEN)
+                                </h5>
+                                @if (!string.IsNullOrEmpty(L(svc.ShortDescriptionTH, svc.ShortDescriptionEN)))
+                                {
+                                    <p class="text-muted small mb-3 flex-grow-1">
+                                        @(L(svc.ShortDescriptionTH, svc.ShortDescriptionEN) is { Length: > 120 } sd
+                                            ? sd[..120] + "…"
+                                            : L(svc.ShortDescriptionTH, svc.ShortDescriptionEN))
+                                    </p>
+                                }
+                                <a asp-controller="Services" asp-action="Detail"
+                                   asp-route-slug="@svc.ServiceSlug"
+                                   class="btn btn-primary mt-auto"
+                                   style="background:#2d4199;border-color:#2d4199">
+                                    @(lang == "th" ? "ดูรายละเอียด" : "View Details")
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── C. All Services ───────────────────────────────────────────────────────── *@
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <p class="section-eyebrow">@(lang == "th" ? "บริการทั้งหมด" : "All Services")</p>
+            <h2 class="section-title">
+                @(lang == "th" ? "บริการครบวงจรของเรา" : "Our Complete Service Range")
+            </h2>
+            <p class="section-subtitle">
+                @(lang == "th"
+                    ? "เราพร้อมดูแลเครื่องมือวัดของคุณทุกขั้นตอน ตั้งแต่การติดตั้งจนถึงการสอบเทียบ"
+                    : "We support your instruments at every stage — from installation to calibration and beyond.")
+            </p>
+        </div>
+
+        @if (Model.Services.Any())
+        {
+            <div class="row g-4">
+                @foreach (var (svc, idx) in Model.Services.Select((s, i) => (s, i)))
+                {
+                    var delay = (idx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    <div class="col-md-6 col-lg-3 reveal @delay">
+                        <div class="service-card card shadow-sm">
+                            @if (!string.IsNullOrEmpty(svc.CoverImageUrl))
+                            {
+                                <img src="@svc.CoverImageUrl"
+                                     alt="@L(svc.ServiceNameTH, svc.ServiceNameEN)"
+                                     class="service-card-img" />
+                            }
+                            else
+                            {
+                                <div class="service-card-img-placeholder" style="height:150px">
+                                    <i class="@(string.IsNullOrEmpty(svc.IconUrl) ? "bi bi-tools" : svc.IconUrl)"></i>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                    @L(svc.ServiceNameTH, svc.ServiceNameEN)
+                                </h6>
+                                @if (!string.IsNullOrEmpty(L(svc.ShortDescriptionTH, svc.ShortDescriptionEN)))
+                                {
+                                    <p class="small text-muted mb-3 flex-grow-1">
+                                        @(L(svc.ShortDescriptionTH, svc.ShortDescriptionEN) is { Length: > 80 } sd
+                                            ? sd[..80] + "…"
+                                            : L(svc.ShortDescriptionTH, svc.ShortDescriptionEN))
+                                    </p>
+                                }
+                                <a asp-controller="Services" asp-action="Detail"
+                                   asp-route-slug="@svc.ServiceSlug"
+                                   class="btn btn-sm btn-outline-primary mt-auto"
+                                   style="color:#2d4199;border-color:#2d4199">
+                                    @(lang == "th" ? "ดูรายละเอียด" : "Learn More")
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-tools fs-1 d-block mb-3" style="color:#c5cde8"></i>
+                <p>@(lang == "th" ? "ยังไม่มีข้อมูลบริการ" : "No services available.")</p>
+            </div>
+        }
+    </div>
+</section>
+
+@* ── D. CTA ────────────────────────────────────────────────────────────────── *@
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8 reveal">
+                <h2 class="text-white fw-bold mb-2">
+                    @(lang == "th"
+                        ? "ต้องการทีมสนับสนุนด้านเทคนิคสำหรับเครื่องมือของคุณ?"
+                        : "Need technical support for your instruments?")
+                </h2>
+                <p class="text-white-50 mb-0">
+                    @(lang == "th"
+                        ? "ผู้เชี่ยวชาญของเราพร้อมดูแลทุกความต้องการด้านเครื่องมือวัดของคุณ"
+                        : "Our specialists are ready to handle all your instrument service needs.")
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end reveal reveal-delay-1">
+                <a asp-controller="Contact" asp-action="Index"
+                   class="btn btn-light btn-lg px-4 me-2">
+                    <i class="bi bi-chat-dots me-1"></i>
+                    @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                </a>
+                <a asp-controller="Quotation" asp-action="Create"
+                   class="btn btn-outline-light btn-lg px-4">
+                    @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

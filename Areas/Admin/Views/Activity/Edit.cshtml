@@ -1,0 +1,143 @@
+@model Needis.Web.ViewModels.Admin.ActivityViewModel
+@{
+    ViewData["Title"] = "Edit Activity";
+}
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width:900px">
+    <div class="card-body p-4">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+
+                <div class="col-12"><h6 class="text-muted border-bottom pb-2">Basic Info</h6></div>
+
+                <div class="col-md-8">
+                    <label asp-for="ActivitySlug" class="form-label fw-medium">Slug <span class="text-danger">*</span></label>
+                    <input asp-for="ActivitySlug" class="form-control" />
+                    <span asp-validation-for="ActivitySlug" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ActivityTitleEN" class="form-label fw-medium">Title EN <span class="text-danger">*</span></label>
+                    <input asp-for="ActivityTitleEN" class="form-control" />
+                    <span asp-validation-for="ActivityTitleEN" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ActivityTitleTH" class="form-label fw-medium">Title TH</label>
+                    <input asp-for="ActivityTitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ShortDescriptionEN" class="form-label fw-medium">Short Description EN</label>
+                    <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ShortDescriptionTH" class="form-label fw-medium">Short Description TH</label>
+                    <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SummaryEN" class="form-label fw-medium">Summary EN</label>
+                    <textarea asp-for="SummaryEN" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SummaryTH" class="form-label fw-medium">Summary TH</label>
+                    <textarea asp-for="SummaryTH" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="col-12"><h6 class="text-muted border-bottom pb-2 mt-2">Details</h6></div>
+
+                <div class="col-md-4">
+                    <label asp-for="ActivityDate" class="form-label fw-medium">Activity Date</label>
+                    <input asp-for="ActivityDate" type="date" class="form-control"
+                           value="@(Model.ActivityDate.HasValue ? Model.ActivityDate.Value.ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PublishedDate" class="form-label fw-medium">Published Date</label>
+                    <input asp-for="PublishedDate" type="date" class="form-control"
+                           value="@(Model.PublishedDate.HasValue ? Model.PublishedDate.Value.ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="AuthorName" class="form-label fw-medium">Author</label>
+                    <input asp-for="AuthorName" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="LocationEN" class="form-label fw-medium">Location EN</label>
+                    <input asp-for="LocationEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="LocationTH" class="form-label fw-medium">Location TH</label>
+                    <input asp-for="LocationTH" class="form-control" />
+                </div>
+
+                <div class="col-12"><h6 class="text-muted border-bottom pb-2 mt-2">Images</h6></div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Cover Image</label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingCoverImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.ExistingCoverImageUrl" alt="Cover" class="img-thumbnail" style="max-height:100px" />
+                        </div>
+                    }
+                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div class="form-text">Max 3 MB. Leave empty to keep current.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Banner Image</label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingBannerImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.ExistingBannerImageUrl" alt="Banner" class="img-thumbnail" style="max-height:100px" />
+                        </div>
+                    }
+                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div class="form-text">Max 3 MB. Leave empty to keep current.</div>
+                </div>
+
+                <div class="col-12"><h6 class="text-muted border-bottom pb-2 mt-2">Status & SEO</h6></div>
+
+                <div class="col-md-4 d-flex align-items-center gap-4">
+                    <div class="form-check">
+                        <input asp-for="IsFeatured" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsFeatured" class="form-check-label fw-medium">Featured</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsPublished" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsPublished" class="form-check-label fw-medium">Published</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetaTitleEN" class="form-label fw-medium">Meta Title EN</label>
+                    <input asp-for="MetaTitleEN" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetaTitleTH" class="form-label fw-medium">Meta Title TH</label>
+                    <input asp-for="MetaTitleTH" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetaDescriptionEN" class="form-label fw-medium">Meta Description EN</label>
+                    <textarea asp-for="MetaDescriptionEN" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetaDescriptionTH" class="form-label fw-medium">Meta Description TH</label>
+                    <textarea asp-for="MetaDescriptionTH" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

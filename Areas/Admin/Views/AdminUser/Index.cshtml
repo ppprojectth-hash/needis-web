@@ -1,0 +1,131 @@
+@model List<Needis.Web.ViewModels.Admin.AdminUserListItemViewModel>
+@{
+    ViewData["Title"] = "Admin Users";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var currentUserId = int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var uid) ? uid : 0;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Admin Users</h4>
+        <p class="text-muted small mb-0">Manage back-office accounts and roles.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>Add User
+    </a>
+</div>
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>@error
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-people fs-1 d-block mb-2" style="color:#c5cde8"></i>
+                No admin users found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size:.9rem">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Display Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @user.Username
+                                    @if (user.Id == currentUserId)
+                                    {
+                                        <span class="badge bg-primary ms-1" style="font-size:.65rem">You</span>
+                                    }
+                                </td>
+                                <td class="text-muted">@user.Email</td>
+                                <td class="text-muted">@user.DisplayName</td>
+                                <td>
+                                    @{
+                                        var roleColor = user.Role == "SuperAdmin" ? "danger" : "secondary";
+                                    }
+                                    <span class="badge bg-@roleColor bg-opacity-15 text-@roleColor border border-@roleColor border-opacity-25">
+                                        @user.Role
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-15 text-secondary border">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-muted small">
+                                    @(user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm") : "—")
+                                </td>
+                                <td class="text-muted small">@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                <td class="text-end">
+                                    <div class="d-flex gap-1 justify-content-end">
+                                        <a asp-action="Edit" asp-route-id="@user.Id"
+                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="ChangePassword" asp-route-id="@user.Id"
+                                           class="btn btn-sm btn-outline-warning" title="Change Password">
+                                            <i class="bi bi-key"></i>
+                                        </a>
+                                        <form asp-action="ToggleActive" asp-route-id="@user.Id"
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirmToggle('@user.Username', @(user.IsActive ? "true" : "false"))">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="btn btn-sm @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+                                                    title="@(user.IsActive ? "Deactivate" : "Activate")">
+                                                <i class="bi @(user.IsActive ? "bi-person-slash" : "bi-person-check")"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmToggle(username, isActive) {
+            const action = isActive === true || isActive === 'true' ? 'deactivate' : 'activate';
+            return confirm(`Are you sure you want to ${action} user "${username}"?`);
+        }
+    </script>
+}

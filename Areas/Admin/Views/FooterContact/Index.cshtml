@@ -1,0 +1,157 @@
+@model Needis.Web.ViewModels.Admin.FooterContactViewModel
+@{
+    ViewData["Title"] = "Footer Contact";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Footer Contact</h4>
+        <p class="text-muted small mb-0">Manage contact information displayed in the website footer.</p>
+    </div>
+</div>
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<form asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+
+        @* Company Description *@
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-building me-2 text-primary"></i>Company Description</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CompanyDescriptionTH" class="form-label fw-medium"></label>
+                            <textarea asp-for="CompanyDescriptionTH" class="form-control" rows="4"
+                                      placeholder="คำอธิบายบริษัท (ภาษาไทย)"></textarea>
+                            <span asp-validation-for="CompanyDescriptionTH" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="CompanyDescriptionEN" class="form-label fw-medium"></label>
+                            <textarea asp-for="CompanyDescriptionEN" class="form-control" rows="4"
+                                      placeholder="Company description in English"></textarea>
+                            <span asp-validation-for="CompanyDescriptionEN" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Address *@
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-geo-alt me-2 text-primary"></i>Address</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="AddressTH" class="form-label fw-medium"></label>
+                            <textarea asp-for="AddressTH" class="form-control" rows="3"
+                                      placeholder="ที่อยู่ (ภาษาไทย)"></textarea>
+                            <span asp-validation-for="AddressTH" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="AddressEN" class="form-label fw-medium"></label>
+                            <textarea asp-for="AddressEN" class="form-control" rows="3"
+                                      placeholder="Address in English"></textarea>
+                            <span asp-validation-for="AddressEN" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Contact Channels & Social Links *@
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-telephone me-2 text-primary"></i>Contact Channels</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label fw-medium"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                            <input asp-for="Phone" class="form-control" placeholder="+66 2 xxx xxxx" />
+                        </div>
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-medium"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                            <input asp-for="Email" class="form-control" placeholder="contact@example.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div>
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label fw-medium">Active</label>
+                        </div>
+                        <div class="form-text">When active, footer contact info overrides Site Settings values.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header py-3">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-share me-2 text-primary"></i>Social Links</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="FacebookUrl" class="form-label fw-medium"></label>
+                        <div class="input-group">
+                            <span class="input-group-text text-primary"><i class="bi bi-facebook"></i></span>
+                            <input asp-for="FacebookUrl" class="form-control" placeholder="https://facebook.com/yourpage" />
+                        </div>
+                        <span asp-validation-for="FacebookUrl" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="LineUrl" class="form-label fw-medium"></label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="color:#00B900"><i class="bi bi-line"></i></span>
+                            <input asp-for="LineUrl" class="form-control" placeholder="https://line.me/ti/p/..." />
+                        </div>
+                        <span asp-validation-for="LineUrl" class="text-danger small"></span>
+                    </div>
+                    <div>
+                        <label asp-for="LinkedInUrl" class="form-label fw-medium"></label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="color:#0A66C2"><i class="bi bi-linkedin"></i></span>
+                            <input asp-for="LinkedInUrl" class="form-control" placeholder="https://linkedin.com/company/..." />
+                        </div>
+                        <span asp-validation-for="LinkedInUrl" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-floppy-fill me-2"></i>Save Changes
+        </button>
+    </div>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,227 @@
+@model Needis.Web.ViewModels.Admin.ContactMessageDetailViewModel
+@{
+    ViewData["Title"] = "Message Detail";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var msg = Model.Message;
+    var statusNow = msg.Status ?? "New";
+    string[] statuses = ["New", "Read", "Replied", "Closed", "Spam"];
+    (string Bg, string Text) StatusBadge(string s) => s switch {
+        "New"     => ("bg-primary",   "text-white"),
+        "Read"    => ("bg-info",      "text-white"),
+        "Replied" => ("bg-success",   "text-white"),
+        "Closed"  => ("bg-secondary", "text-white"),
+        "Spam"    => ("bg-danger",    "text-white"),
+        _         => ("bg-primary",   "text-white"),
+    };
+    var (bbg, btxt) = StatusBadge(statusNow);
+}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <div class="flex-grow-1">
+        <h4 class="fw-bold mb-0">Message Detail</h4>
+        <p class="text-muted small mb-0">
+            Received @msg.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+            &nbsp;·&nbsp;
+            <span class="badge @bbg @btxt">@statusNow</span>
+        </p>
+    </div>
+</div>
+
+@if (TempData["Success"] is string ok)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@ok
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-4">
+
+    @* Left Column: Message Info *@
+    <div class="col-lg-7">
+
+        @* Sender Info *@
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3">
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-person me-2 text-primary"></i>Sender Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-medium">Full Name</div>
+                        <div class="fw-semibold">@(msg.FullName ?? "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-medium">Email</div>
+                        <div><a href="mailto:@msg.Email">@msg.Email</a></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-medium">Phone</div>
+                        <div>@(msg.Phone ?? "—")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="small text-muted fw-medium">Language</div>
+                        <div>@(string.IsNullOrEmpty(msg.Language) ? "—" : msg.Language.ToUpper())</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(msg.IpAddress))
+                    {
+                        <div class="col-sm-6">
+                            <div class="small text-muted fw-medium">IP Address</div>
+                            <div class="font-monospace small">@msg.IpAddress</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Message Content *@
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-chat-left-text me-2 text-primary"></i>Message
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-muted fw-medium mb-1">Subject</div>
+                <div class="fw-semibold mb-3">@(msg.Subject ?? "—")</div>
+                <div class="small text-muted fw-medium mb-1">Message</div>
+                <div class="bg-light rounded p-3" style="white-space:pre-wrap;font-size:.9rem">@(msg.Message ?? "—")</div>
+            </div>
+        </div>
+
+    </div>
+
+    @* Right Column: Admin Management *@
+    <div class="col-lg-5">
+
+        @* Status Management *@
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3">
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>Management
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@msg.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Status</label>
+                        <select name="Status" class="form-select">
+                            @foreach (var s in statuses)
+                            {
+                                <option value="@s" selected="@(s == statusNow ? "selected" : null)">@s</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Assigned To</label>
+                        <input name="AssignedTo" class="form-control" value="@(msg.AssignedTo ?? "")"
+                               placeholder="Username or team..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Admin Remark</label>
+                        <textarea name="AdminRemark" class="form-control" rows="4"
+                                  placeholder="Internal notes...">@(msg.AdminRemark ?? "")</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-floppy-fill me-2"></i>Save Changes
+                    </button>
+                </form>
+
+                <div class="d-flex gap-2 mt-3">
+                    @if (statusNow != "Spam")
+                    {
+                        <form asp-action="MarkAsSpam" asp-route-id="@msg.Id" method="post" class="flex-grow-1"
+                              onsubmit="return confirm('Mark this message as spam?')">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                                <i class="bi bi-shield-x me-1"></i>Mark as Spam
+                            </button>
+                        </form>
+                    }
+                    @if (statusNow != "Closed")
+                    {
+                        <form asp-action="Close" asp-route-id="@msg.Id" method="post" class="flex-grow-1">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-secondary w-100 btn-sm">
+                                <i class="bi bi-check2-square me-1"></i>Close
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Timeline *@
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Timeline
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column gap-2" style="font-size:.85rem">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Received</span>
+                        <span class="fw-medium">@msg.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                    </div>
+                    @if (msg.ReadAt.HasValue)
+                    {
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Read At</span>
+                            <span class="fw-medium">@msg.ReadAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    }
+                    @if (msg.RepliedAt.HasValue)
+                    {
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Replied At</span>
+                            <span class="fw-medium text-success">@msg.RepliedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    }
+                    @if (msg.ClosedAt.HasValue)
+                    {
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Closed At</span>
+                            <span class="fw-medium text-secondary">@msg.ClosedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    }
+                    @if (msg.UpdatedAt.HasValue)
+                    {
+                        <hr class="my-1" />
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Last Updated</span>
+                            <span>@msg.UpdatedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(msg.UpdatedBy))
+                        {
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Updated By</span>
+                                <span>@msg.UpdatedBy</span>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

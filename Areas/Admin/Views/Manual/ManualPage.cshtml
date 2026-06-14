@@ -1,0 +1,112 @@
+@model Needis.Web.ViewModels.Manual.ManualPageViewModel
+@{
+    ViewData["Title"] = "Manual — " + Model.Title;
+}
+
+<div class="manual-admin-shell">
+
+    @* ── Hero header ────────────────────────────────────────────── *@
+    <div class="manual-hero-card no-print">
+        <div>
+            <div class="manual-hero-badge">
+                <i class="bi bi-book-half"></i> Documentation
+            </div>
+            <h1 class="manual-hero-title">คู่มือการใช้งาน</h1>
+            <p class="manual-hero-subtitle">@Model.Title</p>
+        </div>
+        <div class="manual-hero-actions">
+            <a href="/Admin/Manual/Print/@Model.ManualKey" target="_blank"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-printer me-1"></i>Print View
+            </a>
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+               class="btn btn-sm fw-semibold"
+               style="background:#2d4199;color:#fff;border:none">
+                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    @* ── Two-column layout ───────────────────────────────────────── *@
+    <div class="manual-admin-layout">
+
+        @* Sidebar *@
+        <aside class="manual-sidebar no-print">
+
+            @* Menu card *@
+            <div class="manual-sidebar-card">
+                <div class="manual-sidebar-title">คู่มือทั้งหมด</div>
+                <ul class="manual-menu-list">
+                    @foreach (var item in Model.MenuItems)
+                    {
+                        <li>
+                            <a href="@item.Url"
+                               class="manual-menu-item @(item.IsActive ? "active" : "")">
+                                <span class="manual-menu-icon">
+                                    <i class="bi @item.IconCss"></i>
+                                </span>
+                                <span class="manual-menu-text">
+                                    <span class="manual-menu-title">@item.TitleTH</span>
+                                    <span class="manual-menu-subtitle">@item.TitleEN</span>
+                                </span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            @* Download card *@
+            <div class="manual-sidebar-card manual-download-card">
+                <div class="manual-sidebar-title">ดาวน์โหลด / พิมพ์</div>
+                <div style="padding:.4rem 0 .6rem">
+                    <a href="/Admin/Manual/Print/@Model.ManualKey" target="_blank"
+                       class="manual-download-btn">
+                        <i class="bi bi-printer" style="color:#2d4199"></i>
+                        Print / Save as PDF
+                    </a>
+                    <button onclick="window.print()" class="manual-download-btn">
+                        <i class="bi bi-file-earmark-pdf" style="color:#dc2626"></i>
+                        พิมพ์หน้านี้
+                    </button>
+                </div>
+            </div>
+
+        </aside>
+
+        @* Main content *@
+        <main class="manual-main">
+            <article class="manual-content-card">
+                <div class="manual-content-top">
+                    <span class="manual-content-badge">
+                        <i class="bi bi-file-text"></i>@Model.Title
+                    </span>
+                </div>
+                <div class="manual-prose-wrap">
+                    <div class="manual-prose">
+                        @Html.Raw(Model.HtmlContent)
+                    </div>
+                </div>
+            </article>
+
+            @* Bottom bar *@
+            <div class="manual-action-bar no-print">
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>กลับ Dashboard
+                </a>
+                <div class="d-flex gap-2">
+                    <a href="/Admin/Manual/Print/@Model.ManualKey" target="_blank"
+                       class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-printer me-1"></i>Print View
+                    </a>
+                    <button onclick="window.print()"
+                            class="btn btn-sm fw-semibold"
+                            style="background:#2d4199;color:#fff;border:none">
+                        <i class="bi bi-file-earmark-pdf me-1"></i>พิมพ์ / บันทึก PDF
+                    </button>
+                </div>
+            </div>
+        </main>
+
+    </div>
+</div>
