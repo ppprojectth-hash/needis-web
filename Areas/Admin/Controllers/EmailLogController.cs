@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 
 namespace Needis.Web.Areas.Admin.Controllers;
 
@@ -23,16 +24,16 @@ public class EmailLogController : Controller
     {
         ViewData["Title"] = "Email Logs";
 
-        var now    = DateTime.UtcNow;
-        dateFrom ??= now.AddDays(-7).Date;
-        dateTo   ??= now.Date;
+        var nowBangkok = BangkokTimeHelper.NowBangkok();
+        dateFrom ??= nowBangkok.Date.AddDays(-7);
+        dateTo   ??= nowBangkok.Date;
 
-        var from = dateFrom.Value.Date;
-        var to   = dateTo.Value.Date.AddDays(1);
+        var from        = BangkokTimeHelper.ConvertBangkokDateStartToUtc(dateFrom.Value);
+        var toExclusive = BangkokTimeHelper.ConvertBangkokDateEndExclusiveToUtc(dateTo.Value);
 
         var query = _db.EmailSendLogs
             .AsNoTracking()
-            .Where(l => l.CreatedAt >= from && l.CreatedAt < to)
+            .Where(l => l.CreatedAt >= from && l.CreatedAt < toExclusive)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(status))

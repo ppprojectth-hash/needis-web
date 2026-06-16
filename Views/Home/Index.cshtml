@@ -164,26 +164,6 @@
                                                     </a>
                                                 }
                                             </div>
-                                            @* Stats (first slide only to avoid repetition) *@
-                                            @if (bIdx == 0)
-                                            {
-                                                <div class="hero-stats-row">
-                                                    <div class="hero-stat">
-                                                        <span class="hero-stat-value">20<span class="hero-stat-accent">+</span></span>
-                                                        <span class="hero-stat-label">@(lang == "th" ? "ปีประสบการณ์" : "Years Experience")</span>
-                                                    </div>
-                                                    <div class="hero-stat-sep" aria-hidden="true"></div>
-                                                    <div class="hero-stat">
-                                                        <span class="hero-stat-value">500<span class="hero-stat-accent">+</span></span>
-                                                        <span class="hero-stat-label">@(lang == "th" ? "ลูกค้าที่ไว้วางใจ" : "Clients Served")</span>
-                                                    </div>
-                                                    <div class="hero-stat-sep" aria-hidden="true"></div>
-                                                    <div class="hero-stat">
-                                                        <span class="hero-stat-value">1000<span class="hero-stat-accent">+</span></span>
-                                                        <span class="hero-stat-label">@(lang == "th" ? "ผลิตภัณฑ์ที่ติดตั้ง" : "Products Installed")</span>
-                                                    </div>
-                                                </div>
-                                            }
                                         </div>
 
                                         @* YouTube iframe column *@
@@ -263,22 +243,6 @@ else
                             @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
                             <i class="bi bi-arrow-right ms-2"></i>
                         </a>
-                    </div>
-                    <div class="hero-stats-row">
-                        <div class="hero-stat">
-                            <span class="hero-stat-value">20<span class="hero-stat-accent">+</span></span>
-                            <span class="hero-stat-label">@(lang == "th" ? "ปีประสบการณ์" : "Years Experience")</span>
-                        </div>
-                        <div class="hero-stat-sep" aria-hidden="true"></div>
-                        <div class="hero-stat">
-                            <span class="hero-stat-value">500<span class="hero-stat-accent">+</span></span>
-                            <span class="hero-stat-label">@(lang == "th" ? "ลูกค้าที่ไว้วางใจ" : "Clients Served")</span>
-                        </div>
-                        <div class="hero-stat-sep" aria-hidden="true"></div>
-                        <div class="hero-stat">
-                            <span class="hero-stat-value">1000<span class="hero-stat-accent">+</span></span>
-                            <span class="hero-stat-label">@(lang == "th" ? "ผลิตภัณฑ์ที่ติดตั้ง" : "Products Installed")</span>
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-flex justify-content-center reveal reveal-delay-2">
@@ -379,7 +343,7 @@ else
             {
                 <div class="text-center mt-4">
                     <a asp-controller="Product" asp-action="Index"
-                       class="btn btn-outline-primary px-4" style="border-color:#2d4199;color:#2d4199">
+                       class="btn btn-outline-primary px-4" style="border-color:var(--needis-primary);color:var(--needis-primary)">
                         @(lang == "th" ? "ดูหมวดหมู่ทั้งหมด" : "View All Categories")
                         <i class="bi bi-arrow-right ms-1"></i>
                     </a>
@@ -416,7 +380,7 @@ else
             </div>
             <a asp-controller="Product" asp-action="Index"
                class="btn btn-outline-primary flex-shrink-0"
-               style="border-color:#2d4199;color:#2d4199">
+               style="border-color:var(--needis-primary);color:var(--needis-primary)">
                 @(lang == "th" ? "ดูสินค้าทั้งหมด" : "View All Products")
                 <i class="bi bi-arrow-right ms-1"></i>
             </a>
@@ -443,7 +407,7 @@ else
                             </div>
                         }
                         <div class="flex-grow-1">
-                            <h4 class="fw-bold mb-0" style="color:#1a2b6b;font-size:1.15rem">@grpName</h4>
+                            <h4 class="fw-bold mb-0" style="color:var(--needis-dark);font-size:1.15rem">@grpName</h4>
                             @if (!string.IsNullOrEmpty(grpDesc))
                             {
                                 <p class="text-muted small mb-0 mt-1">@grpDesc</p>
@@ -635,7 +599,7 @@ else
                             <div class="home-service-icon mb-3">
                                 <i class="bi @sIcon"></i>
                             </div>
-                            <h6 class="fw-bold mb-2" style="color:#1a2b6b;font-size:.98rem">@sName</h6>
+                            <h6 class="fw-bold mb-2" style="color:var(--needis-dark);font-size:.98rem">@sName</h6>
                             @if (!string.IsNullOrEmpty(sDesc))
                             {
                                 <p class="small text-muted mb-3 lh-lg">
@@ -674,7 +638,7 @@ else
                             <div class="home-service-icon mb-3">
                                 <i class="bi @ss.Icon"></i>
                             </div>
-                            <h6 class="fw-bold mb-2" style="color:#1a2b6b;font-size:.98rem">
+                            <h6 class="fw-bold mb-2" style="color:var(--needis-dark);font-size:.98rem">
                                 @(lang == "th" ? ss.TH : ss.EN)
                             </h6>
                             <p class="small text-muted mb-3 lh-lg">
@@ -693,7 +657,7 @@ else
 
         <div class="text-center mt-4">
             <a asp-controller="Services" asp-action="Index"
-               class="btn btn-outline-primary px-4" style="border-color:#2d4199;color:#2d4199">
+               class="btn btn-outline-primary px-4" style="border-color:var(--needis-primary);color:var(--needis-primary)">
                 @(lang == "th" ? "ดูบริการทั้งหมด" : "View All Services")
                 <i class="bi bi-arrow-right ms-1"></i>
             </a>
@@ -723,7 +687,7 @@ else
                 </div>
                 <a asp-controller="Activity" asp-action="Index"
                    class="btn btn-outline-primary flex-shrink-0"
-                   style="border-color:#2d4199;color:#2d4199">
+                   style="border-color:var(--needis-primary);color:var(--needis-primary)">
                     @(lang == "th" ? "ดูกิจกรรมทั้งหมด" : "View All Activity")
                     <i class="bi bi-arrow-right ms-1"></i>
                 </a>

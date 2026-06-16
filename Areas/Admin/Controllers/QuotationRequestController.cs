@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.Models;
 using Needis.Web.ViewModels.Admin;
 
@@ -34,16 +35,16 @@ public class QuotationRequestController : Controller
     {
         ViewData["Title"] = "Quotation Requests";
 
-        var now    = DateTime.UtcNow;
-        dateFrom ??= now.AddDays(-30).Date;
-        dateTo   ??= now.Date;
+        var nowBangkok = BangkokTimeHelper.NowBangkok();
+        dateFrom ??= nowBangkok.Date.AddDays(-30);
+        dateTo   ??= nowBangkok.Date;
 
-        var from = dateFrom.Value.Date;
-        var to   = dateTo.Value.Date.AddDays(1);
+        var from        = BangkokTimeHelper.ConvertBangkokDateStartToUtc(dateFrom.Value);
+        var toExclusive = BangkokTimeHelper.ConvertBangkokDateEndExclusiveToUtc(dateTo.Value);
 
         var query = _db.QuotationRequests
             .AsNoTracking()
-            .Where(r => r.CreatedAt >= from && r.CreatedAt < to)
+            .Where(r => r.CreatedAt >= from && r.CreatedAt < toExclusive)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(status))

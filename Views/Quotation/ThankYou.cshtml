@@ -9,11 +9,11 @@
         <div class="row justify-content-center">
             <div class="col-lg-6 text-center">
 
-                <div class="mb-4" style="font-size:5rem;color:#2d4199">
+                <div class="mb-4" style="font-size:5rem;color:var(--needis-primary)">
                     <i class="bi bi-check-circle-fill"></i>
                 </div>
 
-                <h1 class="fw-bold mb-2" style="color:#1a2b6b">
+                <h1 class="fw-bold mb-2" style="color:var(--needis-dark)">
                     @(lang == "th" ? "ส่งคำขอเรียบร้อยแล้ว!" : "Request Submitted!")
                 </h1>
                 <p class="text-muted mb-4 lh-lg">
@@ -28,7 +28,7 @@
                         <div class="small text-muted mb-1">
                             @(lang == "th" ? "หมายเลขคำขอของคุณ" : "Your Request Number")
                         </div>
-                        <div class="fw-bold fs-5" style="color:#2d4199;letter-spacing:.05em">
+                        <div class="fw-bold fs-5" style="color:var(--needis-primary);letter-spacing:.05em">
                             @requestNo
                         </div>
                     </div>
@@ -43,19 +43,19 @@
                 <div class="d-flex flex-wrap justify-content-center gap-3">
                     <a asp-controller="Home" asp-action="Index"
                        class="btn btn-primary px-4"
-                       style="background:#2d4199;border-color:#2d4199">
+                       style="background:var(--needis-primary);border-color:var(--needis-primary)">
                         <i class="bi bi-house me-1"></i>
                         @(lang == "th" ? "กลับหน้าหลัก" : "Back to Home")
                     </a>
                     <a asp-controller="Product" asp-action="Index"
                        class="btn btn-outline-primary px-4"
-                       style="color:#2d4199;border-color:#2d4199">
+                       style="color:var(--needis-primary);border-color:var(--needis-primary)">
                         <i class="bi bi-box-seam me-1"></i>
                         @(lang == "th" ? "ดูสินค้า" : "View Products")
                     </a>
                     <a asp-controller="Services" asp-action="Index"
                        class="btn btn-outline-primary px-4"
-                       style="color:#2d4199;border-color:#2d4199">
+                       style="color:var(--needis-primary);border-color:var(--needis-primary)">
                         <i class="bi bi-tools me-1"></i>
                         @(lang == "th" ? "ดูบริการ" : "View Services")
                     </a>

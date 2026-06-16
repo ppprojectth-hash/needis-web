@@ -1,27 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Needis.Web.Data;
 using Needis.Web.Services;
 
 namespace Needis.Web.ViewComponents;
 
 public class SiteHeaderViewComponent : ViewComponent
 {
-    private readonly AppDbContext     _db;
-    private readonly ILanguageService _lang;
+    private readonly ISiteSettingService _siteSetting;
+    private readonly ILanguageService    _lang;
 
-    public SiteHeaderViewComponent(AppDbContext db, ILanguageService lang)
+    public SiteHeaderViewComponent(ISiteSettingService siteSetting, ILanguageService lang)
     {
-        _db   = db;
-        _lang = lang;
+        _siteSetting = siteSetting;
+        _lang        = lang;
     }
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        var setting = await _db.SiteSettings
-            .AsNoTracking()
-            .Where(s => s.IsActive)
-            .FirstOrDefaultAsync();
+        var setting = await _siteSetting.GetActiveAsync();
 
         var currentLang = _lang.GetCurrentLanguage(HttpContext);
         var returnUrl   = HttpContext.Request.Path.Value ?? "/";

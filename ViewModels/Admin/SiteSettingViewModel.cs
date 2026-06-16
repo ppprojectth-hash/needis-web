@@ -21,6 +21,8 @@ public class SiteSettingViewModel
 
     [Display(Name = "Main Color")]
     [MaxLength(20)]
+    [RegularExpression(@"^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$",
+        ErrorMessage = "Main Color must be a valid hex code, e.g. #2d4199 or #RGB.")]
     public string? MainColor { get; set; } = "#2d4199";
 
     [Display(Name = "Phone")]

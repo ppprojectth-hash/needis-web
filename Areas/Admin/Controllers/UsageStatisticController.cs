@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.ViewModels.Admin;
 
 namespace Needis.Web.Areas.Admin.Controllers;
@@ -21,15 +22,12 @@ public class UsageStatisticController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(DateTime? dateFrom, DateTime? dateTo, string? keyword)
     {
-        var today = DateTime.UtcNow.Date;
+        var todayBangkok = BangkokTimeHelper.NowBangkok().Date;
+        var startDate    = dateFrom?.Date ?? todayBangkok.AddDays(-7);
+        var endDate      = dateTo?.Date   ?? todayBangkok;
 
-        var from = DateTime.SpecifyKind(
-            (dateFrom?.Date ?? today.AddDays(-7)),
-            DateTimeKind.Utc);
-
-        var to = DateTime.SpecifyKind(
-            (dateTo?.Date ?? today).AddDays(1),
-            DateTimeKind.Utc);
+        var from = BangkokTimeHelper.ConvertBangkokDateStartToUtc(startDate);
+        var to   = BangkokTimeHelper.ConvertBangkokDateEndExclusiveToUtc(endDate);
 
         var query = _db.UsageLogs
             .AsNoTracking()
@@ -81,8 +79,8 @@ public class UsageStatisticController : Controller
 
         var vm = new UsageStatisticIndexViewModel
         {
-            DateFrom          = dateFrom?.Date ?? today.AddDays(-7),
-            DateTo            = dateTo?.Date   ?? today,
+            DateFrom          = startDate,
+            DateTo            = endDate,
             Keyword           = keyword,
             TotalRequests     = total,
             SuccessRequests   = success,

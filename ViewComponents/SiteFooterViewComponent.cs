@@ -7,21 +7,20 @@ namespace Needis.Web.ViewComponents;
 
 public class SiteFooterViewComponent : ViewComponent
 {
-    private readonly AppDbContext     _db;
-    private readonly ILanguageService _lang;
+    private readonly AppDbContext        _db;
+    private readonly ISiteSettingService _siteSetting;
+    private readonly ILanguageService    _lang;
 
-    public SiteFooterViewComponent(AppDbContext db, ILanguageService lang)
+    public SiteFooterViewComponent(AppDbContext db, ISiteSettingService siteSetting, ILanguageService lang)
     {
-        _db   = db;
-        _lang = lang;
+        _db          = db;
+        _siteSetting = siteSetting;
+        _lang        = lang;
     }
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        var setting = await _db.SiteSettings
-            .AsNoTracking()
-            .Where(s => s.IsActive)
-            .FirstOrDefaultAsync();
+        var setting = await _siteSetting.GetActiveAsync();
 
         var footerContact = await _db.FooterContacts
             .AsNoTracking()

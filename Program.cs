@@ -44,6 +44,9 @@ builder.Services.AddScoped<IMediaFileService, MediaFileService>();
 // Manual service
 builder.Services.AddScoped<IManualService, ManualService>();
 
+// Site setting service
+builder.Services.AddScoped<ISiteSettingService, SiteSettingService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

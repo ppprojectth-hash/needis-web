@@ -82,7 +82,7 @@
                                         <i class="@svc.IconUrl"></i>
                                     </div>
                                 }
-                                <h5 class="fw-bold mb-2" style="color:#1a2b6b">
+                                <h5 class="fw-bold mb-2" style="color:var(--needis-dark)">
                                     @L(svc.ServiceNameTH, svc.ServiceNameEN)
                                 </h5>
                                 @if (!string.IsNullOrEmpty(L(svc.ShortDescriptionTH, svc.ShortDescriptionEN)))
@@ -96,7 +96,7 @@
                                 <a asp-controller="Services" asp-action="Detail"
                                    asp-route-slug="@svc.ServiceSlug"
                                    class="btn btn-primary mt-auto"
-                                   style="background:#2d4199;border-color:#2d4199">
+                                   style="background:var(--needis-primary);border-color:var(--needis-primary)">
                                     @(lang == "th" ? "ดูรายละเอียด" : "View Details")
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
@@ -145,7 +145,7 @@
                                 </div>
                             }
                             <div class="card-body d-flex flex-column p-3">
-                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">
                                     @L(svc.ServiceNameTH, svc.ServiceNameEN)
                                 </h6>
                                 @if (!string.IsNullOrEmpty(L(svc.ShortDescriptionTH, svc.ShortDescriptionEN)))
@@ -159,7 +159,7 @@
                                 <a asp-controller="Services" asp-action="Detail"
                                    asp-route-slug="@svc.ServiceSlug"
                                    class="btn btn-sm btn-outline-primary mt-auto"
-                                   style="color:#2d4199;border-color:#2d4199">
+                                   style="color:var(--needis-primary);border-color:var(--needis-primary)">
                                     @(lang == "th" ? "ดูรายละเอียด" : "Learn More")
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>

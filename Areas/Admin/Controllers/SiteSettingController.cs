@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.Models;
 using Needis.Web.ViewModels.Admin;
 
@@ -46,7 +47,7 @@ public class SiteSettingController : Controller
         // Map text fields
         setting.CompanyNameTH  = vm.CompanyNameTH  ?? string.Empty;
         setting.CompanyNameEN  = vm.CompanyNameEN  ?? string.Empty;
-        setting.MainColor      = vm.MainColor?.Trim() is { Length: > 0 } c ? c : "#2d4199";
+        setting.MainColor      = ColorHelper.NormalizeHexColor(vm.MainColor);
         setting.ContactPhone   = vm.Phone;
         setting.ContactEmail   = vm.Email;
         setting.AddressTH      = vm.AddressTH;

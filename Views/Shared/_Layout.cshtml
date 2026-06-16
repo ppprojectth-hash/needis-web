@@ -1,6 +1,10 @@
+@using Needis.Web.Helpers
 @inject Needis.Web.Services.ILanguageService LanguageService
+@inject Needis.Web.Services.ISiteSettingService SiteSettingService
 @{
     var currentLanguage = LanguageService.GetCurrentLanguage(Context);
+    var activeSiteSetting = await SiteSettingService.GetActiveAsync();
+    var primaryColor = ColorHelper.NormalizeHexColor(activeSiteSetting?.MainColor);
 }
 <!DOCTYPE html>
 <html lang="@currentLanguage">
@@ -20,6 +24,17 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        :root {
+            --needis-primary: @primaryColor;
+            --needis-dark: color-mix(in srgb, @primaryColor 82%, black);
+            --needis-primary-deep: color-mix(in srgb, @primaryColor 65%, black);
+            --needis-primary-hover: color-mix(in srgb, @primaryColor 88%, white);
+            --needis-primary-mid: color-mix(in srgb, @primaryColor 35%, white);
+            --needis-primary-light: color-mix(in srgb, @primaryColor 18%, white);
+            --needis-primary-soft: color-mix(in srgb, @primaryColor 8%, white);
+        }
+    </style>
 </head>
 <body>
 

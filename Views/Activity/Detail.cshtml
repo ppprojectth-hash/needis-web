@@ -62,7 +62,7 @@
             <div class="d-flex flex-wrap gap-2 mb-3">
                 @foreach (var t in Model.Tags.Take(3))
                 {
-                    <span class="activity-tag-badge" style="background:@(t.TagColor ?? "#2d4199")">
+                    <span class="activity-tag-badge" style="background:@(t.TagColor ?? "var(--needis-primary)")">
                         @L(t.TagNameTH, t.TagNameEN)
                     </span>
                 }
@@ -139,7 +139,7 @@
                     {
                         @if (!string.IsNullOrEmpty(bTitle))
                         {
-                            <h5 class="fw-bold mb-2" style="color:#1a2b6b">@bTitle</h5>
+                            <h5 class="fw-bold mb-2" style="color:var(--needis-dark)">@bTitle</h5>
                         }
                         @if (!string.IsNullOrEmpty(bContent))
                         {
@@ -192,7 +192,7 @@
                     {
                         @if (!string.IsNullOrEmpty(bTitle))
                         {
-                            <h5 class="fw-bold mb-3" style="color:#1a2b6b">@bTitle</h5>
+                            <h5 class="fw-bold mb-3" style="color:var(--needis-dark)">@bTitle</h5>
                         }
                         @if (blkImages.Any())
                         {
@@ -219,7 +219,7 @@
                     {
                         @if (!string.IsNullOrEmpty(bTitle))
                         {
-                            <h5 class="fw-bold mb-3" style="color:#1a2b6b">@bTitle</h5>
+                            <h5 class="fw-bold mb-3" style="color:var(--needis-dark)">@bTitle</h5>
                         }
                         @if (!string.IsNullOrEmpty(blk.VideoUrl))
                         {
@@ -236,7 +236,7 @@
                             {
                                 <a href="@blk.VideoUrl" target="_blank" rel="noopener"
                                    class="btn btn-outline-primary"
-                                   style="color:#2d4199;border-color:#2d4199">
+                                   style="color:var(--needis-primary);border-color:var(--needis-primary)">
                                     <i class="bi bi-play-circle me-2"></i>
                                     @(lang == "th" ? "ดูวิดีโอ" : "Watch Video")
                                 </a>
@@ -250,7 +250,7 @@
                             <div class="py-2">
                                 <a href="@blk.ButtonUrl"
                                    class="btn btn-primary px-4"
-                                   style="background:#2d4199;border-color:#2d4199">
+                                   style="background:var(--needis-primary);border-color:var(--needis-primary)">
                                     @bBtnText
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
@@ -262,7 +262,7 @@
                         @* Fallback: treat unknown block as text *@
                         @if (!string.IsNullOrEmpty(bTitle))
                         {
-                            <h5 class="fw-bold mb-2" style="color:#1a2b6b">@bTitle</h5>
+                            <h5 class="fw-bold mb-2" style="color:var(--needis-dark)">@bTitle</h5>
                         }
                         @if (!string.IsNullOrEmpty(bContent))
                         {
@@ -276,7 +276,7 @@
             @if (Model.Images.Any())
             {
                 <div class="activity-block reveal">
-                    <h5 class="fw-bold mb-3" style="color:#1a2b6b">
+                    <h5 class="fw-bold mb-3" style="color:var(--needis-dark)">
                         @(lang == "th" ? "รูปภาพกิจกรรม" : "Activity Images")
                     </h5>
                     <div class="activity-album-grid">
@@ -311,7 +311,7 @@
 {
     <section class="py-5" style="background:#f8f9fc">
         <div class="container">
-            <h4 class="fw-bold mb-4 reveal" style="color:#1a2b6b">
+            <h4 class="fw-bold mb-4 reveal" style="color:var(--needis-dark)">
                 @(lang == "th" ? "บทความและกิจกรรมเพิ่มเติม" : "More Articles")
             </h4>
             <div class="row g-4">
@@ -340,12 +340,12 @@
                                     @foreach (var m in more.ActivityTagMaps.Where(m => m.ActivityTag?.IsActive == true).Take(1))
                                     {
                                         <span class="activity-tag-badge"
-                                              style="background:@(m.ActivityTag?.TagColor ?? "#2d4199");font-size:.65rem">
+                                              style="background:@(m.ActivityTag?.TagColor ?? "var(--needis-primary)");font-size:.65rem">
                                             @L(m.ActivityTag?.TagNameTH, m.ActivityTag?.TagNameEN)
                                         </span>
                                     }
                                 </div>
-                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">
                                     @L(more.ActivityTitleTH, more.ActivityTitleEN)
                                 </h6>
                                 @if (!string.IsNullOrEmpty(mDate))
@@ -355,7 +355,7 @@
                                 <a asp-controller="Activity" asp-action="Detail"
                                    asp-route-slug="@more.ActivitySlug"
                                    class="btn btn-sm btn-outline-primary"
-                                   style="color:#2d4199;border-color:#2d4199">
+                                   style="color:var(--needis-primary);border-color:var(--needis-primary)">
                                     @(lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>

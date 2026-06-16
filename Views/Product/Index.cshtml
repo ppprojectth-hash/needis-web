@@ -86,7 +86,7 @@
                             <input type="text" name="search" value="@Model.Search"
                                    class="form-control"
                                    placeholder="@(lang == "th" ? "ชื่อ, รุ่น, รหัส..." : "Name, model, SKU...")" />
-                            <button type="submit" class="btn btn-primary" style="background:#2d4199;border-color:#2d4199">
+                            <button type="submit" class="btn btn-primary" style="background:var(--needis-primary);border-color:var(--needis-primary)">
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
@@ -240,7 +240,7 @@
                                         <div>
                                             @if (product.IsPriceVisible && product.Price.HasValue)
                                             {
-                                                <span class="fw-bold" style="color:#2d4199">
+                                                <span class="fw-bold" style="color:var(--needis-primary)">
                                                     @product.Price.Value.ToString("N2") ฿
                                                 </span>
                                             }
@@ -285,7 +285,7 @@
                     {
                         <a asp-controller="Product" asp-action="Index"
                            class="btn btn-primary px-4"
-                           style="background:#2d4199;border-color:#2d4199">
+                           style="background:var(--needis-primary);border-color:var(--needis-primary)">
                             <i class="bi bi-x-circle me-1"></i>
                             @(lang == "th" ? "ล้างตัวกรอง" : "Clear Filters")
                         </a>

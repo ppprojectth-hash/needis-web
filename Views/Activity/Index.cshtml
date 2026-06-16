@@ -61,7 +61,7 @@
                         var href = Url.Action("Index", "Activity", new { tag = t.TagKey });
                         <a href="@href"
                            class="tag-filter-pill @(isActive ? "active" : "")"
-                           style="@(isActive ? $"background:{t.TagColor ?? "#2d4199"};border-color:{t.TagColor ?? "#2d4199"}" : $"border-color:{t.TagColor ?? "#e5e7eb"}")">
+                           style="@(isActive ? $"background:{t.TagColor ?? "var(--needis-primary)"};border-color:{t.TagColor ?? "var(--needis-primary)"}" : $"border-color:{t.TagColor ?? "#e5e7eb"}")">
                             @tName
                         </a>
                     }
@@ -77,7 +77,7 @@
                     }
                     <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm"
                            placeholder="@(lang == "th" ? "ค้นหา..." : "Search...")" />
-                    <button type="submit" class="btn btn-sm btn-primary px-3" style="background:#2d4199;border-color:#2d4199">
+                    <button type="submit" class="btn btn-sm btn-primary px-3" style="background:var(--needis-primary);border-color:var(--needis-primary)">
                         <i class="bi bi-search"></i>
                     </button>
                     @if (hasFilter)
@@ -94,7 +94,7 @@
         @if (Model.SelectedTag is not null)
         {
             <div class="mt-3 d-flex align-items-center gap-2">
-                <span class="activity-tag-badge" style="background:@(Model.SelectedTag.TagColor ?? "#2d4199")">
+                <span class="activity-tag-badge" style="background:@(Model.SelectedTag.TagColor ?? "var(--needis-primary)")">
                     @L(Model.SelectedTag.TagNameTH, Model.SelectedTag.TagNameEN)
                 </span>
                 @if (!string.IsNullOrEmpty(L(Model.SelectedTag.TagDescriptionTH, Model.SelectedTag.TagDescriptionEN)))
@@ -140,12 +140,12 @@
                                     @foreach (var m in feat.ActivityTagMaps.Where(m => m.ActivityTag?.IsActive == true).OrderBy(m => m.DisplayOrder).Take(2))
                                     {
                                         <span class="activity-tag-badge"
-                                              style="background:@(m.ActivityTag?.TagColor ?? "#2d4199")">
+                                              style="background:@(m.ActivityTag?.TagColor ?? "var(--needis-primary)")">
                                             @L(m.ActivityTag?.TagNameTH, m.ActivityTag?.TagNameEN)
                                         </span>
                                     }
                                 </div>
-                                <h5 class="fw-bold mb-2" style="color:#1a2b6b">
+                                <h5 class="fw-bold mb-2" style="color:var(--needis-dark)">
                                     @L(feat.ActivityTitleTH, feat.ActivityTitleEN)
                                 </h5>
                                 @if (!string.IsNullOrEmpty(L(feat.ShortDescriptionTH, feat.ShortDescriptionEN)))
@@ -164,7 +164,7 @@
                                     <a asp-controller="Activity" asp-action="Detail"
                                        asp-route-slug="@feat.ActivitySlug"
                                        class="btn btn-sm btn-primary"
-                                       style="background:#2d4199;border-color:#2d4199">
+                                       style="background:var(--needis-primary);border-color:var(--needis-primary)">
                                         @(lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
                                     </a>
                                 </div>
@@ -202,7 +202,7 @@
         else
         {
             <div class="d-flex align-items-center justify-content-between mb-4">
-                <h4 class="fw-bold mb-0" style="color:#1a2b6b">
+                <h4 class="fw-bold mb-0" style="color:var(--needis-dark)">
                     @(lang == "th" ? "กิจกรรมและข่าวสารล่าสุด" : "Latest Activity")
                 </h4>
                 <span class="text-muted small">@Model.Activities.Count @(lang == "th" ? "รายการ" : "items")</span>
@@ -236,12 +236,12 @@
                                     @foreach (var m in act.ActivityTagMaps.Where(m => m.ActivityTag?.IsActive == true).OrderBy(m => m.IsPrimary ? 0 : 1).Take(2))
                                     {
                                         <span class="activity-tag-badge"
-                                              style="background:@(m.ActivityTag?.TagColor ?? "#2d4199");font-size:.65rem">
+                                              style="background:@(m.ActivityTag?.TagColor ?? "var(--needis-primary)");font-size:.65rem">
                                             @L(m.ActivityTag?.TagNameTH, m.ActivityTag?.TagNameEN)
                                         </span>
                                     }
                                 </div>
-                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">
                                     @L(act.ActivityTitleTH, act.ActivityTitleEN)
                                 </h6>
                                 @if (!string.IsNullOrEmpty(L(act.ShortDescriptionTH, act.ShortDescriptionEN)))
@@ -260,7 +260,7 @@
                                     <a asp-controller="Activity" asp-action="Detail"
                                        asp-route-slug="@act.ActivitySlug"
                                        class="btn btn-sm btn-outline-primary"
-                                       style="color:#2d4199;border-color:#2d4199;font-size:.78rem">
+                                       style="color:var(--needis-primary);border-color:var(--needis-primary);font-size:.78rem">
                                         @(lang == "th" ? "อ่านต่อ" : "Read")
                                     </a>
                                 </div>
@@ -281,7 +281,7 @@
                 {
                     <a asp-controller="Activity" asp-action="Index"
                        class="btn btn-outline-primary mt-3"
-                       style="color:#2d4199;border-color:#2d4199">
+                       style="color:var(--needis-primary);border-color:var(--needis-primary)">
                         <i class="bi bi-x-circle me-1"></i>
                         @(lang == "th" ? "ล้างตัวกรอง" : "Clear Filter")
                     </a>

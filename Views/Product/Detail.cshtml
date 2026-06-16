@@ -90,7 +90,7 @@
                 </div>
             }
 
-            <h1 class="fw-bold mb-2" style="font-size:clamp(1.4rem,3vw,2rem);color:#1a2b6b">@name</h1>
+            <h1 class="fw-bold mb-2" style="font-size:clamp(1.4rem,3vw,2rem);color:var(--needis-dark)">@name</h1>
 
             @* Brand / Model / SKU *@
             @if (!string.IsNullOrEmpty(product.Brand) || !string.IsNullOrEmpty(product.Model))
@@ -149,7 +149,7 @@
                             <div class="rounded-2 p-2 text-center h-100"
                                  style="background:#f0f3ff;border:1px solid #d0d9ff">
                                 <div class="small fw-semibold text-muted" style="font-size:.72rem;line-height:1.3">@hsName</div>
-                                <div class="fw-bold mt-1" style="color:#2d4199;font-size:.95rem">
+                                <div class="fw-bold mt-1" style="color:var(--needis-primary);font-size:.95rem">
                                     @hsValue
                                     @if (!string.IsNullOrEmpty(hsUnit))
                                     {
@@ -189,7 +189,7 @@
                    asp-action="Create"
                    asp-route-productSlug="@product.Slug"
                    class="btn btn-primary px-4"
-                   style="background:#2d4199;border-color:#2d4199">
+                   style="background:var(--needis-primary);border-color:var(--needis-primary)">
                     <i class="bi bi-envelope me-1"></i>
                     @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
                 </a>
@@ -205,7 +205,7 @@
             @* Quote Cart link *@
             <div class="mb-3">
                 <a asp-controller="QuotationCart" asp-action="Index"
-                   class="small text-decoration-none" style="color:#2d4199">
+                   class="small text-decoration-none" style="color:var(--needis-primary)">
                     <i class="bi bi-cart3 me-1"></i>
                     @(lang == "th" ? "ดูรายการขอใบเสนอราคา" : "View Quote Cart")
                     <i class="bi bi-arrow-right ms-1"></i>
@@ -228,7 +228,7 @@
                 <div class="@(hasSpec ? "col-lg-6" : "col-12")">
                     <div class="card border-0 shadow-sm rounded-3 h-100">
                         <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
-                            <h5 class="fw-bold" style="color:#2d4199">
+                            <h5 class="fw-bold" style="color:var(--needis-primary)">
                                 <i class="bi bi-file-text me-2"></i>
                                 @(lang == "th" ? "รายละเอียดสินค้า" : "Product Description")
                             </h5>
@@ -245,7 +245,7 @@
                 <div class="@(!string.IsNullOrEmpty(fullDesc) ? "col-lg-6" : "col-12")">
                     <div class="card border-0 shadow-sm rounded-3 h-100">
                         <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
-                            <h5 class="fw-bold" style="color:#2d4199">
+                            <h5 class="fw-bold" style="color:var(--needis-primary)">
                                 <i class="bi bi-list-check me-2"></i>
                                 @(lang == "th" ? "ข้อมูลจำเพาะ" : "Specifications")
                             </h5>
@@ -259,13 +259,13 @@
                                            style="font-size:.88rem">
                                         <thead style="background:#f0f3ff">
                                             <tr>
-                                                <th class="py-2 ps-3" style="width:35%;color:#2d4199">
+                                                <th class="py-2 ps-3" style="width:35%;color:var(--needis-primary)">
                                                     @(lang == "th" ? "รายการ" : "Parameter")
                                                 </th>
-                                                <th class="py-2" style="color:#2d4199">
+                                                <th class="py-2" style="color:var(--needis-primary)">
                                                     @(lang == "th" ? "ค่า" : "Value")
                                                 </th>
-                                                <th class="py-2 d-none d-md-table-cell" style="width:25%;color:#2d4199">
+                                                <th class="py-2 d-none d-md-table-cell" style="width:25%;color:var(--needis-primary)">
                                                     @(lang == "th" ? "หมายเหตุ" : "Remark")
                                                 </th>
                                             </tr>
@@ -277,7 +277,7 @@
                                                 {
                                                     <tr style="background:#e8ecff">
                                                         <td colspan="3" class="ps-3 py-1 fw-semibold small"
-                                                            style="color:#2d4199;letter-spacing:.02em">
+                                                            style="color:var(--needis-primary);letter-spacing:.02em">
                                                             <i class="bi bi-folder2 me-1 opacity-75"></i>@grp.Key
                                                         </td>
                                                     </tr>
@@ -328,7 +328,7 @@
     @if (Model.RelatedProducts.Any())
     {
         <div class="mt-5">
-            <h4 class="fw-bold mb-4" style="color:#1a2b6b">
+            <h4 class="fw-bold mb-4" style="color:var(--needis-dark)">
                 @(lang == "th" ? "สินค้าในหมวดเดียวกัน" : "Related Products")
             </h4>
             <div class="row g-4">
@@ -376,7 +376,7 @@
                                 <div class="mt-auto pt-2">
                                     @if (rel.IsPriceVisible && rel.Price.HasValue)
                                     {
-                                        <p class="fw-bold mb-0 small" style="color:#2d4199">
+                                        <p class="fw-bold mb-0 small" style="color:var(--needis-primary)">
                                             @rel.Price.Value.ToString("N2") ฿
                                         </p>
                                     }

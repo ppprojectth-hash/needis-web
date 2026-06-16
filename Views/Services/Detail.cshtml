@@ -94,7 +94,7 @@
 
                     @if (!string.IsNullOrEmpty(secTitle))
                     {
-                        <h4 class="fw-bold mb-2" style="color:#1a2b6b">@secTitle</h4>
+                        <h4 class="fw-bold mb-2" style="color:var(--needis-dark)">@secTitle</h4>
                     }
                     @if (!string.IsNullOrEmpty(secSubtitle))
                     {
@@ -217,7 +217,7 @@
                     <div class="service-contact-card reveal">
                         @if (!string.IsNullOrEmpty(cardTitle))
                         {
-                            <h5 class="fw-bold mb-2" style="color:#1a2b6b">@cardTitle</h5>
+                            <h5 class="fw-bold mb-2" style="color:var(--needis-dark)">@cardTitle</h5>
                         }
                         @if (!string.IsNullOrEmpty(cardDesc))
                         {
@@ -226,14 +226,14 @@
                         @if (!string.IsNullOrEmpty(primText))
                         {
                             <a href="@primUrl" class="btn btn-primary w-100 mb-2"
-                               style="background:#2d4199;border-color:#2d4199">
+                               style="background:var(--needis-primary);border-color:var(--needis-primary)">
                                 @primText
                             </a>
                         }
                         @if (!string.IsNullOrEmpty(secText))
                         {
                             <a href="@secUrl" class="btn btn-outline-primary w-100 mb-3"
-                               style="color:#2d4199;border-color:#2d4199">
+                               style="color:var(--needis-primary);border-color:var(--needis-primary)">
                                 @secText
                             </a>
                         }
@@ -242,18 +242,18 @@
                             <div class="d-flex align-items-center gap-2 pt-2 border-top">
                                 @if (!string.IsNullOrEmpty(card.ContactIconUrl))
                                 {
-                                    <i class="@card.ContactIconUrl" style="color:#2d4199;font-size:1.1rem"></i>
+                                    <i class="@card.ContactIconUrl" style="color:var(--needis-primary);font-size:1.1rem"></i>
                                 }
                                 else
                                 {
-                                    <i class="bi bi-telephone-fill" style="color:#2d4199"></i>
+                                    <i class="bi bi-telephone-fill" style="color:var(--needis-primary)"></i>
                                 }
                                 <div>
                                     @if (!string.IsNullOrEmpty(ctLabel))
                                     {
                                         <div class="contact-label">@ctLabel</div>
                                     }
-                                    <div class="fw-semibold small" style="color:#1a2b6b">@card.ContactValue</div>
+                                    <div class="fw-semibold small" style="color:var(--needis-dark)">@card.ContactValue</div>
                                 </div>
                             </div>
                         }
@@ -264,7 +264,7 @@
             {
                 @* Default CTA sidebar when no contact cards are configured *@
                 <div class="service-contact-card reveal">
-                    <h5 class="fw-bold mb-2" style="color:#1a2b6b">
+                    <h5 class="fw-bold mb-2" style="color:var(--needis-dark)">
                         @(lang == "th" ? "ต้องการบริการนี้?" : "Need this service?")
                     </h5>
                     <p class="text-muted small mb-3">
@@ -274,12 +274,12 @@
                     </p>
                     <a asp-controller="Contact" asp-action="Index"
                        class="btn btn-primary w-100 mb-2"
-                       style="background:#2d4199;border-color:#2d4199">
+                       style="background:var(--needis-primary);border-color:var(--needis-primary)">
                         @(lang == "th" ? "ติดต่อทีมสนับสนุน" : "Contact Support")
                     </a>
                     <a href="@($"/Quotation/Create?serviceSlug={svc.ServiceSlug}")"
                        class="btn btn-outline-primary w-100 mb-2"
-                       style="color:#2d4199;border-color:#2d4199">
+                       style="color:var(--needis-primary);border-color:var(--needis-primary)">
                         @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
                     </a>
                     @* Add to Quote Cart *@
@@ -295,7 +295,7 @@
                     </form>
                     <div class="mt-2 text-center">
                         <a asp-controller="QuotationCart" asp-action="Index"
-                           class="small text-decoration-none" style="color:#2d4199">
+                           class="small text-decoration-none" style="color:var(--needis-primary)">
                             <i class="bi bi-cart3 me-1"></i>
                             @(lang == "th" ? "ดูรายการขอใบเสนอราคา" : "View Quote Cart")
                         </a>
@@ -311,7 +311,7 @@
 {
     <section class="py-5" style="background:#f8f9fc">
         <div class="container">
-            <h4 class="fw-bold mb-4 reveal" style="color:#1a2b6b">
+            <h4 class="fw-bold mb-4 reveal" style="color:var(--needis-dark)">
                 @(lang == "th" ? "บริการอื่น ๆ ที่เกี่ยวข้อง" : "Related Services")
             </h4>
             <div class="row g-4">
@@ -335,7 +335,7 @@
                                 </div>
                             }
                             <div class="card-body">
-                                <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                                <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">
                                     @L(rel.ServiceNameTH, rel.ServiceNameEN)
                                 </h6>
                                 @if (!string.IsNullOrEmpty(L(rel.ShortDescriptionTH, rel.ShortDescriptionEN)))
@@ -349,7 +349,7 @@
                                 <a asp-controller="Services" asp-action="Detail"
                                    asp-route-slug="@rel.ServiceSlug"
                                    class="btn btn-sm btn-outline-primary"
-                                   style="color:#2d4199;border-color:#2d4199">
+                                   style="color:var(--needis-primary);border-color:var(--needis-primary)">
                                     @(lang == "th" ? "ดูรายละเอียด" : "Learn More")
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>

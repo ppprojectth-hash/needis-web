@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.Models;
 using Needis.Web.ViewModels.Admin;
 
@@ -23,20 +24,20 @@ public class ProductSaleController : Controller
     {
         ViewData["Title"] = "Product Sales";
 
-        var now    = DateTime.UtcNow;
-        dateFrom ??= now.AddMonths(-1).Date;
-        dateTo   ??= now.Date;
+        var nowBangkok = BangkokTimeHelper.NowBangkok();
+        dateFrom ??= nowBangkok.Date.AddMonths(-1);
+        dateTo   ??= nowBangkok.Date;
 
         ViewBag.DateFrom = dateFrom.Value.ToString("yyyy-MM-dd");
         ViewBag.DateTo   = dateTo.Value.ToString("yyyy-MM-dd");
         ViewBag.Keyword  = keyword;
 
-        var from = dateFrom.Value.Date;
-        var to   = dateTo.Value.Date.AddDays(1);
+        var from        = BangkokTimeHelper.ConvertBangkokDateStartToUtc(dateFrom.Value);
+        var toExclusive = BangkokTimeHelper.ConvertBangkokDateEndExclusiveToUtc(dateTo.Value);
 
         var query = _db.ProductSales.AsNoTracking()
             .Include(ps => ps.Product)
-            .Where(ps => !ps.IsDelete && ps.SaleDate >= from && ps.SaleDate < to)
+            .Where(ps => !ps.IsDelete && ps.SaleDate >= from && ps.SaleDate < toExclusive)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(keyword))

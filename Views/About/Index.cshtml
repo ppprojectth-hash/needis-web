@@ -109,7 +109,7 @@
                                     }
                                     @if (!string.IsNullOrEmpty(L(item.TitleTH, item.TitleEN)))
                                     {
-                                        <h6 class="fw-bold mb-2" style="color:#1a2b6b">@L(item.TitleTH, item.TitleEN)</h6>
+                                        <h6 class="fw-bold mb-2" style="color:var(--needis-dark)">@L(item.TitleTH, item.TitleEN)</h6>
                                     }
                                     @if (!string.IsNullOrEmpty(L(item.DescriptionTH, item.DescriptionEN)))
                                     {
@@ -309,7 +309,7 @@
                             @if (isLeft)
                             {
                                 <div class="timeline-card">
-                                    <h6 class="fw-bold mb-1" style="color:#1a2b6b">@hTitle</h6>
+                                    <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">@hTitle</h6>
                                     @if (!string.IsNullOrEmpty(hDesc))
                                     {
                                         <p class="text-muted small mb-0 lh-lg">@hDesc</p>
@@ -328,7 +328,7 @@
                             @if (!isLeft)
                             {
                                 <div class="timeline-card">
-                                    <h6 class="fw-bold mb-1" style="color:#1a2b6b">@hTitle</h6>
+                                    <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">@hTitle</h6>
                                     @if (!string.IsNullOrEmpty(hDesc))
                                     {
                                         <p class="text-muted small mb-0 lh-lg">@hDesc</p>
@@ -379,7 +379,7 @@
                                     <i class="bi bi-person-fill"></i>
                                 </div>
                             }
-                            <h6 class="fw-bold mb-1" style="color:#1a2b6b">
+                            <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">
                                 @(lang == "th" ? (staff.FullNameTH ?? staff.FullNameEN) : (staff.FullNameEN ?? staff.FullNameTH))
                             </h6>
                             @if (!string.IsNullOrEmpty(lang == "th" ? staff.PositionTH : staff.PositionEN))

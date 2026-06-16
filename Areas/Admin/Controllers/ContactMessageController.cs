@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.ViewModels.Admin;
 
 namespace Needis.Web.Areas.Admin.Controllers;
@@ -26,11 +27,15 @@ public class ContactMessageController : Controller
         DateTime? dateFrom, DateTime? dateTo,
         string? status, string? keyword, string? assignedTo)
     {
-        var from = (dateFrom ?? DateTime.UtcNow.AddDays(-30)).Date;
-        var to   = (dateTo   ?? DateTime.UtcNow).Date.AddDays(1).AddSeconds(-1);
+        var nowBangkok = BangkokTimeHelper.NowBangkok();
+        var startDate  = dateFrom ?? nowBangkok.Date.AddDays(-30);
+        var endDate    = dateTo   ?? nowBangkok.Date;
+
+        var from         = BangkokTimeHelper.ConvertBangkokDateStartToUtc(startDate);
+        var toExclusive  = BangkokTimeHelper.ConvertBangkokDateEndExclusiveToUtc(endDate);
 
         var query = _db.ContactMessages.AsNoTracking()
-            .Where(c => c.CreatedAt >= from && c.CreatedAt <= to);
+            .Where(c => c.CreatedAt >= from && c.CreatedAt < toExclusive);
 
         if (!string.IsNullOrWhiteSpace(status))
             query = query.Where(c => c.Status == status);
@@ -71,7 +76,7 @@ public class ContactMessageController : Controller
 
         // Summary counts across all time for selected status range
         var countQuery = _db.ContactMessages.AsNoTracking()
-            .Where(c => c.CreatedAt >= from && c.CreatedAt <= to);
+            .Where(c => c.CreatedAt >= from && c.CreatedAt < toExclusive);
 
         var totalCount   = await countQuery.CountAsync();
         var newCount     = await countQuery.CountAsync(c => c.Status == "New"     || c.Status == null);
@@ -82,8 +87,8 @@ public class ContactMessageController : Controller
 
         var vm = new ContactMessageIndexViewModel
         {
-            DateFrom     = from,
-            DateTo       = (dateTo ?? DateTime.UtcNow).Date,
+            DateFrom     = startDate.Date,
+            DateTo       = endDate.Date,
             Status       = status,
             Keyword      = keyword,
             AssignedTo   = assignedTo,
@@ -222,11 +227,15 @@ public class ContactMessageController : Controller
         DateTime? dateFrom, DateTime? dateTo,
         string? status, string? keyword)
     {
-        var from = (dateFrom ?? DateTime.UtcNow.AddDays(-30)).Date;
-        var to   = (dateTo   ?? DateTime.UtcNow).Date.AddDays(1).AddSeconds(-1);
+        var nowBangkok = BangkokTimeHelper.NowBangkok();
+        var startDate  = dateFrom ?? nowBangkok.Date.AddDays(-30);
+        var endDate    = dateTo   ?? nowBangkok.Date;
+
+        var from        = BangkokTimeHelper.ConvertBangkokDateStartToUtc(startDate);
+        var toExclusive = BangkokTimeHelper.ConvertBangkokDateEndExclusiveToUtc(endDate);
 
         var query = _db.ContactMessages.AsNoTracking()
-            .Where(c => c.CreatedAt >= from && c.CreatedAt <= to);
+            .Where(c => c.CreatedAt >= from && c.CreatedAt < toExclusive);
 
         if (!string.IsNullOrWhiteSpace(status))
             query = query.Where(c => c.Status == status);
