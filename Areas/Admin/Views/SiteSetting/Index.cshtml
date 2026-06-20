@@ -190,9 +190,8 @@
                         </label>
                         @if (!string.IsNullOrEmpty(Model.LogoUrl))
                         {
-                            <div class="mb-2 p-2 border rounded-2 bg-white d-inline-block">
-                                <img src="@Model.LogoUrl" alt="Current Logo"
-                                     style="max-height:60px;max-width:220px;object-fit:contain" />
+                            <div class="logo-preview-frame mb-2">
+                                <img src="@Model.LogoUrl" alt="Current Logo" />
                             </div>
                             <div class="text-muted small mb-2">Current logo</div>
                         }
@@ -223,7 +222,7 @@
                                accept=".jpg,.jpeg,.png,.webp,.ico" />
                         <span asp-validation-for="FaviconFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-1">
-                            Recommended: 64 × 64 px &nbsp;·&nbsp; PNG, ICO &nbsp;·&nbsp; Max 2 MB
+                            Recommended: 64 × 64 px &nbsp;·&nbsp; PNG, ICO &nbsp;·&nbsp; Max 1 MB
                         </div>
                     </div>
 

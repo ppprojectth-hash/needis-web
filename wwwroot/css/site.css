@@ -895,6 +895,7 @@ body { margin-bottom: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans
     height: 90px;
     border-radius: 50%;
     object-fit: cover;
+    object-position: center top;
     border: 3px solid var(--needis-primary-soft);
     margin-bottom: 1rem;
 }
@@ -2520,4 +2521,263 @@ body { margin-bottom: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans
     .manual-prose code { background: #f5f5f5 !important; color: #333 !important; }
 
     @page { margin: 2cm 2.5cm; size: A4; }
+}
+
+/* ═══════════════════════════════════════════════
+   GLOBAL IMAGE SAFETY
+═══════════════════════════════════════════════ */
+img {
+    max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════
+   IMAGE FRAME UTILITIES
+═══════════════════════════════════════════════ */
+.image-frame {
+    position: relative;
+    overflow: hidden;
+    background: #f1f5f9;
+    border-radius: 16px;
+}
+
+.image-frame img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.image-cover img,
+.img-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-contain img,
+.img-contain {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.img-position-top  { object-position: center top;    }
+.img-position-center { object-position: center center; }
+
+/* ── Staff / Profile photos ── */
+.staff-photo-frame {
+    width: 90px;
+    height: 90px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #eef2ff;
+    border: 3px solid var(--needis-primary-soft);
+    flex-shrink: 0;
+}
+
+.staff-photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+/* Card variant — centres itself, has bottom margin */
+.staff-card-photo-frame {
+    width: 90px;
+    height: 90px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #eef2ff;
+    border: 3px solid var(--needis-primary-soft);
+    margin: 0 auto 1rem;
+}
+
+.staff-card-photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+/* ── Product images ── */
+.product-image-frame {
+    aspect-ratio: 4 / 3;
+    background: #f8fafc;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.product-image-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    padding: 16px;
+    display: block;
+}
+
+/* ── Banner / Hero images ── */
+.banner-image-frame {
+    aspect-ratio: 16 / 6;
+    overflow: hidden;
+}
+
+.banner-image-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+/* ── Category / Activity / Service / About card images ── */
+.category-image-frame,
+.activity-image-frame,
+.service-image-frame,
+.about-image-frame {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.category-image-frame img,
+.activity-image-frame img,
+.service-image-frame img,
+.about-image-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+/* ── Logo preview frame ── */
+.logo-preview-frame {
+    width: 250px;
+    height: 80px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-preview-frame img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* ── Admin upload preview frame ── */
+.admin-upload-preview-frame {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 16 / 10;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-upload-preview-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ═══════════════════════════════════════════════
+   HOME POPUP / ANNOUNCEMENT MODAL
+═══════════════════════════════════════════════ */
+.home-popup-modal .modal-backdrop { background: rgba(0,0,0,.65); }
+
+.home-popup-dialog {
+    max-width: 680px;
+    margin: 1.5rem auto;
+}
+
+.home-popup-content {
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+}
+
+.home-popup-image-frame {
+    width: 100%;
+    max-height: 480px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.home-popup-img {
+    width: 100%;
+    height: 100%;
+    max-height: 480px;
+    object-fit: contain;
+    display: block;
+}
+
+.home-popup-body {
+    padding: 1.5rem 2rem 2rem;
+    background: #fff;
+    text-align: center;
+}
+
+.home-popup-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a2b6b;
+    margin-bottom: .5rem;
+}
+
+.home-popup-desc {
+    font-size: .95rem;
+    color: #555;
+    margin-bottom: 1.25rem;
+}
+
+.home-popup-btn {
+    background: #2d4199;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: .6rem 2rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    transition: background .2s;
+}
+
+.home-popup-btn:hover {
+    background: #1a2b6b;
+    color: #fff;
+}
+
+.home-popup-close {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+    z-index: 10;
+    background: rgba(0,0,0,.5);
+    border-radius: 50%;
+    padding: .4rem;
+    opacity: .85;
+    transition: opacity .2s;
+}
+
+.home-popup-close:hover { opacity: 1; }
+
+@media (max-width: 575.98px) {
+    .home-popup-dialog { margin: .5rem; max-width: 100%; }
+    .home-popup-image-frame { max-height: 320px; }
+    .home-popup-img { max-height: 320px; }
+    .home-popup-body { padding: 1rem 1.25rem 1.5rem; }
 }

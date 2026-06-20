@@ -369,9 +369,11 @@
                         <div class="staff-card">
                             @if (!string.IsNullOrEmpty(staff.ProfileImageUrl))
                             {
-                                <img src="@staff.ProfileImageUrl"
-                                     alt="@(lang == "th" ? staff.FullNameTH : staff.FullNameEN)"
-                                     class="staff-photo mx-auto d-block" />
+                                <div class="staff-card-photo-frame">
+                                    <img src="@staff.ProfileImageUrl"
+                                         alt="@(lang == "th" ? staff.FullNameTH : staff.FullNameEN)"
+                                         loading="lazy" />
+                                </div>
                             }
                             else
                             {

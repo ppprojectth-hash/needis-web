@@ -44,6 +44,7 @@
                     }
                     <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
                     <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                    <div class="text-muted small mt-2">JPG, PNG, WebP, SVG &nbsp;·&nbsp; Max 3 MB &nbsp;·&nbsp; Leave empty to keep current.</div>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>

@@ -1,0 +1,150 @@
+@model IEnumerable<Needis.Web.Models.HomePopup>
+@{
+    ViewData["Title"] = "Home Popups / Announcements";
+}
+
+@if (TempData["Success"] is string successMsg)
+{
+    <div class="alert alert-success alert-dismissible d-flex align-items-center gap-2 rounded-3 mb-4">
+        <i class="bi bi-check-circle-fill flex-shrink-0"></i>
+        <span>@successMsg</span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-megaphone me-2" style="color:#2d4199"></i>Home Popups / Announcements
+        </h5>
+        <p class="text-muted small mb-0 mt-1">Manage announcement popups shown on the home page</p>
+    </div>
+    <a asp-action="Create" class="btn btn-sm btn-primary px-3" style="background:#2d4199;border-color:#2d4199">
+        <i class="bi bi-plus-lg me-1"></i>Add Popup
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    @if (!Model.Any())
+    {
+        <div class="card-body text-center text-muted py-5">
+            <i class="bi bi-megaphone fs-1 d-block mb-3" style="color:#c5cde8"></i>
+            <p class="mb-2">No popups yet.</p>
+            <a asp-action="Create" class="btn btn-sm btn-primary" style="background:#2d4199;border-color:#2d4199">
+                <i class="bi bi-plus-lg me-1"></i>Create First Popup
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background:#f8f9fc">
+                    <tr class="text-muted small fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.04em">
+                        <th class="ps-4 py-3" style="width:90px">Preview</th>
+                        <th class="py-3">Title</th>
+                        <th class="py-3" style="width:120px">Type</th>
+                        <th class="py-3" style="width:180px">Date Range</th>
+                        <th class="py-3 text-center" style="width:80px">Order</th>
+                        <th class="py-3 text-center" style="width:90px">Once/Day</th>
+                        <th class="py-3 text-center" style="width:100px">Status</th>
+                        <th class="py-3 text-end pe-4" style="width:120px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var now = DateTime.UtcNow;
+                    }
+                    @foreach (var p in Model)
+                    {
+                        var isScheduled = p.StartDateUtc.HasValue && p.StartDateUtc > now;
+                        var isExpired   = p.EndDateUtc.HasValue   && p.EndDateUtc   < now;
+                        string statusBadge;
+                        string statusClass;
+                        if (!p.IsActive)          { statusBadge = "Inactive";  statusClass = "text-bg-secondary"; }
+                        else if (isExpired)        { statusBadge = "Expired";   statusClass = "text-bg-warning"; }
+                        else if (isScheduled)      { statusBadge = "Scheduled"; statusClass = "text-bg-info"; }
+                        else                       { statusBadge = "Active";    statusClass = "text-bg-success"; }
+
+                        <tr>
+                            <td class="ps-4 py-2">
+                                @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                {
+                                    <div class="rounded-2 overflow-hidden" style="width:72px;height:48px;background:#f8fafc;border:1px solid #eee">
+                                        <img src="@p.ImageUrl" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="rounded-2 d-flex align-items-center justify-content-center bg-light" style="width:72px;height:48px;color:#aaa">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td class="py-2">
+                                <div class="fw-semibold small">@(p.TitleEN)</div>
+                                @if (!string.IsNullOrEmpty(p.TitleTH))
+                                {
+                                    <div class="text-muted small">@p.TitleTH</div>
+                                }
+                            </td>
+                            <td class="py-2 small">
+                                @if (!string.IsNullOrEmpty(p.PopupType))
+                                {
+                                    <span class="badge bg-light text-dark border">@p.PopupType</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="py-2 small text-muted">
+                                @if (p.StartDateUtc.HasValue || p.EndDateUtc.HasValue)
+                                {
+                                    <div>@(p.StartDateUtc?.ToString("dd MMM yyyy") ?? "—")</div>
+                                    <div>→ @(p.EndDateUtc?.ToString("dd MMM yyyy") ?? "always")</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Always</span>
+                                }
+                            </td>
+                            <td class="py-2 text-center">
+                                @if (p.ShowOncePerDay)
+                                {
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-circle text-muted"></i>
+                                }
+                            </td>
+                            <td class="py-2 text-center">
+                                <span class="badge rounded-pill @statusClass">@statusBadge</span>
+                            </td>
+                            <td class="py-2 text-end pe-4">
+                                <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="ToggleActive" asp-route-id="@p.Id" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary me-1"
+                                            title="@(p.IsActive ? "Deactivate" : "Activate")">
+                                        <i class="bi @(p.IsActive ? "bi-toggle-on text-success" : "bi-toggle-off text-secondary")"></i>
+                                    </button>
+                                </form>
+                                <form asp-action="Delete" asp-route-id="@p.Id" method="post" style="display:inline"
+                                      onsubmit="return confirm('Delete this popup? This cannot be undone.')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

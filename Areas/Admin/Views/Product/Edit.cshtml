@@ -200,28 +200,24 @@
                         <label class="form-label small fw-semibold">Product Image</label>
                         @if (!string.IsNullOrEmpty(Model.MainImageUrl))
                         {
-                            <div class="mb-2">
-                                <img id="imagePreview" src="@Model.MainImageUrl" alt="Current image"
-                                     class="img-fluid rounded-2 w-100"
-                                     style="max-height:200px;object-fit:contain;background:#f8f9fc" />
-                                <div class="text-muted small mt-1">Current image</div>
+                            <div class="admin-upload-preview-frame mb-2">
+                                <img id="imagePreview" src="@Model.MainImageUrl" alt="Current image" />
                             </div>
+                            <div class="text-muted small mt-1">Current image</div>
                         }
                         else
                         {
-                            <div id="imagePreviewWrap" class="mb-2 d-none">
-                                <img id="imagePreview" src="#" alt="Preview"
-                                     class="img-fluid rounded-2 w-100"
-                                     style="max-height:200px;object-fit:contain;background:#f8f9fc" />
+                            <div id="imagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                                <img id="imagePreview" src="#" alt="Preview" />
                             </div>
                         }
                         <input asp-for="MainImageFile" type="file" class="form-control"
-                               accept=".jpg,.jpeg,.png,.webp" id="ImageFileInput" />
+                               accept=".jpg,.jpeg,.png,.webp" id="ImageFileInput"
+                               data-preview-target="#imagePreview" />
                         <span asp-validation-for="MainImageFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
-                            Recommended: <strong>800 × 800 px</strong><br />
-                            JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB<br />
-                            Leave empty to keep current image.
+                            Recommended: <strong>1200 × 900 px</strong> with white/transparent background<br />
+                            JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current image.
                         </div>
                     </div>
 
@@ -239,7 +235,7 @@
                                accept=".pdf" id="BrochureFileInput" />
                         <span asp-validation-for="BrochureFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
-                            PDF only &nbsp;·&nbsp; Max 10 MB<br />
+                            PDF only &nbsp;·&nbsp; Max 20 MB<br />
                             Leave empty to keep current brochure.
                         </div>
                     </div>
@@ -310,13 +306,10 @@
 
 @section Scripts {
 <script>
+    // data-preview-target in site.js handles src update; just unhide the frame if needed
     document.getElementById('ImageFileInput')?.addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-        const preview = document.getElementById('imagePreview');
-        const wrap    = document.getElementById('imagePreviewWrap');
-        if (preview) preview.src = URL.createObjectURL(file);
-        if (wrap)    wrap.classList.remove('d-none');
+        const wrap = document.getElementById('imagePreviewWrap');
+        if (wrap && this.files[0]) wrap.classList.remove('d-none');
     });
 </script>
 }

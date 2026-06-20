@@ -17,6 +17,7 @@
 </nav>
 
 @if (await PermSvc.HasPermissionAsync(User, "Banner.View") ||
+     await PermSvc.HasPermissionAsync(User, "HomePopup.View") ||
      await PermSvc.HasPermissionAsync(User, "Category.View") ||
      await PermSvc.HasPermissionAsync(User, "Product.View"))
 {
@@ -27,6 +28,13 @@
             <a class="nav-link @Active("Banner")"
                asp-area="Admin" asp-controller="Banner" asp-action="Index">
                 <i class="bi bi-images"></i> Home Banners
+            </a>
+        }
+        @if (await PermSvc.HasPermissionAsync(User, "HomePopup.View"))
+        {
+            <a class="nav-link @Active("HomePopup")"
+               asp-area="Admin" asp-controller="HomePopup" asp-action="Index">
+                <i class="bi bi-megaphone"></i> Home Popups
             </a>
         }
         @if (await PermSvc.HasPermissionAsync(User, "Category.View"))

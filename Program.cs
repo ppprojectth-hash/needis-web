@@ -14,6 +14,7 @@ using Needis.Web.Services.Media;
 using Needis.Web.Services.Quotation;
 using Needis.Web.Services.Manual;
 using Needis.Web.Services.Seo;
+using Needis.Web.Services.HomePopup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,9 @@ builder.Services.AddScoped<IManualService, ManualService>();
 // Site setting service
 builder.Services.AddScoped<ISiteSettingService, SiteSettingService>();
 
+// Home popup service
+builder.Services.AddScoped<IHomePopupService, HomePopupService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -79,6 +83,7 @@ string[] permissionKeys =
     "Media.View", "Media.Upload", "Media.Edit", "Media.Delete",
     "Seo.View", "Seo.Edit",
     "Manual.View",
+    "HomePopup.View", "HomePopup.Create", "HomePopup.Edit", "HomePopup.Delete",
 ];
 
 builder.Services.AddAuthorization(options =>

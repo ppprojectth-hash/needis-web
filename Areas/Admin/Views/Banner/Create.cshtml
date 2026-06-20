@@ -111,7 +111,7 @@
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">
                                 Banner Image <span class="text-danger">*</span>
-                                <span class="text-muted fw-normal">(jpg, png, webp — max 5 MB, recommend 1920×700)</span>
+                                <span class="text-muted fw-normal">(jpg, png, webp — max 5 MB, recommended 1920 × 800 px)</span>
                             </label>
                             <input asp-for="ImageFile" type="file" class="form-control"
                                    accept=".jpg,.jpeg,.png,.webp,.svg" id="ImageFileInput"
@@ -120,6 +120,9 @@
                             <div id="imagePreviewWrap" class="mt-2 d-none">
                                 <img id="imagePreview" src="#" alt="Preview"
                                      class="rounded-2" style="max-height:140px;max-width:100%;object-fit:contain" />
+                            </div>
+                            <div class="text-muted small mt-2">
+                                Recommended: <strong>1920 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB
                             </div>
                         </div>
                         <div>
@@ -133,6 +136,9 @@
                             <div id="mobileImgWrap" class="mt-2 d-none">
                                 <img id="mobileImgPreview" src="#" alt="Preview"
                                      class="rounded-2" style="max-height:100px;max-width:100%;object-fit:contain" />
+                            </div>
+                            <div class="text-muted small mt-2">
+                                Recommended: 960 × 600 px &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 3 MB
                             </div>
                         </div>
                     </div>

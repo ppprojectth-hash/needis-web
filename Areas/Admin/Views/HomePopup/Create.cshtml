@@ -1,0 +1,238 @@
+@model Needis.Web.ViewModels.Admin.HomePopupViewModel
+@{
+    ViewData["Title"] = "Add Popup";
+    string[] popupTypes = ["Event", "Announcement", "Promotion", "Tribute", "Maintenance", "General"];
+}
+
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-plus-circle me-2" style="color:#2d4199"></i>Add Popup
+        </h5>
+        <p class="text-muted small mb-0 mt-1">Create a new home page popup / announcement</p>
+    </div>
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+</div>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div><div asp-validation-summary="ModelOnly"></div></div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        @* ── Left column ── *@
+        <div class="col-lg-7">
+
+            @* 1. Content *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-translate me-2 text-primary"></i>Content</h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="TitleEN" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.TitleEN) <span class="text-danger">*</span></label>
+                            <input asp-for="TitleEN" class="form-control" placeholder="Popup title in English" />
+                            <span asp-validation-for="TitleEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="TitleTH" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.TitleTH)</label>
+                            <input asp-for="TitleTH" class="form-control" placeholder="ชื่อ Popup ภาษาไทย" />
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="DescriptionEN" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.DescriptionEN)</label>
+                            <textarea asp-for="DescriptionEN" class="form-control" rows="3" placeholder="Description in English"></textarea>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="DescriptionTH" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.DescriptionTH)</label>
+                            <textarea asp-for="DescriptionTH" class="form-control" rows="3" placeholder="คำอธิบายภาษาไทย"></textarea>
+                        </div>
+                    </div>
+                    <div>
+                        <label asp-for="PopupType" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.PopupType)</label>
+                        <select asp-for="PopupType" class="form-select">
+                            <option value="">— Select type —</option>
+                            @foreach (var t in popupTypes)
+                            {
+                                <option value="@t">@t</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            @* 2. Image *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-image me-2 text-primary"></i>Image</h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="mb-4">
+                        <label asp-for="ImageFile" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ImageFile) <span class="text-danger">*</span></label>
+                        <div id="imagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                            <img id="imagePreview" src="#" alt="Preview" />
+                        </div>
+                        <input asp-for="ImageFile" type="file" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp,.gif" id="ImageFileInput"
+                               data-preview-target="#imagePreview" />
+                        <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-2">
+                            Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP, GIF &nbsp;·&nbsp; Max 5 MB
+                        </div>
+                    </div>
+                    <div>
+                        <label asp-for="MobileImageFile" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.MobileImageFile)</label>
+                        <div id="mobilePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                            <img id="mobilePreview" src="#" alt="Preview" />
+                        </div>
+                        <input asp-for="MobileImageFile" type="file" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp,.gif" id="MobileImageFileInput"
+                               data-preview-target="#mobilePreview" />
+                        <div class="text-muted small mt-2">
+                            Recommended: 600 × 900 px (portrait) &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* 3. Link / CTA *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-link-45deg me-2 text-primary"></i>Link / CTA</h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label asp-for="LinkUrl" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.LinkUrl)</label>
+                        <input asp-for="LinkUrl" class="form-control" placeholder="https://... or /products" />
+                        <div class="text-muted small mt-1">Leave empty to show image only (no clickable link).</div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="ButtonTextEN" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ButtonTextEN)</label>
+                            <input asp-for="ButtonTextEN" class="form-control" placeholder="e.g. Learn More" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="ButtonTextTH" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ButtonTextTH)</label>
+                            <input asp-for="ButtonTextTH" class="form-control" placeholder="เช่น ดูเพิ่มเติม" />
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="OpenLinkInNewTab" type="checkbox" class="form-check-input" />
+                        <label asp-for="OpenLinkInNewTab" class="form-check-label small fw-semibold">@Html.DisplayNameFor(m => m.OpenLinkInNewTab)</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* ── Right column ── *@
+        <div class="col-lg-5">
+
+            @* 4. Display Rules *@
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-sliders me-2 text-primary"></i>Display Rules</h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label small fw-semibold">@Html.DisplayNameFor(m => m.IsActive)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="ShowOnlyHomePage" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="ShowOnlyHomePage" class="form-check-label small fw-semibold">@Html.DisplayNameFor(m => m.ShowOnlyHomePage)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="ShowOncePerSession" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="ShowOncePerSession" class="form-check-label small fw-semibold">@Html.DisplayNameFor(m => m.ShowOncePerSession)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="ShowOncePerDay" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="ShowOncePerDay" class="form-check-label small fw-semibold">@Html.DisplayNameFor(m => m.ShowOncePerDay)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DisplayDelaySeconds" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.DisplayDelaySeconds)</label>
+                        <div class="input-group">
+                            <input asp-for="DisplayDelaySeconds" type="number" class="form-control" min="0" max="10" />
+                            <span class="input-group-text">sec</span>
+                        </div>
+                        <span asp-validation-for="DisplayDelaySeconds" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DisplayOrder" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.DisplayOrder)</label>
+                        <input asp-for="DisplayOrder" type="number" class="form-control" min="0" max="9999" />
+                        <div class="text-muted small mt-1">Lower numbers appear first.</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label asp-for="StartDate" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.StartDate)</label>
+                            <input asp-for="StartDate" type="date" class="form-control"
+                                   value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? "")" />
+                            <span asp-validation-for="StartDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="EndDate" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.EndDate)</label>
+                            <input asp-for="EndDate" type="date" class="form-control"
+                                   value="@(Model.EndDate?.ToString("yyyy-MM-dd") ?? "")" />
+                            <span asp-validation-for="EndDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="text-muted small mt-2">Leave dates blank to always display.</div>
+
+                </div>
+            </div>
+
+            @* Save *@
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body d-grid gap-2">
+                    <button type="submit" class="btn btn-primary" style="background:#2d4199;border-color:#2d4199">
+                        <i class="bi bi-check-lg me-1"></i>Create Popup
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    document.getElementById('ImageFileInput')?.addEventListener('change', function () {
+        const wrap = document.getElementById('imagePreviewWrap');
+        if (wrap && this.files[0]) wrap.classList.remove('d-none');
+    });
+    document.getElementById('MobileImageFileInput')?.addEventListener('change', function () {
+        const wrap = document.getElementById('mobilePreviewWrap');
+        if (wrap && this.files[0]) wrap.classList.remove('d-none');
+    });
+</script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

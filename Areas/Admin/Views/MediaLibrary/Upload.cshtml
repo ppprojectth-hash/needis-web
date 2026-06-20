@@ -27,6 +27,10 @@
                         </label>
                         <input asp-for="File" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" />
                         <span asp-validation-for="File" class="text-danger small"></span>
+                        <div class="text-muted small mt-2">
+                            <strong>Images:</strong> JPG, PNG, WebP, SVG, GIF, ICO &nbsp;·&nbsp; Max 5 MB<br />
+                            <strong>Documents:</strong> PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX &nbsp;·&nbsp; Max 20 MB
+                        </div>
                     </div>
 
                     @* Usage / Module *@

@@ -91,19 +91,19 @@
                     <label asp-for="CoverImageFile" class="form-label fw-medium">Cover Image</label>
                     <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
                     <span asp-validation-for="CoverImageFile" class="text-danger small"></span>
-                    <div class="form-text">Used in listing cards. Max 3 MB.</div>
+                    <div class="text-muted small mt-2">Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB</div>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="BannerImageFile" class="form-label fw-medium">Banner Image</label>
                     <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
                     <span asp-validation-for="BannerImageFile" class="text-danger small"></span>
-                    <div class="form-text">Used as page hero/banner. Max 3 MB.</div>
+                    <div class="text-muted small mt-2">Recommended: <strong>1920 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB</div>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="IconFile" class="form-label fw-medium">Icon Image</label>
                     <input asp-for="IconFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
                     <span asp-validation-for="IconFile" class="text-danger small"></span>
-                    <div class="form-text">Small icon. Max 3 MB.</div>
+                    <div class="text-muted small mt-2">PNG, SVG &nbsp;·&nbsp; Max 1 MB</div>
                 </div>
             </div>
 

@@ -47,6 +47,7 @@ public class AppDbContext : DbContext
     public DbSet<QuotationCart>          QuotationCarts         => Set<QuotationCart>();
     public DbSet<QuotationCartItem>      QuotationCartItems     => Set<QuotationCartItem>();
     public DbSet<MediaFile>              MediaFiles             => Set<MediaFile>();
+    public DbSet<HomePopup>              HomePopups             => Set<HomePopup>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
@@ -475,6 +476,26 @@ public class AppDbContext : DbContext
             e.HasIndex(x => x.IsActive);
             e.HasIndex(x => x.IsDelete);
             e.HasIndex(x => x.FileExtension);
+        });
+
+        modelBuilder.Entity<HomePopup>(e =>
+        {
+            e.Property(x => x.TitleTH).HasMaxLength(200);
+            e.Property(x => x.TitleEN).HasMaxLength(200);
+            e.Property(x => x.ImageUrl).HasMaxLength(500);
+            e.Property(x => x.MobileImageUrl).HasMaxLength(500);
+            e.Property(x => x.LinkUrl).HasMaxLength(500);
+            e.Property(x => x.ButtonTextTH).HasMaxLength(100);
+            e.Property(x => x.ButtonTextEN).HasMaxLength(100);
+            e.Property(x => x.PopupType).HasMaxLength(100);
+            e.Property(x => x.CreatedBy).HasMaxLength(150);
+            e.Property(x => x.UpdatedBy).HasMaxLength(150);
+            e.HasIndex(x => x.IsActive);
+            e.HasIndex(x => x.IsDelete);
+            e.HasIndex(x => x.StartDateUtc);
+            e.HasIndex(x => x.EndDateUtc);
+            e.HasIndex(x => x.DisplayOrder);
+            e.HasIndex(x => x.PopupType);
         });
 
         modelBuilder.Entity<UsageLog>(e =>

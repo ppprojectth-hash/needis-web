@@ -24,6 +24,20 @@
     revealEls.forEach(function (el) { observer.observe(el); });
 })();
 
+// Image upload preview: wire <input type="file" data-preview-target="#someImg"> to an <img> element.
+(function () {
+    document.querySelectorAll('input[type="file"][data-preview-target]').forEach(function (input) {
+        var targetSelector = input.getAttribute('data-preview-target');
+        var target = document.querySelector(targetSelector);
+        if (!target) return;
+        input.addEventListener('change', function () {
+            var file = this.files && this.files[0];
+            if (!file) return;
+            target.src = URL.createObjectURL(file);
+        });
+    });
+})();
+
 // Navbar elevated shadow when user has scrolled past the top.
 (function () {
     var navbar = document.querySelector('.site-navbar');

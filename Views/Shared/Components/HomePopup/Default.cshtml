@@ -1,0 +1,125 @@
+@model Needis.Web.Models.HomePopup
+@{
+    var lang     = ViewData["CurrentLanguage"] as string ?? "EN";
+    var title    = lang == "TH" && !string.IsNullOrEmpty(Model.TitleTH) ? Model.TitleTH : Model.TitleEN;
+    var desc     = lang == "TH" && !string.IsNullOrEmpty(Model.DescriptionTH) ? Model.DescriptionTH : Model.DescriptionEN;
+    var btnText  = lang == "TH" && !string.IsNullOrEmpty(Model.ButtonTextTH) ? Model.ButtonTextTH : Model.ButtonTextEN;
+    var hasLink  = !string.IsNullOrEmpty(Model.LinkUrl);
+    var hasMobile = !string.IsNullOrEmpty(Model.MobileImageUrl);
+    var popupKey = $"home_popup_{Model.Id}";
+    var delayMs  = Model.DisplayDelaySeconds * 1000;
+    var oncePerSession = Model.ShowOncePerSession ? "true" : "false";
+    var oncePerDay     = Model.ShowOncePerDay     ? "true" : "false";
+    var linkTarget     = Model.OpenLinkInNewTab    ? "_blank" : "_self";
+}
+
+<div class="modal fade home-popup-modal" id="homePopupModal" tabindex="-1"
+     aria-label="@Html.Encode(title)" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered home-popup-dialog">
+        <div class="modal-content home-popup-content border-0 shadow-lg">
+
+            @* Close button *@
+            <button type="button" class="home-popup-close btn-close btn-close-white"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+            @* Image *@
+            <div class="home-popup-image-frame">
+                @if (hasMobile)
+                {
+                    <img src="@Model.ImageUrl"
+                         alt="@Html.Encode(title)"
+                         class="home-popup-img d-none d-sm-block" />
+                    <img src="@Model.MobileImageUrl"
+                         alt="@Html.Encode(title)"
+                         class="home-popup-img d-block d-sm-none" />
+                }
+                else
+                {
+                    <img src="@Model.ImageUrl"
+                         alt="@Html.Encode(title)"
+                         class="home-popup-img" />
+                }
+            </div>
+
+            @* Body (optional: title, description, CTA) *@
+            @if (!string.IsNullOrEmpty(title) || !string.IsNullOrEmpty(desc) || (hasLink && !string.IsNullOrEmpty(btnText)))
+            {
+                <div class="home-popup-body">
+                    @if (!string.IsNullOrEmpty(title))
+                    {
+                        <h5 class="home-popup-title">@title</h5>
+                    }
+                    @if (!string.IsNullOrEmpty(desc))
+                    {
+                        <p class="home-popup-desc">@desc</p>
+                    }
+                    @if (hasLink && !string.IsNullOrEmpty(btnText))
+                    {
+                        <a href="@Model.LinkUrl" target="@linkTarget"
+                           class="btn home-popup-btn"
+                           rel="@(Model.OpenLinkInNewTab ? "noopener noreferrer" : null)"
+                           data-bs-dismiss="modal">
+                            @btnText
+                        </a>
+                    }
+                </div>
+            }
+            else if (hasLink)
+            {
+                @* Image-only clickable popup — wrap image in a link *@
+                <a href="@Model.LinkUrl" target="@linkTarget"
+                   class="stretched-link visually-hidden"
+                   rel="@(Model.OpenLinkInNewTab ? "noopener noreferrer" : null)">
+                    @title
+                </a>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var KEY          = '@popupKey';
+    var DELAY        = @delayMs;
+    var ONCE_SESSION = @oncePerSession;
+    var ONCE_DAY     = @oncePerDay;
+    var TODAY        = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+
+    function alreadySeen() {
+        if (ONCE_SESSION && sessionStorage.getItem(KEY + '_session')) return true;
+        if (ONCE_DAY && localStorage.getItem(KEY + '_day') === TODAY)  return true;
+        return false;
+    }
+
+    function markSeen() {
+        if (ONCE_SESSION) sessionStorage.setItem(KEY + '_session', '1');
+        if (ONCE_DAY)     localStorage.setItem(KEY + '_day', TODAY);
+    }
+
+    if (alreadySeen()) return;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('homePopupModal');
+        if (!el) return;
+
+        setTimeout(function () {
+            var modal = new bootstrap.Modal(el, { backdrop: true, keyboard: true });
+            modal.show();
+            markSeen();
+
+            // If image-only + link: click on image opens the link
+            @if (hasLink && string.IsNullOrEmpty(btnText))
+            {
+                <text>
+                el.querySelector('.home-popup-img')?.addEventListener('click', function () {
+                    modal.hide();
+                    window.open('@Html.Raw(Model.LinkUrl)', '@linkTarget');
+                });
+                el.querySelector('.home-popup-image-frame')?.style?.setProperty('cursor', 'pointer');
+                </text>
+            }
+        }, DELAY);
+    });
+})();
+</script>

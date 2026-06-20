@@ -44,8 +44,18 @@
                 </div>
                 <div class="col-12">
                     <label asp-for="ImageFile" class="form-label fw-medium">Profile Photo</label>
-                    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    <div class="mb-2">
+                        <div class="staff-photo-frame" style="width:72px;height:72px;display:none;" id="staffPhotoFrameNew">
+                            <img id="staffPhotoPreview" src="#" alt="Preview" />
+                        </div>
+                    </div>
+                    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp"
+                           data-preview-target="#staffPhotoPreview"
+                           onchange="document.getElementById('staffPhotoFrameNew').style.display=''" />
                     <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                    <div class="text-muted small mt-1">
+                        Recommended: 800 × 800 px or 4:5 portrait &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 2 MB
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="StartDate" class="form-label fw-medium">Start Date</label>

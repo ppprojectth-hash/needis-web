@@ -47,11 +47,25 @@
                     @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
                     {
                         <div class="mb-2">
-                            <img src="@Model.ExistingImageUrl" alt="" class="rounded-circle" style="width:60px;height:60px;object-fit:cover" />
+                            <div class="staff-photo-frame" style="width:72px;height:72px;">
+                                <img id="staffPhotoPreview" src="@Model.ExistingImageUrl" alt="Current photo" />
+                            </div>
                         </div>
                     }
-                    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    else
+                    {
+                        <div class="mb-2">
+                            <div class="staff-photo-frame" style="width:72px;height:72px;display:none;" id="staffPhotoFrameNew">
+                                <img id="staffPhotoPreview" src="#" alt="Preview" />
+                            </div>
+                        </div>
+                    }
+                    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp"
+                           data-preview-target="#staffPhotoPreview" />
                     <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                    <div class="text-muted small mt-1">
+                        Recommended: 800 × 800 px or 4:5 portrait &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 2 MB
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="StartDate" class="form-label fw-medium">Start Date</label>

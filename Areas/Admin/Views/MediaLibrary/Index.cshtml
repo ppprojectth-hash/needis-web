@@ -126,12 +126,12 @@ else
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="card border-0 shadow-sm rounded-3 h-100" style="overflow:hidden">
                     @* Preview *@
-                    <div class="media-thumb d-flex align-items-center justify-content-center"
-                         style="height:140px;background:#f3f5f9;overflow:hidden">
+                    <div class="media-thumb"
+                         style="height:140px;background:#f3f5f9;overflow:hidden;display:flex;align-items:center;justify-content:center">
                         @if (isImage)
                         {
                             <img src="@file.FileUrl" alt="@(file.AltTextEN ?? file.OriginalFileName)"
-                                 style="max-height:140px;max-width:100%;object-fit:contain"
+                                 style="width:100%;height:140px;object-fit:cover;object-position:center center"
                                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
                             <div style="display:none;align-items:center;justify-content:center;height:100%;width:100%">
                                 <i class="bi bi-image text-muted" style="font-size:2.5rem"></i>
