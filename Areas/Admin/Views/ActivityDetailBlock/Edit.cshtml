@@ -62,11 +62,13 @@
                 </div>
                 <div class="col-12">
                     <label asp-for="BlockContentEN" class="form-label fw-medium">Content EN</label>
-                    <textarea asp-for="BlockContentEN" class="form-control" rows="4"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "BlockContentEN", Value = Model.BlockContentEN, Rows = 4, Language = "en" }' />
                 </div>
                 <div class="col-12">
                     <label asp-for="BlockContentTH" class="form-label fw-medium">Content TH</label>
-                    <textarea asp-for="BlockContentTH" class="form-control" rows="4"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "BlockContentTH", Value = Model.BlockContentTH, Rows = 4, Language = "th" }' />
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Block Image</label>

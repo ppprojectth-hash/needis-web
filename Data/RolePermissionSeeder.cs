@@ -62,6 +62,9 @@ public static class RolePermissionSeeder
         ("HomePopup.Create",     "Content",   "Create Home Popups",       36),
         ("HomePopup.Edit",       "Content",   "Edit Home Popups",         37),
         ("HomePopup.Delete",     "Content",   "Delete Home Popups",       38),
+
+        ("SiteText.View",        "Content",   "View Website Texts",       33),
+        ("SiteText.Edit",        "Content",   "Edit Website Texts",       34),
     ];
 
     private static readonly string[] AllKeys =
@@ -82,6 +85,7 @@ public static class RolePermissionSeeder
             "SiteSetting.View",
             "Banner.View",    "Banner.Create",    "Banner.Edit",    "Banner.Delete",
             "HomePopup.View", "HomePopup.Create", "HomePopup.Edit", "HomePopup.Delete",
+            "SiteText.View",  "SiteText.Edit",
             "Category.View",  "Category.Create",  "Category.Edit",  "Category.Delete",
             "Product.View",   "Product.Create",   "Product.Edit",   "Product.Delete",
             "About.View",     "About.Edit",

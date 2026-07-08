@@ -50,6 +50,7 @@
                             @if (!string.IsNullOrEmpty((string?)svc.CoverImageUrl))
                             {
                                 <img src="@svc.CoverImageUrl" alt="" class="rounded" style="width:44px;height:44px;object-fit:cover" />
+                                <div class="admin-file-size mt-1">@FileInfoSvc.GetFileSizeDisplay(svc.CoverImageUrl)</div>
                             }
                             else
                             {
@@ -92,16 +93,29 @@
                             <a asp-controller="ServiceContactCard" asp-action="Index" asp-route-serviceId="@svc.Id"
                                class="badge bg-secondary text-decoration-none">@svc.CardCount Cards</a>
                         </td>
-                        <td class="text-end pe-3 text-nowrap">
-                            <a asp-action="Details" asp-route-id="@svc.Id"
-                               class="btn btn-sm btn-outline-secondary me-1">Details</a>
-                            <a asp-action="Edit" asp-route-id="@svc.Id"
-                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
-                            <form asp-action="Delete" asp-route-id="@svc.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this service?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <td class="actions-cell pe-3">
+                            <div class="admin-actions">
+                                <a asp-action="Details" asp-route-id="@svc.Id"
+                                   class="admin-action-btn admin-action-btn-view"
+                                   title="View Details" aria-label="View service details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@svc.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit service">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@svc.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this service?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete service">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

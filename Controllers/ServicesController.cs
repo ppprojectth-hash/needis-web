@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
 using Needis.Web.ViewModels.Services;
 
 namespace Needis.Web.Controllers;
@@ -10,11 +11,19 @@ public class ServicesController : Controller
 {
     private readonly AppDbContext _db;
     private readonly ILanguageService _lang;
+    private readonly ISiteTextService _siteText;
 
-    public ServicesController(AppDbContext db, ILanguageService lang)
+    private static readonly string[] TextKeys =
+    [
+        "services.page.title", "services.page.subtitle",
+        "services.rental.title", "services.rental.subtitle", "services.view_detail",
+    ];
+
+    public ServicesController(AppDbContext db, ILanguageService lang, ISiteTextService siteText)
     {
-        _db   = db;
-        _lang = lang;
+        _db       = db;
+        _lang     = lang;
+        _siteText = siteText;
     }
 
     // ── GET /Services ────────────────────────────────────────────────────────
@@ -40,12 +49,15 @@ public class ServicesController : Controller
             .ThenBy(s => s.ServiceNameEN)
             .ToListAsync();
 
+        var texts = await _siteText.GetTextsAsync(TextKeys, lang);
+
         var vm = new ServicesIndexViewModel
         {
             CurrentLanguage  = lang,
             ServicePage      = servicePage,
             Services         = allServices,
             FeaturedServices = allServices.Where(s => s.IsFeatured).Take(6).ToList(),
+            Texts            = texts,
         };
 
         return View(vm);

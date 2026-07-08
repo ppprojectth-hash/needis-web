@@ -13,6 +13,9 @@ namespace Needis.Web.Areas.Admin.Controllers;
 [RequirePermission("About.View")]
 public class StaffProfileController : Controller
 {
+    private static readonly string[] AllowedPdfExtensions = [".pdf"];
+    private const long MaxPdfBytes = 20 * 1024 * 1024; // 20 MB
+
     private readonly AppDbContext _db;
     private readonly IWebHostEnvironment _env;
     private string CurrentUser => User.Identity?.Name ?? "system";
@@ -35,13 +38,14 @@ public class StaffProfileController : Controller
 
         if (!string.IsNullOrWhiteSpace(keyword))
             query = query.Where(s =>
-                (s.FullNameTH != null && s.FullNameTH.Contains(keyword)) ||
-                (s.FullNameEN != null && s.FullNameEN.Contains(keyword)) ||
-                (s.EmployeeCode != null && s.EmployeeCode.Contains(keyword)) ||
-                (s.Department != null && s.Department.Contains(keyword)));
+                (s.FullNameTH    != null && s.FullNameTH.Contains(keyword)) ||
+                (s.FullNameEN    != null && s.FullNameEN.Contains(keyword)) ||
+                (s.EmployeeCode  != null && s.EmployeeCode.Contains(keyword)) ||
+                (s.Department    != null && s.Department.Contains(keyword)));
 
         var list = await query
-            .OrderByDescending(s => s.IsActive)
+            .OrderBy(s => s.DisplayOrder)
+            .ThenByDescending(s => s.IsActive)
             .ThenBy(s => s.FullNameEN)
             .ToListAsync();
 
@@ -52,7 +56,13 @@ public class StaffProfileController : Controller
     public IActionResult Create()
     {
         ViewData["Title"] = "Add Staff Profile";
-        return View(new StaffProfileViewModel { IsActive = true });
+        return View(new StaffProfileViewModel
+        {
+            IsActive        = true,
+            ShowPublic      = false,
+            ShowContactInfo = true,
+            ShowDetailPage  = true,
+        });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -60,14 +70,19 @@ public class StaffProfileController : Controller
     {
         ViewData["Title"] = "Add Staff Profile";
 
+        // Employee code uniqueness
         if (!string.IsNullOrWhiteSpace(vm.EmployeeCode) &&
             await _db.StaffProfiles.AnyAsync(s => s.EmployeeCode == vm.EmployeeCode && !s.IsDelete))
-        {
             ModelState.AddModelError(nameof(vm.EmployeeCode), $"Employee code '{vm.EmployeeCode}' already exists.");
-        }
+
+        // Generate / normalise slug
+        var slug = NormaliseSlug(vm.Slug, vm.FullNameEN);
+        if (await _db.StaffProfiles.AnyAsync(s => s.Slug == slug && !s.IsDelete))
+            slug = $"{slug}-{Guid.NewGuid().ToString("N")[..6]}";
 
         if (!ModelState.IsValid) return View(vm);
 
+        // Photo upload
         string? imagePath = null;
         if (vm.ImageFile is { Length: > 0 })
         {
@@ -76,21 +91,44 @@ public class StaffProfileController : Controller
             imagePath = path;
         }
 
+        // PDF upload
+        string? pdfPath = null;
+        string? pdfName = null;
+        if (vm.PdfFile is { Length: > 0 })
+        {
+            var (ok, err, path, name) = await SavePdfAsync(vm.PdfFile);
+            if (!ok) { ModelState.AddModelError(nameof(vm.PdfFile), err); return View(vm); }
+            pdfPath = path;
+            pdfName = name;
+        }
+
         _db.StaffProfiles.Add(new StaffProfile
         {
             EmployeeCode    = vm.EmployeeCode,
-            FullNameTH      = vm.FullNameTH,
             FullNameEN      = vm.FullNameEN,
-            PositionTH      = vm.PositionTH,
+            FullNameTH      = vm.FullNameTH,
             PositionEN      = vm.PositionEN,
+            PositionTH      = vm.PositionTH,
+            Slug            = slug,
             Department      = vm.Department,
             StaffType       = vm.StaffType,
             IsExpert        = vm.IsExpert,
             ShowPublic      = vm.ShowPublic,
+            DisplayOrder    = vm.DisplayOrder,
+            IsActive        = vm.IsActive,
             ProfileImageUrl = imagePath,
+            MobilePhone     = vm.MobilePhone?.Trim(),
+            Email           = vm.Email?.Trim(),
+            BiographyTH     = vm.BiographyTH?.Trim(),
+            BiographyEN     = vm.BiographyEN?.Trim(),
+            AchievementTH   = vm.AchievementTH?.Trim(),
+            AchievementEN   = vm.AchievementEN?.Trim(),
+            PdfFileUrl      = pdfPath,
+            PdfFileName     = pdfName,
+            ShowContactInfo = vm.ShowContactInfo,
+            ShowDetailPage  = vm.ShowDetailPage,
             StartDate       = vm.StartDate.HasValue ? DateTime.SpecifyKind(vm.StartDate.Value, DateTimeKind.Utc) : null,
             EndDate         = vm.EndDate.HasValue   ? DateTime.SpecifyKind(vm.EndDate.Value,   DateTimeKind.Utc) : null,
-            IsActive        = vm.IsActive,
             CreatedAt       = DateTime.UtcNow,
             CreatedBy       = CurrentUser,
         });
@@ -112,18 +150,30 @@ public class StaffProfileController : Controller
         {
             Id               = s.Id,
             EmployeeCode     = s.EmployeeCode,
-            FullNameTH       = s.FullNameTH,
             FullNameEN       = s.FullNameEN,
-            PositionTH       = s.PositionTH,
+            FullNameTH       = s.FullNameTH,
             PositionEN       = s.PositionEN,
+            PositionTH       = s.PositionTH,
+            Slug             = s.Slug,
             Department       = s.Department,
             StaffType        = s.StaffType,
             IsExpert         = s.IsExpert,
             ShowPublic       = s.ShowPublic,
+            DisplayOrder     = s.DisplayOrder,
+            IsActive         = s.IsActive,
             ExistingImageUrl = s.ProfileImageUrl,
+            MobilePhone      = s.MobilePhone,
+            Email            = s.Email,
+            BiographyTH      = s.BiographyTH,
+            BiographyEN      = s.BiographyEN,
+            AchievementTH    = s.AchievementTH,
+            AchievementEN    = s.AchievementEN,
+            ExistingPdfUrl   = s.PdfFileUrl,
+            ExistingPdfName  = s.PdfFileName,
+            ShowContactInfo  = s.ShowContactInfo,
+            ShowDetailPage   = s.ShowDetailPage,
             StartDate        = s.StartDate,
             EndDate          = s.EndDate,
-            IsActive         = s.IsActive,
         });
     }
 
@@ -134,15 +184,19 @@ public class StaffProfileController : Controller
 
         if (!string.IsNullOrWhiteSpace(vm.EmployeeCode) &&
             await _db.StaffProfiles.AnyAsync(s => s.EmployeeCode == vm.EmployeeCode && s.Id != id && !s.IsDelete))
-        {
             ModelState.AddModelError(nameof(vm.EmployeeCode), $"Employee code '{vm.EmployeeCode}' already exists.");
-        }
+
+        // Generate / normalise slug
+        var slug = NormaliseSlug(vm.Slug, vm.FullNameEN);
+        if (await _db.StaffProfiles.AnyAsync(s => s.Slug == slug && s.Id != id && !s.IsDelete))
+            slug = $"{slug}-{Guid.NewGuid().ToString("N")[..6]}";
 
         if (!ModelState.IsValid) return View(vm);
 
         var entity = await _db.StaffProfiles.FindAsync(id);
         if (entity is null || entity.IsDelete) return NotFound();
 
+        // Photo upload
         if (vm.ImageFile is { Length: > 0 })
         {
             var (ok, err, path) = await ImageUploadHelper.SaveAsync(vm.ImageFile, _env.WebRootPath, "uploads/about/staffs");
@@ -150,20 +204,39 @@ public class StaffProfileController : Controller
             entity.ProfileImageUrl = path;
         }
 
-        entity.EmployeeCode = vm.EmployeeCode;
-        entity.FullNameTH   = vm.FullNameTH;
-        entity.FullNameEN   = vm.FullNameEN;
-        entity.PositionTH   = vm.PositionTH;
-        entity.PositionEN   = vm.PositionEN;
-        entity.Department   = vm.Department;
-        entity.StaffType    = vm.StaffType;
-        entity.IsExpert     = vm.IsExpert;
-        entity.ShowPublic   = vm.ShowPublic;
-        entity.StartDate    = vm.StartDate.HasValue ? DateTime.SpecifyKind(vm.StartDate.Value, DateTimeKind.Utc) : null;
-        entity.EndDate      = vm.EndDate.HasValue   ? DateTime.SpecifyKind(vm.EndDate.Value,   DateTimeKind.Utc) : null;
-        entity.IsActive     = vm.IsActive;
-        entity.UpdatedAt    = DateTime.UtcNow;
-        entity.UpdatedBy    = CurrentUser;
+        // PDF upload
+        if (vm.PdfFile is { Length: > 0 })
+        {
+            var (ok, err, path, name) = await SavePdfAsync(vm.PdfFile);
+            if (!ok) { ModelState.AddModelError(nameof(vm.PdfFile), err); return View(vm); }
+            entity.PdfFileUrl  = path;
+            entity.PdfFileName = name;
+        }
+
+        entity.EmployeeCode    = vm.EmployeeCode;
+        entity.FullNameEN      = vm.FullNameEN;
+        entity.FullNameTH      = vm.FullNameTH;
+        entity.PositionEN      = vm.PositionEN;
+        entity.PositionTH      = vm.PositionTH;
+        entity.Slug            = slug;
+        entity.Department      = vm.Department;
+        entity.StaffType       = vm.StaffType;
+        entity.IsExpert        = vm.IsExpert;
+        entity.ShowPublic      = vm.ShowPublic;
+        entity.DisplayOrder    = vm.DisplayOrder;
+        entity.IsActive        = vm.IsActive;
+        entity.MobilePhone     = vm.MobilePhone?.Trim();
+        entity.Email           = vm.Email?.Trim();
+        entity.BiographyTH     = vm.BiographyTH?.Trim();
+        entity.BiographyEN     = vm.BiographyEN?.Trim();
+        entity.AchievementTH   = vm.AchievementTH?.Trim();
+        entity.AchievementEN   = vm.AchievementEN?.Trim();
+        entity.ShowContactInfo = vm.ShowContactInfo;
+        entity.ShowDetailPage  = vm.ShowDetailPage;
+        entity.StartDate       = vm.StartDate.HasValue ? DateTime.SpecifyKind(vm.StartDate.Value, DateTimeKind.Utc) : null;
+        entity.EndDate         = vm.EndDate.HasValue   ? DateTime.SpecifyKind(vm.EndDate.Value,   DateTimeKind.Utc) : null;
+        entity.UpdatedAt       = DateTime.UtcNow;
+        entity.UpdatedBy       = CurrentUser;
 
         await _db.SaveChangesAsync();
         TempData["Success"] = "Staff profile updated.";
@@ -184,5 +257,36 @@ public class StaffProfileController : Controller
             TempData["Success"] = "Staff profile deleted.";
         }
         return RedirectToAction(nameof(Index));
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+
+    private static string NormaliseSlug(string? slug, string? fallback)
+    {
+        if (!string.IsNullOrWhiteSpace(slug))
+            return SlugHelper.Generate(slug);
+        return SlugHelper.Generate(fallback);
+    }
+
+    private async Task<(bool ok, string error, string path, string name)> SavePdfAsync(IFormFile file)
+    {
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!AllowedPdfExtensions.Contains(ext))
+            return (false, "Only PDF files are allowed.", string.Empty, string.Empty);
+
+        if (file.Length > MaxPdfBytes)
+            return (false, "PDF size must not exceed 20 MB.", string.Empty, string.Empty);
+
+        var dir = Path.Combine(_env.WebRootPath, "uploads", "staff-profiles", "pdfs");
+        Directory.CreateDirectory(dir);
+
+        var fileName = $"{Guid.NewGuid()}.pdf";
+        var filePath = Path.Combine(dir, fileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        var originalName = Path.GetFileNameWithoutExtension(file.FileName);
+        return (true, string.Empty, $"/uploads/staff-profiles/pdfs/{fileName}", originalName);
     }
 }

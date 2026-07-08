@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
 using Needis.Web.ViewModels.Product;
 
 namespace Needis.Web.Controllers;
@@ -10,11 +12,20 @@ public class ProductController : Controller
 {
     private readonly AppDbContext     _db;
     private readonly ILanguageService _lang;
+    private readonly ISiteTextService _siteText;
 
-    public ProductController(AppDbContext db, ILanguageService lang)
+    private static readonly string[] TextKeys =
+    [
+        "product.page.title", "product.page.subtitle", "product.search.placeholder",
+        "product.categories.title", "product.all_products", "product.view_detail",
+        "product.add_to_quote", "product.empty.title", "product.empty.description",
+    ];
+
+    public ProductController(AppDbContext db, ILanguageService lang, ISiteTextService siteText)
     {
-        _db   = db;
-        _lang = lang;
+        _db       = db;
+        _lang     = lang;
+        _siteText = siteText;
     }
 
     // GET /Product  or  /Product?category={slug}&search={q}
@@ -33,10 +44,21 @@ public class ProductController : Controller
         if (!string.IsNullOrWhiteSpace(category))
             selectedCategory = categories.FirstOrDefault(c => c.Slug == category);
 
-        var query = _db.Products
+        var baseQuery = _db.Products
             .AsNoTracking()
+            .Where(p => p.IsActive);
+
+        // Category counts must come from the base (unfiltered-by-category) query so
+        // selecting a category doesn't zero out the other sidebar counts.
+        var categoryCounts = await baseQuery
+            .GroupBy(p => p.CategoryId)
+            .Select(g => new { CategoryId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.CategoryId, x => x.Count);
+
+        var allProductsCount = await baseQuery.CountAsync();
+
+        var query = baseQuery
             .Include(p => p.Category)
-            .Where(p => p.IsActive)
             .AsQueryable();
 
         if (selectedCategory != null)
@@ -60,6 +82,8 @@ public class ProductController : Controller
             .ThenBy(p => p.NameEN)
             .ToListAsync();
 
+        var texts = await _siteText.GetTextsAsync(TextKeys, lang);
+
         var vm = new ProductListViewModel
         {
             Products             = products,
@@ -69,6 +93,9 @@ public class ProductController : Controller
             SelectedCategory     = selectedCategory,
             Search               = search?.Trim(),
             CurrentLanguage      = lang,
+            AllProductsCount     = allProductsCount,
+            CategoryCounts       = categoryCounts,
+            Texts                = texts,
         };
 
         if (selectedCategory != null)
@@ -115,12 +142,20 @@ public class ProductController : Controller
             .ThenBy(s => s.Id)
             .ToListAsync();
 
+        string? embedUrl = null;
+        if (product.ShowYoutubeVideo && !string.IsNullOrWhiteSpace(product.YoutubeVideoUrl))
+            embedUrl = YoutubeHelper.GetEmbedUrl(product.YoutubeVideoUrl);
+
+        var texts = await _siteText.GetTextsAsync(TextKeys, lang);
+
         var vm = new ProductDetailViewModel
         {
             Product         = product,
             RelatedProducts = related,
             Specifications  = specs,
             CurrentLanguage = lang,
+            YoutubeEmbedUrl = embedUrl,
+            Texts           = texts,
         };
 
         ViewData["SeoPageKey"]       = "product-detail";

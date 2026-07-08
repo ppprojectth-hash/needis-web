@@ -123,17 +123,24 @@
                         <td class="small text-muted">
                             @(item.UpdatedAt?.ToString("dd MMM yyyy") ?? "—")
                         </td>
-                        <td class="text-end">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this SEO setting?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+                        <td class="actions-cell">
+                            <div class="admin-actions">
+                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit SEO setting">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this SEO setting?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete SEO setting">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

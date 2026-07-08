@@ -1,4 +1,5 @@
 @model AboutIndexViewModel
+@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
 @{
     var lang = Model.CurrentLanguage;
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
@@ -19,10 +20,10 @@
             </ol>
         </nav>
         <h1 class="page-header-title">
-            @(lang == "th" ? "เกี่ยวกับ Needis" : "About Needis")
+            @Model.T("about.page.title", lang == "th" ? "เกี่ยวกับ Needis" : "About Needis")
         </h1>
         <p class="page-header-subtitle">
-            @(lang == "th"
+            @Model.T("about.page.subtitle", lang == "th"
                 ? "พันธมิตรด้านเครื่องมือวัด เครื่องมือวิทยาศาสตร์ และบริการสนับสนุนทางเทคนิค"
                 : "Trusted partner for measuring tools, scientific instruments, and technical support.")
         </p>
@@ -87,7 +88,7 @@
                     }
                     @if (!string.IsNullOrEmpty(sDesc))
                     {
-                        <p class="section-subtitle">@sDesc</p>
+                        <div class="section-subtitle rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div>
                     }
                 </div>
                 @if (sItems.Any())
@@ -141,7 +142,7 @@
                         }
                         @if (!string.IsNullOrEmpty(sDesc))
                         {
-                            <p class="text-muted lh-lg">@sDesc</p>
+                            <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div>
                         }
                     </div>
                 </div>
@@ -160,7 +161,7 @@
                         <div class="col-lg-7 reveal reveal-delay-1">
                             @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
                             @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
-                            @if (!string.IsNullOrEmpty(sDesc)) { <p class="text-muted lh-lg">@sDesc</p> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div> }
                         </div>
                     }
                     else if (!imgLeft && !string.IsNullOrEmpty(sImageUrl))
@@ -168,7 +169,7 @@
                         <div class="col-lg-7 reveal">
                             @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
                             @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
-                            @if (!string.IsNullOrEmpty(sDesc)) { <p class="text-muted lh-lg">@sDesc</p> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div> }
                         </div>
                         <div class="col-lg-5 reveal reveal-delay-1">
                             <img src="@sImageUrl" alt="@sTitle" class="about-section-img w-100" />
@@ -180,7 +181,7 @@
                         <div class="col-lg-7 reveal">
                             @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
                             @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
-                            @if (!string.IsNullOrEmpty(sDesc)) { <p class="text-muted lh-lg">@sDesc</p> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div> }
                         </div>
                         @if (sItems.Any())
                         {
@@ -350,13 +351,13 @@
         <div class="container">
             <div class="text-center mb-5 reveal">
                 <p class="section-eyebrow">
-                    @(lang == "th" ? "ทีมงานของเรา" : "Meet the Team")
+                    @Model.T("about.team.eyebrow", lang == "th" ? "ทีมงานของเรา" : "Meet the Team")
                 </p>
                 <h2 class="section-title">
-                    @(lang == "th" ? "ทีมผู้เชี่ยวชาญของเรา" : "Our Expert Team")
+                    @Model.T("about.team.title", lang == "th" ? "ทีมผู้เชี่ยวชาญของเรา" : "Our Expert Team")
                 </h2>
                 <p class="section-subtitle">
-                    @(lang == "th"
+                    @Model.T("about.team.subtitle", lang == "th"
                         ? "ผู้เชี่ยวชาญด้านเทคนิคที่พร้อมให้คำปรึกษาและสนับสนุนคุณ"
                         : "Technical specialists ready to advise and support your instrumentation needs.")
                 </p>
@@ -365,14 +366,19 @@
                 @foreach (var (staff, sIdx) in Model.PublicStaffProfiles.Select((s, i) => (s, i)))
                 {
                     var sDelay = (sIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+                    var staffName  = lang == "th" ? (staff.FullNameTH ?? staff.FullNameEN) : (staff.FullNameEN ?? staff.FullNameTH);
+                    var staffPos   = lang == "th" ? staff.PositionTH  : staff.PositionEN;
+                    var staffBio   = lang == "th" ? staff.BiographyTH : staff.BiographyEN;
+                    var bioExcerpt = staffBio is { Length: > 0 }
+                        ? (staffBio.Length > 100 ? staffBio[..100].TrimEnd() + "…" : staffBio)
+                        : null;
+                    var canViewDetail = FF.StaffProfileDetailEnabled && staff.ShowDetailPage && !string.IsNullOrEmpty(staff.Slug);
                     <div class="col-6 col-md-4 col-lg-3 reveal @sDelay">
                         <div class="staff-card">
                             @if (!string.IsNullOrEmpty(staff.ProfileImageUrl))
                             {
                                 <div class="staff-card-photo-frame">
-                                    <img src="@staff.ProfileImageUrl"
-                                         alt="@(lang == "th" ? staff.FullNameTH : staff.FullNameEN)"
-                                         loading="lazy" />
+                                    <img src="@staff.ProfileImageUrl" alt="@staffName" loading="lazy" />
                                 </div>
                             }
                             else
@@ -381,18 +387,41 @@
                                     <i class="bi bi-person-fill"></i>
                                 </div>
                             }
-                            <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">
-                                @(lang == "th" ? (staff.FullNameTH ?? staff.FullNameEN) : (staff.FullNameEN ?? staff.FullNameTH))
-                            </h6>
-                            @if (!string.IsNullOrEmpty(lang == "th" ? staff.PositionTH : staff.PositionEN))
+                            <h6 class="fw-bold mb-1" style="color:var(--needis-dark)">@staffName</h6>
+                            @if (!string.IsNullOrEmpty(staffPos))
                             {
-                                <p class="text-muted small mb-1">
-                                    @(lang == "th" ? staff.PositionTH : staff.PositionEN)
-                                </p>
+                                <p class="text-muted small mb-1">@staffPos</p>
                             }
                             @if (!string.IsNullOrEmpty(staff.Department))
                             {
-                                <p class="small mb-0" style="color:var(--needis-primary)">@staff.Department</p>
+                                <p class="small mb-1" style="color:var(--needis-primary)">@staff.Department</p>
+                            }
+                            @if (bioExcerpt is not null)
+                            {
+                                <p class="text-muted small mb-2" style="font-size:.78rem;line-height:1.45">@bioExcerpt</p>
+                            }
+                            @if (staff.ShowContactInfo && (!string.IsNullOrEmpty(staff.MobilePhone) || !string.IsNullOrEmpty(staff.Email)))
+                            {
+                                <div class="d-flex gap-2 justify-content-center flex-wrap mb-2">
+                                    @if (!string.IsNullOrEmpty(staff.MobilePhone))
+                                    {
+                                        <a href="tel:@staff.MobilePhone" class="staff-contact-icon" title="@staff.MobilePhone" aria-label="Call @staffName">
+                                            <i class="bi bi-telephone-fill"></i>
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(staff.Email))
+                                    {
+                                        <a href="mailto:@staff.Email" class="staff-contact-icon" title="@staff.Email" aria-label="Email @staffName">
+                                            <i class="bi bi-envelope-fill"></i>
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            @if (canViewDetail)
+                            {
+                                <a href="/About/Staff/@staff.Slug" class="staff-view-profile-btn">
+                                    @(lang == "th" ? "ดูโปรไฟล์" : "View Profile")
+                                </a>
                             }
                         </div>
                     </div>
@@ -402,7 +431,110 @@
     </section>
 }
 
-@* ── G. CTA Section ───────────────────────────────────────────────────────── *@
+@* ── G. Google Map / Location ─────────────────────────────────────────────── *@
+@if (FF.AboutGoogleMapEnabled && Model.ShowMapOnAboutPage && (Model.GoogleMapUrl != null || Model.GoogleMapEmbedUrl != null))
+{
+    var mapTitle = L(Model.MapTitleTH, Model.MapTitleEN) is { Length: > 0 } mt
+        ? mt : Model.T("about.location.title", lang == "th" ? "ที่ตั้งของเรา" : "Our Location");
+    var mapDesc = L(Model.MapDescriptionTH, Model.MapDescriptionEN) is { Length: > 0 } md
+        ? md : Model.T("about.location.subtitle", lang == "th"
+            ? "ดูที่ตั้งบริษัทหรือเปิดตำแหน่งใน Google Maps"
+            : "Visit us or open the location in Google Maps.");
+    var address = L(Model.AddressTH, Model.AddressEN);
+
+    <section class="about-map-section py-5">
+        <div class="container">
+            <div class="row g-4 g-lg-5 align-items-start">
+
+                @* Info column *@
+                <div class="col-lg-4 reveal">
+                    <div class="about-map-info">
+                        <div class="about-map-info-icon mb-3">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <h2 class="about-map-title mb-2">@mapTitle</h2>
+                        <p class="about-map-desc mb-3">@mapDesc</p>
+
+                        @if (!string.IsNullOrEmpty(address))
+                        {
+                            <div class="about-map-address mb-3">
+                                <i class="bi bi-building me-2 opacity-75"></i>@address
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ContactPhone))
+                        {
+                            <div class="about-map-contact mb-2">
+                                <i class="bi bi-telephone me-2 opacity-75"></i>
+                                <a href="tel:@Model.ContactPhone" class="text-decoration-none">
+                                    @Model.ContactPhone
+                                </a>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ContactEmail))
+                        {
+                            <div class="about-map-contact mb-3">
+                                <i class="bi bi-envelope me-2 opacity-75"></i>
+                                <a href="mailto:@Model.ContactEmail" class="text-decoration-none">
+                                    @Model.ContactEmail
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model.GoogleMapUrl != null)
+                        {
+                            <div class="about-map-actions">
+                                <a href="@Model.GoogleMapUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn about-map-btn">
+                                    <i class="bi bi-map me-2"></i>
+                                    @Model.T("about.location.button", lang == "th" ? "เปิดใน Google Maps" : "Open in Google Maps")
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* Map column *@
+                <div class="col-lg-8 reveal reveal-delay-1">
+                    @if (Model.GoogleMapEmbedUrl != null)
+                    {
+                        <div class="about-map-frame">
+                            <iframe src="@Model.GoogleMapEmbedUrl"
+                                    title="@Html.Encode(mapTitle)"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    allowfullscreen></iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Placeholder when no embed URL is set *@
+                        <div class="about-map-placeholder">
+                            <i class="bi bi-map-fill about-map-placeholder-icon"></i>
+                            <p class="about-map-placeholder-text">
+                                @(lang == "th" ? "แผนที่ยังไม่ได้ตั้งค่า" : "Map not configured")
+                            </p>
+                            @if (Model.GoogleMapUrl != null)
+                            {
+                                <a href="@Model.GoogleMapUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn about-map-btn mt-2">
+                                    <i class="bi bi-map me-2"></i>
+                                    @Model.T("about.location.button", lang == "th" ? "เปิดใน Google Maps" : "Open in Google Maps")
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </section>
+}
+
+@* ── H. CTA Section ───────────────────────────────────────────────────────── *@
 <section class="cta-section py-5">
     <div class="container">
         <div class="row align-items-center g-4">

@@ -79,16 +79,18 @@
                             <label asp-for="ShortDescriptionEN" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionEN)
                             </label>
-                            <textarea asp-for="ShortDescriptionEN" class="form-control" rows="3"
-                                      placeholder="Brief description in English"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 3,
+                                Placeholder = "Brief description in English", Language = "en" }' />
                             <span asp-validation-for="ShortDescriptionEN" class="text-danger small"></span>
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="ShortDescriptionTH" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionTH)
                             </label>
-                            <textarea asp-for="ShortDescriptionTH" class="form-control" rows="3"
-                                      placeholder="คำอธิบายสั้นภาษาไทย"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 3,
+                                Placeholder = "คำอธิบายสั้นภาษาไทย", Language = "th" }' />
                             <span asp-validation-for="ShortDescriptionTH" class="text-danger small"></span>
                         </div>
                     </div>

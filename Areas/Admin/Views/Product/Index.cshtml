@@ -81,7 +81,7 @@
     else
     {
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 admin-table">
                 <thead style="background:#f8f9fc">
                     <tr class="text-muted small fw-semibold"
                         style="font-size:.8rem;text-transform:uppercase;letter-spacing:.04em">
@@ -94,7 +94,7 @@
                         <th class="py-3 text-center" style="width:75px">Featured</th>
                         <th class="py-3 text-center" style="width:80px">Order</th>
                         <th class="py-3 text-center" style="width:90px">Status</th>
-                        <th class="py-3 text-end pe-4" style="width:110px">Actions</th>
+                        <th class="py-3 actions-cell pe-4">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,6 +107,7 @@
                                     <img src="@item.MainImagePath" alt="@item.NameEN"
                                          class="rounded-2"
                                          style="width:56px;height:56px;object-fit:contain;background:#f8f9fc;border:1px solid #eee" />
+                                    <div class="admin-file-size mt-1 text-center">@FileInfoSvc.GetFileSizeDisplay(item.MainImagePath)</div>
                                 }
                                 else
                                 {
@@ -121,6 +122,12 @@
                                 @if (!string.IsNullOrEmpty(item.NameTH))
                                 {
                                     <div class="text-muted small">@item.NameTH</div>
+                                }
+                                @if (FF.ProductYoutubeVideoEnabled && item.HasVideo)
+                                {
+                                    <span class="badge mt-1" style="background:#ff0000;font-size:.68rem">
+                                        <i class="bi bi-youtube me-1"></i>Video
+                                    </span>
                                 }
                             </td>
                             <td class="py-2 small text-muted">@item.CategoryNameEN</td>
@@ -172,25 +179,33 @@
                                     <span class="badge rounded-pill text-bg-secondary">Inactive</span>
                                 }
                             </td>
-                            <td class="py-2 text-end pe-4">
-                                <a asp-area="Admin" asp-controller="ProductSpecification" asp-action="Index"
-                                   asp-route-productId="@item.Id"
-                                   class="btn btn-sm btn-outline-secondary me-1"
-                                   title="Manage Specifications">
-                                    <i class="bi bi-list-check"></i>
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@item.Id"
-                                   class="btn btn-sm btn-outline-primary me-1">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
-                                      style="display:inline"
-                                      onsubmit="return confirm('Delete this product? This cannot be undone.')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                            <td class="actions-cell pe-4">
+                                <div class="admin-actions">
+                                    <a asp-area="Admin" asp-controller="ProductSpecification" asp-action="Index"
+                                       asp-route-productId="@item.Id"
+                                       class="admin-action-btn admin-action-btn-secondary"
+                                       title="Manage Specifications"
+                                       aria-label="Manage Specifications">
+                                        <i class="bi bi-card-list"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id"
+                                       class="admin-action-btn admin-action-btn-edit"
+                                       title="Edit"
+                                       aria-label="Edit product">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                          class="admin-action-form"
+                                          onsubmit="return confirm('Delete this product? This cannot be undone.')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit"
+                                                class="admin-action-btn admin-action-btn-delete"
+                                                title="Delete"
+                                                aria-label="Delete product">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }

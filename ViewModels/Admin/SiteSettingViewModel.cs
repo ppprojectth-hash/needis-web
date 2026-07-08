@@ -54,6 +54,33 @@ public class SiteSettingViewModel
     [MaxLength(500)]
     public string? LinkedInUrl { get; set; }
 
+    [Display(Name = "Show Map on About Page")]
+    public bool ShowMapOnAboutPage { get; set; } = true;
+
+    [Display(Name = "Google Map URL")]
+    [MaxLength(1000)]
+    public string? GoogleMapUrl { get; set; }
+
+    [Display(Name = "Google Map Embed URL")]
+    [MaxLength(2000)]
+    public string? GoogleMapEmbedUrl { get; set; }
+
+    [Display(Name = "Map Title (TH)")]
+    [MaxLength(200)]
+    public string? MapTitleTH { get; set; }
+
+    [Display(Name = "Map Title (EN)")]
+    [MaxLength(200)]
+    public string? MapTitleEN { get; set; }
+
+    [Display(Name = "Map Description (TH)")]
+    [MaxLength(500)]
+    public string? MapDescriptionTH { get; set; }
+
+    [Display(Name = "Map Description (EN)")]
+    [MaxLength(500)]
+    public string? MapDescriptionEN { get; set; }
+
     public bool IsActive { get; set; } = true;
 
     [Display(Name = "Logo Image")]

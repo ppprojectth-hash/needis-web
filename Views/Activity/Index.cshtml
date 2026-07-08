@@ -4,9 +4,9 @@
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
 
     var heroTitle = L(Model.ActivityPage?.TitleTH, Model.ActivityPage?.TitleEN) is { Length: > 0 } ht
-        ? ht : (lang == "th" ? "กิจกรรมและข่าวสาร" : "Activity");
+        ? ht : Model.T("activity.page.title", lang == "th" ? "กิจกรรมและข่าวสาร" : "Activity");
     var heroSub = L(Model.ActivityPage?.SubtitleTH, Model.ActivityPage?.SubtitleEN) is { Length: > 0 } hs
-        ? hs : (lang == "th" ? "ข่าวสาร กิจกรรม บทความ และโปรโมชั่นล่าสุด" : "Latest news, events, articles, and promotions.");
+        ? hs : Model.T("activity.page.subtitle", lang == "th" ? "ข่าวสาร กิจกรรม บทความ และโปรโมชั่นล่าสุด" : "Latest news, events, articles, and promotions.");
     var heroBg  = Model.ActivityPage?.BackgroundImageUrl;
     var hasFilter = !string.IsNullOrEmpty(Model.SelectedTagKey) || !string.IsNullOrEmpty(Model.Search);
 
@@ -165,7 +165,7 @@
                                        asp-route-slug="@feat.ActivitySlug"
                                        class="btn btn-sm btn-primary"
                                        style="background:var(--needis-primary);border-color:var(--needis-primary)">
-                                        @(lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
+                                        @Model.T("activity.read_more", lang == "th" ? "อ่านเพิ่มเติม" : "Read More")
                                     </a>
                                 </div>
                             </div>
@@ -275,7 +275,7 @@
             <div class="text-center py-5">
                 <i class="bi bi-newspaper fs-1 d-block mb-3" style="color:#c5cde8"></i>
                 <h5 class="text-muted fw-semibold">
-                    @(lang == "th" ? "ไม่พบข้อมูลกิจกรรมหรือข่าวสาร" : "No activity found.")
+                    @Model.T("activity.empty.title", lang == "th" ? "ไม่พบข้อมูลกิจกรรมหรือข่าวสาร" : "No activity found.")
                 </h5>
                 @if (hasFilter)
                 {

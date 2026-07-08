@@ -59,6 +59,7 @@
                             @if (!string.IsNullOrEmpty(activity.CoverImageUrl))
                             {
                                 <img src="@activity.CoverImageUrl" alt="" class="rounded" style="width:44px;height:44px;object-fit:cover" />
+                                <div class="admin-file-size mt-1">@FileInfoSvc.GetFileSizeDisplay(activity.CoverImageUrl)</div>
                             }
                             else
                             {
@@ -115,22 +116,44 @@
                             }
                         </td>
                         <td class="text-center text-muted small">@activity.ViewCount</td>
-                        <td class="text-end pe-3 text-nowrap">
-                            <a asp-action="Edit" asp-route-id="@activity.Id"
-                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
-                            <a asp-action="ManageTags" asp-route-id="@activity.Id"
-                               class="btn btn-sm btn-outline-info me-1">Tags</a>
-                            <a asp-controller="ActivityDetailBlock" asp-action="Index" asp-route-activityId="@activity.Id"
-                               class="btn btn-sm btn-outline-secondary me-1">Blocks</a>
-                            <a asp-controller="ActivityImage" asp-action="Index" asp-route-activityId="@activity.Id"
-                               class="btn btn-sm btn-outline-secondary me-1">Images</a>
-                            <a asp-controller="ActivityRelatedItem" asp-action="Index" asp-route-activityId="@activity.Id"
-                               class="btn btn-sm btn-outline-secondary me-1">Related</a>
-                            <form asp-action="Delete" asp-route-id="@activity.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this activity?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <td class="actions-cell pe-3">
+                            <div class="admin-actions">
+                                <a asp-action="Edit" asp-route-id="@activity.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit activity">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="ManageTags" asp-route-id="@activity.Id"
+                                   class="admin-action-btn admin-action-btn-secondary"
+                                   title="Manage Tags" aria-label="Manage tags">
+                                    <i class="bi bi-tags"></i>
+                                </a>
+                                <a asp-controller="ActivityDetailBlock" asp-action="Index" asp-route-activityId="@activity.Id"
+                                   class="admin-action-btn admin-action-btn-secondary"
+                                   title="Detail Blocks" aria-label="Detail blocks">
+                                    <i class="bi bi-layout-text-sidebar"></i>
+                                </a>
+                                <a asp-controller="ActivityImage" asp-action="Index" asp-route-activityId="@activity.Id"
+                                   class="admin-action-btn admin-action-btn-secondary"
+                                   title="Images" aria-label="Manage images">
+                                    <i class="bi bi-images"></i>
+                                </a>
+                                <a asp-controller="ActivityRelatedItem" asp-action="Index" asp-route-activityId="@activity.Id"
+                                   class="admin-action-btn admin-action-btn-secondary"
+                                   title="Related" aria-label="Related items">
+                                    <i class="bi bi-diagram-3"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@activity.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this activity?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete activity">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

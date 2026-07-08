@@ -5,6 +5,7 @@ using Needis.Web.Data;
 using Needis.Web.Models;
 using Needis.Web.Options;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
 using Needis.Web.Services.Email;
 using Needis.Web.ViewModels.Contact;
 
@@ -18,6 +19,14 @@ public class ContactController : Controller
     private readonly IEmailTemplateService _emailTemplate;
     private readonly EmailOptions _emailOpts;
     private readonly ILogger<ContactController> _logger;
+    private readonly ISiteTextService _siteText;
+
+    private static readonly string[] TextKeys =
+    [
+        "contact.page.title", "contact.page.subtitle",
+        "contact.form.title", "contact.form.subtitle",
+        "contact.submit_button", "contact.success_message",
+    ];
 
     public ContactController(
         AppDbContext db,
@@ -25,7 +34,8 @@ public class ContactController : Controller
         IEmailSender emailSender,
         IEmailTemplateService emailTemplate,
         IOptions<EmailOptions> emailOpts,
-        ILogger<ContactController> logger)
+        ILogger<ContactController> logger,
+        ISiteTextService siteText)
     {
         _db            = db;
         _lang          = lang;
@@ -33,6 +43,7 @@ public class ContactController : Controller
         _emailTemplate = emailTemplate;
         _emailOpts     = emailOpts.Value;
         _logger        = logger;
+        _siteText      = siteText;
     }
 
     [HttpGet]
@@ -46,6 +57,7 @@ public class ContactController : Controller
             SiteSetting     = await LoadSiteSettingAsync(),
             FooterContact   = await LoadFooterContactAsync(),
             Form            = new ContactFormViewModel(),
+            Texts           = await _siteText.GetTextsAsync(TextKeys, lang),
         };
 
         ViewData["SeoPageKey"] = "contact";
@@ -66,6 +78,7 @@ public class ContactController : Controller
                 SiteSetting     = await LoadSiteSettingAsync(),
                 FooterContact   = await LoadFooterContactAsync(),
                 Form            = Form,
+                Texts           = await _siteText.GetTextsAsync(TextKeys, lang),
             };
             return View(vm);
         }
@@ -92,9 +105,9 @@ public class ContactController : Controller
         var adminUrl = $"{Request.Scheme}://{Request.Host}/Admin/ContactMessage/Detail/{message.Id}";
         await SendContactNotificationAsync(message, adminUrl);
 
-        TempData["ContactSuccess"] = lang == "th"
-            ? "ส่งข้อความเรียบร้อยแล้ว"
-            : "Your message has been sent successfully.";
+        TempData["ContactSuccess"] = await _siteText.GetTextAsync(
+            "contact.success_message", lang,
+            lang == "th" ? "ส่งข้อความเรียบร้อยแล้ว" : "Your message has been sent successfully.");
 
         return RedirectToAction(nameof(Index));
     }

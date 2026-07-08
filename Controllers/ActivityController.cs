@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
 using Needis.Web.Models;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
 using Needis.Web.ViewModels.Activity;
 
 namespace Needis.Web.Controllers;
@@ -12,11 +13,18 @@ public class ActivityController : Controller
 {
     private readonly AppDbContext _db;
     private readonly ILanguageService _lang;
+    private readonly ISiteTextService _siteText;
 
-    public ActivityController(AppDbContext db, ILanguageService lang)
+    private static readonly string[] TextKeys =
+    [
+        "activity.page.title", "activity.page.subtitle", "activity.read_more", "activity.empty.title",
+    ];
+
+    public ActivityController(AppDbContext db, ILanguageService lang, ISiteTextService siteText)
     {
-        _db   = db;
-        _lang = lang;
+        _db       = db;
+        _lang     = lang;
+        _siteText = siteText;
     }
 
     // ── GET /Activity  /Activity?tag=news  /Activity?search=keyword ──────────
@@ -91,6 +99,8 @@ public class ActivityController : Controller
             ? allActivities.Where(a => a.IsFeatured).Take(3).ToList()
             : new List<Models.Activity>();
 
+        var texts = await _siteText.GetTextsAsync(TextKeys, lang);
+
         var vm = new ActivityIndexViewModel
         {
             CurrentLanguage    = lang,
@@ -101,6 +111,7 @@ public class ActivityController : Controller
             SelectedTagKey     = selectedTag?.TagKey,
             SelectedTag        = selectedTag,
             Search             = search,
+            Texts              = texts,
         };
 
         return View(vm);

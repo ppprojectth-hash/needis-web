@@ -21,18 +21,18 @@
 
 <div class="card border-0 shadow-sm rounded-3">
     <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
+        <table class="table table-hover mb-0 align-middle admin-table">
             <thead class="table-light">
                 <tr>
                     <th class="ps-3" style="width:50px">Photo</th>
-                    <th>Full Name EN</th>
-                    <th>Position EN</th>
+                    <th>Name</th>
+                    <th>Position</th>
                     <th>Code</th>
-                    <th>Dept</th>
+                    <th>Details</th>
                     <th class="text-center">Expert</th>
                     <th class="text-center">Public</th>
                     <th class="text-center">Active</th>
-                    <th></th>
+                    <th class="actions-cell">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,28 +42,76 @@
                         <td class="ps-3">
                             @if (!string.IsNullOrEmpty(s.ProfileImageUrl))
                             {
-                                <img src="@s.ProfileImageUrl" alt="" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;object-position:center top" />
+                                <img src="@s.ProfileImageUrl" alt="" class="rounded-circle"
+                                     style="width:36px;height:36px;object-fit:cover;object-position:center top" />
                             }
                             else { <span class="text-muted">—</span> }
                         </td>
-                        <td class="fw-semibold">@(s.FullNameEN ?? "—")</td>
+                        <td>
+                            <div class="fw-semibold">@(s.FullNameEN ?? "—")</div>
+                            @if (!string.IsNullOrEmpty(s.FullNameTH))
+                            { <div class="text-muted small">@s.FullNameTH</div> }
+                        </td>
                         <td class="text-muted small">@(s.PositionEN ?? "—")</td>
                         <td><code class="small">@(s.EmployeeCode ?? "—")</code></td>
-                        <td class="text-muted small">@(s.Department ?? "—")</td>
-                        <td class="text-center">@if (s.IsExpert) { <i class="bi bi-star-fill text-warning"></i> } else { <i class="bi bi-dash text-muted"></i> }</td>
-                        <td class="text-center">@if (s.ShowPublic) { <i class="bi bi-check-circle-fill text-success"></i> } else { <i class="bi bi-dash text-muted"></i> }</td>
-                        <td class="text-center"><span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">@(s.IsActive ? "Active" : "Inactive")</span></td>
-                        <td class="text-end pe-3">
-                            <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
-                            <form asp-action="Delete" asp-route-id="@s.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this staff profile?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                @if (!string.IsNullOrEmpty(s.Email))
+                                { <span class="badge bg-light text-secondary border" title="@s.Email"><i class="bi bi-envelope"></i></span> }
+                                @if (!string.IsNullOrEmpty(s.MobilePhone))
+                                { <span class="badge bg-light text-secondary border" title="@s.MobilePhone"><i class="bi bi-phone"></i></span> }
+                                @if (!string.IsNullOrEmpty(s.PdfFileUrl))
+                                { <span class="badge bg-light text-danger border" title="PDF attached"><i class="bi bi-file-earmark-pdf"></i></span> }
+                                @if (s.ShowDetailPage && !string.IsNullOrEmpty(s.Slug))
+                                { <span class="badge bg-primary-subtle text-primary border border-primary-subtle" title="Detail page enabled"><i class="bi bi-person-lines-fill"></i></span> }
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            @if (s.IsExpert) { <i class="bi bi-star-fill text-warning"></i> }
+                            else { <i class="bi bi-dash text-muted"></i> }
+                        </td>
+                        <td class="text-center">
+                            @if (s.ShowPublic) { <i class="bi bi-check-circle-fill text-success"></i> }
+                            else { <i class="bi bi-dash text-muted"></i> }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">
+                                @(s.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="actions-cell pe-3">
+                            <div class="admin-actions">
+                                @if (s.ShowDetailPage && !string.IsNullOrEmpty(s.Slug))
+                                {
+                                    <a href="/About/Staff/@s.Slug" target="_blank"
+                                       class="admin-action-btn admin-action-btn-view"
+                                       title="View public profile" aria-label="View public profile">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                }
+                                <a asp-action="Edit" asp-route-id="@s.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit staff profile">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@s.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this staff profile?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete staff profile">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
-                @if (!Model.Any()) { <tr><td colspan="9" class="text-center text-muted py-4">No staff profiles found.</td></tr> }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="9" class="text-center text-muted py-4">No staff profiles found.</td></tr>
+                }
             </tbody>
         </table>
     </div>

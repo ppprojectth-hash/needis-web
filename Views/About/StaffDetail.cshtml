@@ -1,0 +1,132 @@
+@model Needis.Web.Models.StaffProfile
+@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
+@{
+    var lang         = ViewBag.CurrentLanguage as string ?? "en";
+    var companyName  = ViewBag.CompanyName as string ?? "Needis";
+    var name         = lang == "th" ? (Model.FullNameTH ?? Model.FullNameEN) : (Model.FullNameEN ?? Model.FullNameTH);
+    var position     = lang == "th" ? Model.PositionTH  : Model.PositionEN;
+    var biography    = lang == "th" ? Model.BiographyTH : Model.BiographyEN;
+    var achievement  = lang == "th" ? Model.AchievementTH : Model.AchievementEN;
+    ViewData["Title"] = $"{name} — {companyName}";
+    ViewData["FullWidth"] = true;
+}
+
+@* ── Breadcrumb ─────────────────────────────────────────────────────────────── *@
+<div class="bg-light border-bottom py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">@(lang == "th" ? "หน้าหลัก" : "Home")</a></li>
+                <li class="breadcrumb-item"><a href="/About" class="text-decoration-none">@(lang == "th" ? "เกี่ยวกับเรา" : "About")</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@name</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+@* ── Hero ────────────────────────────────────────────────────────────────────── *@
+<section class="staff-detail-hero py-5">
+    <div class="container">
+        <div class="row g-4 g-lg-5 align-items-start">
+
+            @* Left: Photo card *@
+            <div class="col-lg-4">
+                <div class="staff-detail-photo-card">
+                    @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+                    {
+                        <div class="staff-detail-photo-frame">
+                            <img src="@Model.ProfileImageUrl" alt="@name" loading="eager" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="staff-detail-photo-placeholder">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                    }
+
+                    @* Contact info block inside photo card *@
+                    @if (Model.ShowContactInfo && (!string.IsNullOrEmpty(Model.MobilePhone) || !string.IsNullOrEmpty(Model.Email)))
+                    {
+                        <div class="staff-detail-contact-block">
+                            @if (!string.IsNullOrEmpty(Model.MobilePhone))
+                            {
+                                <a href="tel:@Model.MobilePhone" class="staff-detail-contact-item">
+                                    <span class="staff-detail-contact-icon"><i class="bi bi-telephone-fill"></i></span>
+                                    <span>@Model.MobilePhone</span>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Email))
+                            {
+                                <a href="mailto:@Model.Email" class="staff-detail-contact-item">
+                                    <span class="staff-detail-contact-icon"><i class="bi bi-envelope-fill"></i></span>
+                                    <span>@Model.Email</span>
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    @* PDF download *@
+                    @if (!string.IsNullOrEmpty(Model.PdfFileUrl))
+                    {
+                        <div class="px-4 pb-4">
+                            <a href="@Model.PdfFileUrl" target="_blank" rel="noopener noreferrer"
+                               class="staff-detail-pdf-btn w-100">
+                                <i class="bi bi-file-earmark-pdf me-2"></i>
+                                @(lang == "th" ? "ดาวน์โหลด PDF" : "Download Profile PDF")
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* Right: Info *@
+            <div class="col-lg-8">
+                <div class="staff-detail-info-card">
+                    @if (!string.IsNullOrEmpty(Model.Department))
+                    {
+                        <span class="staff-detail-dept-chip">@Model.Department</span>
+                    }
+                    <h1 class="staff-detail-name">@name</h1>
+                    @if (!string.IsNullOrEmpty(position))
+                    {
+                        <p class="staff-detail-position">@position</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(biography))
+                    {
+                        <div class="staff-detail-section-card mt-4">
+                            <h5 class="staff-detail-section-title">
+                                <i class="bi bi-person-lines-fill me-2"></i>
+                                @(lang == "th" ? "ประวัติ" : "Biography")
+                            </h5>
+                            <div class="staff-detail-body rich-content">
+                                @Html.Raw(MarkdownService.ToSafeHtml(biography))
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(achievement))
+                    {
+                        <div class="staff-detail-section-card mt-3">
+                            <h5 class="staff-detail-section-title">
+                                <i class="bi bi-award me-2"></i>
+                                @(lang == "th" ? "ผลงานและประสบการณ์" : "Achievements & Experience")
+                            </h5>
+                            <div class="staff-detail-body rich-content">
+                                @Html.Raw(MarkdownService.ToSafeHtml(achievement))
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-4">
+                    <a href="/About" class="btn-staff-back">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        @(lang == "th" ? "กลับสู่หน้าเกี่ยวกับเรา" : "Back to About")
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

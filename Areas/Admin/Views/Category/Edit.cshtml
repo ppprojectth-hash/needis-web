@@ -78,14 +78,16 @@
                             <label asp-for="ShortDescriptionEN" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionEN)
                             </label>
-                            <textarea asp-for="ShortDescriptionEN" class="form-control" rows="3"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 3, Language = "en" }' />
                             <span asp-validation-for="ShortDescriptionEN" class="text-danger small"></span>
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="ShortDescriptionTH" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionTH)
                             </label>
-                            <textarea asp-for="ShortDescriptionTH" class="form-control" rows="3"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 3, Language = "th" }' />
                             <span asp-validation-for="ShortDescriptionTH" class="text-danger small"></span>
                         </div>
                     </div>
@@ -107,10 +109,10 @@
                 <div class="card-body px-4 pb-4 pt-3">
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
                     {
-                        <div class="admin-upload-preview-frame mb-2">
+                        <div class="admin-upload-preview-frame mb-1">
                             <img id="imagePreview" src="@Model.ImageUrl" alt="Current image" />
                         </div>
-                        <div class="text-muted small mt-1">Current image</div>
+                        <div class="text-muted small mb-2">Current image &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ImageUrl)</span></div>
                     }
                     else
                     {
@@ -120,7 +122,9 @@
                     }
                     <input asp-for="ImageFile" type="file" class="form-control"
                            accept=".jpg,.jpeg,.png,.webp,.svg" id="ImageFileInput"
-                           data-preview-target="#imagePreview" />
+                           data-preview-target="#imagePreview"
+                           data-file-size-target="#catImgSize" />
+                    <span id="catImgSize" class="upload-file-meta"></span>
                     <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
                     <div class="text-muted small mt-2">
                         Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp;

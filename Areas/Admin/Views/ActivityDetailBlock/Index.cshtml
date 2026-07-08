@@ -69,21 +69,34 @@
                                 <span class="badge bg-secondary">Inactive</span>
                             }
                         </td>
-                        <td class="text-end pe-3 text-nowrap">
-                            <a asp-action="Edit" asp-route-id="@detailBlock.Id"
-                               class="btn btn-sm btn-outline-primary me-1">Edit</a>
-                            @if (detailBlock.BlockType is "image" or "album")
-                            {
-                                <a asp-controller="ActivityImage" asp-action="Index"
-                                   asp-route-activityId="@detailBlock.ActivityId"
-                                   asp-route-blockId="@detailBlock.Id"
-                                   class="btn btn-sm btn-outline-info me-1">Images</a>
-                            }
-                            <form asp-action="Delete" asp-route-id="@detailBlock.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this block?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <td class="actions-cell pe-3">
+                            <div class="admin-actions">
+                                <a asp-action="Edit" asp-route-id="@detailBlock.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit block">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @if (detailBlock.BlockType is "image" or "album")
+                                {
+                                    <a asp-controller="ActivityImage" asp-action="Index"
+                                       asp-route-activityId="@detailBlock.ActivityId"
+                                       asp-route-blockId="@detailBlock.Id"
+                                       class="admin-action-btn admin-action-btn-view"
+                                       title="Manage Images" aria-label="Manage images">
+                                        <i class="bi bi-images"></i>
+                                    </a>
+                                }
+                                <form asp-action="Delete" asp-route-id="@detailBlock.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this block?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete block">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

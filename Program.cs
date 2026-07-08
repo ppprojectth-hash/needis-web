@@ -14,7 +14,9 @@ using Needis.Web.Services.Media;
 using Needis.Web.Services.Quotation;
 using Needis.Web.Services.Manual;
 using Needis.Web.Services.Seo;
+using Needis.Web.Services.Features;
 using Needis.Web.Services.HomePopup;
+using Needis.Web.Services.Content;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +53,19 @@ builder.Services.AddScoped<ISiteSettingService, SiteSettingService>();
 // Home popup service
 builder.Services.AddScoped<IHomePopupService, HomePopupService>();
 
+// Site text (editable public wording) service
+builder.Services.AddScoped<ISiteTextService, SiteTextService>();
+
+// Markdown rendering for rich description/content fields
+builder.Services.AddScoped<IMarkdownService, MarkdownService>();
+
+// Feature flags
+builder.Services.Configure<FeatureFlagsOptions>(builder.Configuration.GetSection("FeatureFlags"));
+builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+
+// File info (size display for admin uploads)
+builder.Services.AddScoped<Needis.Web.Services.Files.IFileInfoService, Needis.Web.Services.Files.FileInfoService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -84,6 +99,7 @@ string[] permissionKeys =
     "Seo.View", "Seo.Edit",
     "Manual.View",
     "HomePopup.View", "HomePopup.Create", "HomePopup.Edit", "HomePopup.Delete",
+    "SiteText.View", "SiteText.Edit",
 ];
 
 builder.Services.AddAuthorization(options =>
@@ -104,6 +120,7 @@ await AboutSeeder.SeedAsync(app.Services);
 await ServiceSeeder.SeedAsync(app.Services);
 await ActivitySeeder.SeedAsync(app.Services);
 await SeoSeeder.SeedAsync(app.Services);
+await SiteTextSeeder.SeedAsync(app.Services);
 
 if (!app.Environment.IsDevelopment())
 {

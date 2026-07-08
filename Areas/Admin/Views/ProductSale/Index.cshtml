@@ -79,13 +79,24 @@
                         <td class="text-center">
                             <span class="badge @(ps.IsActive ? "bg-success" : "bg-secondary")">@(ps.IsActive ? "Active" : "Inactive")</span>
                         </td>
-                        <td class="text-end pe-3">
-                            <a asp-action="Edit" asp-route-id="@ps.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
-                            <form asp-action="Delete" asp-route-id="@ps.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this sale record?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <td class="actions-cell pe-3">
+                            <div class="admin-actions">
+                                <a asp-action="Edit" asp-route-id="@ps.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit sale record">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@ps.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this sale record?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete sale record">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

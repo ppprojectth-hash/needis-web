@@ -1732,6 +1732,9 @@ namespace Needis.Web.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<bool>("ShowYoutubeVideo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Sku")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -1750,9 +1753,31 @@ namespace Needis.Web.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamptz");
 
+                    b.Property<string>("YoutubeVideoDescriptionEN")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("YoutubeVideoDescriptionTH")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("YoutubeVideoTitleEN")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("YoutubeVideoTitleTH")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("YoutubeVideoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("ShowYoutubeVideo");
 
                     b.HasIndex("Slug")
                         .IsUnique();
@@ -2950,6 +2975,14 @@ namespace Needis.Web.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<string>("GoogleMapEmbedUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("GoogleMapUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -2970,12 +3003,110 @@ namespace Needis.Web.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("MapDescriptionEN")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("MapDescriptionTH")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("MapTitleEN")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("MapTitleTH")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("ShowMapOnAboutPage")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamptz");
 
                     b.HasKey("Id");
 
                     b.ToTable("SiteSettings");
+                });
+
+            modelBuilder.Entity("Needis.Web.Models.SiteText", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Page")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Section")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TextEN")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TextTH")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TextType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsDelete");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("Page");
+
+                    b.ToTable("SiteTexts");
                 });
 
             modelBuilder.Entity("Needis.Web.Models.StaffProfile", b =>
@@ -2985,6 +3116,22 @@ namespace Needis.Web.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AchievementEN")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("AchievementTH")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("BiographyEN")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("BiographyTH")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamptz");
@@ -2996,6 +3143,13 @@ namespace Needis.Web.Migrations
                     b.Property<string>("Department")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
 
                     b.Property<string>("EmployeeCode")
                         .HasMaxLength(100)
@@ -3021,6 +3175,18 @@ namespace Needis.Web.Migrations
                     b.Property<bool>("IsExpert")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("MobilePhone")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PdfFileName")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("PdfFileUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("PositionEN")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
@@ -3033,8 +3199,18 @@ namespace Needis.Web.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<bool>("ShowContactInfo")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ShowDetailPage")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("ShowPublic")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Slug")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
 
                     b.Property<string>("StaffType")
                         .HasMaxLength(100)
@@ -3052,11 +3228,19 @@ namespace Needis.Web.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DisplayOrder");
+
                     b.HasIndex("EmployeeCode");
 
                     b.HasIndex("IsDelete");
 
                     b.HasIndex("IsExpert");
+
+                    b.HasIndex("ShowDetailPage");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasFilter("\"Slug\" IS NOT NULL");
 
                     b.ToTable("StaffProfiles");
                 });

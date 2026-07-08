@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Needis.Web.Helpers;
 
 namespace Needis.Web.ViewModels.Admin;
 
-public class ProductViewModel
+public class ProductViewModel : IValidatableObject
 {
     public int ProductId { get; set; }
 
@@ -82,6 +83,39 @@ public class ProductViewModel
 
     [Display(Name = "Active")]
     public bool IsActive { get; set; } = true;
+
+    // ── YouTube Video ────────────────────────────────────────────────────────
+
+    [Display(Name = "Show YouTube Video")]
+    public bool ShowYoutubeVideo { get; set; } = false;
+
+    [Display(Name = "YouTube Video URL")]
+    [MaxLength(500)]
+    public string? YoutubeVideoUrl { get; set; }
+
+    [Display(Name = "Video Title (TH)")]
+    [MaxLength(200)]
+    public string? YoutubeVideoTitleTH { get; set; }
+
+    [Display(Name = "Video Title (EN)")]
+    [MaxLength(200)]
+    public string? YoutubeVideoTitleEN { get; set; }
+
+    [Display(Name = "Video Description (TH)")]
+    [MaxLength(1000)]
+    public string? YoutubeVideoDescriptionTH { get; set; }
+
+    [Display(Name = "Video Description (EN)")]
+    [MaxLength(1000)]
+    public string? YoutubeVideoDescriptionEN { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (!string.IsNullOrWhiteSpace(YoutubeVideoUrl) && !YoutubeHelper.IsValidYoutubeUrl(YoutubeVideoUrl))
+            yield return new ValidationResult(
+                "Please enter a valid YouTube URL. Supported: youtube.com/watch, youtu.be, embed, or shorts.",
+                [nameof(YoutubeVideoUrl)]);
+    }
 }
 
 public class ProductListItem
@@ -99,4 +133,5 @@ public class ProductListItem
     public bool   IsFeatured    { get; set; }
     public bool   IsActive      { get; set; }
     public int    DisplayOrder  { get; set; }
+    public bool   HasVideo      { get; set; }
 }

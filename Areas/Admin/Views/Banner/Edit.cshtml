@@ -123,15 +123,17 @@
                             </label>
                             @if (!string.IsNullOrEmpty(Model.ImageUrl))
                             {
-                                <div class="mb-2">
+                                <div class="mb-1">
                                     <img src="@Model.ImageUrl" alt="Current image"
                                          class="rounded-2" style="max-height:120px;max-width:100%;object-fit:contain;border:1px solid #eee" />
-                                    <div class="text-muted small mt-1">Current image</div>
                                 </div>
+                                <div class="text-muted small mb-2">Current image &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ImageUrl)</span></div>
                             }
                             <input asp-for="ImageFile" type="file" class="form-control"
                                    accept=".jpg,.jpeg,.png,.webp,.svg"
+                                   data-file-size-target="#bannerImgSize"
                                    onchange="previewFile(this,'imagePreview','imagePreviewWrap')" />
+                            <span id="bannerImgSize" class="upload-file-meta"></span>
                             <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
                             <div id="imagePreviewWrap" class="mt-2 d-none">
                                 <img id="imagePreview" src="#" alt="Preview"
@@ -148,15 +150,17 @@
                             </label>
                             @if (!string.IsNullOrEmpty(Model.MobileImageUrl))
                             {
-                                <div class="mb-2">
+                                <div class="mb-1">
                                     <img src="@Model.MobileImageUrl" alt="Current mobile"
                                          class="rounded-2" style="max-height:80px;max-width:100%;object-fit:contain;border:1px solid #eee" />
-                                    <div class="text-muted small mt-1">Current mobile image</div>
                                 </div>
+                                <div class="text-muted small mb-2">Current mobile &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.MobileImageUrl)</span></div>
                             }
                             <input asp-for="MobileImageFile" type="file" class="form-control"
                                    accept=".jpg,.jpeg,.png,.webp"
+                                   data-file-size-target="#bannerMobileSize"
                                    onchange="previewFile(this,'mobileImgPreview','mobileImgWrap')" />
+                            <span id="bannerMobileSize" class="upload-file-meta"></span>
                             <div id="mobileImgWrap" class="mt-2 d-none">
                                 <img id="mobileImgPreview" src="#" alt="Preview"
                                      class="rounded-2" style="max-height:80px;max-width:100%;object-fit:contain" />

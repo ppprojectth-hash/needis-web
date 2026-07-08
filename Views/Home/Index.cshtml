@@ -228,19 +228,19 @@ else
                                        : "Trusted by 500+ Laboratories & Industries")
                     </div>
                     <h1 class="hero-title-v2">
-                        @L("เครื่องมือวัดและวิทยาศาสตร์เพื่อความแม่นยำระดับมืออาชีพ",
-                           "Precision Instruments for Scientific Excellence")
+                        @Model.T("home.hero.title", L("เครื่องมือวัดและวิทยาศาสตร์เพื่อความแม่นยำระดับมืออาชีพ",
+                           "Precision Instruments for Scientific Excellence"))
                     </h1>
                     <p class="hero-subtitle-v2">
-                        @L("สนับสนุนงานวิจัยและอุตสาหกรรมด้วยเครื่องมือวิเคราะห์ ทดสอบ และตรวจวัดที่มีประสิทธิภาพสูง",
-                           "Empowering research and industry with cutting-edge analytical, testing, and measurement instruments.")
+                        @Model.T("home.hero.subtitle", L("สนับสนุนงานวิจัยและอุตสาหกรรมด้วยเครื่องมือวิเคราะห์ ทดสอบ และตรวจวัดที่มีประสิทธิภาพสูง",
+                           "Empowering research and industry with cutting-edge analytical, testing, and measurement instruments."))
                     </p>
                     <div class="d-flex flex-wrap gap-3 mb-5">
                         <a asp-controller="Product" asp-action="Index" class="btn-hero-primary">
-                            <i class="bi bi-grid me-2"></i>@(lang == "th" ? "สำรวจสินค้า" : "Explore Products")
+                            <i class="bi bi-grid me-2"></i>@Model.T("home.hero.primary_button", lang == "th" ? "สำรวจสินค้า" : "Explore Products")
                         </a>
                         <a asp-controller="Contact" asp-action="Index" class="btn-hero-ghost">
-                            @(lang == "th" ? "ติดต่อเรา" : "Contact Us")
+                            @Model.T("home.hero.secondary_button", lang == "th" ? "ติดต่อเรา" : "Contact Us")
                             <i class="bi bi-arrow-right ms-2"></i>
                         </a>
                     </div>
@@ -276,17 +276,143 @@ else
 
 
 @* ══════════════════════════════════════════════════════════════
-   2. PRODUCT CATEGORIES
+   2. HOT PRODUCT / PROMOTION
+   ══════════════════════════════════════════════════════════════ *@
+@if (FF.HotProductPromotionEnabled && Model.HotProducts.Any())
+{
+    <section class="hot-product-section py-5" id="hot-products">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
+                <div>
+                    <p class="section-eyebrow mb-1">@Model.T("home.hot_products.eyebrow", lang == "th" ? "สินค้าแนะนำ" : "HOT PRODUCTS")</p>
+                    <h2 class="section-title mb-1">
+                        @Model.T("home.hot_products.title", lang == "th" ? "สินค้าแนะนำ / โปรโมชั่น" : "Hot Product / Promotion")
+                    </h2>
+                    <p class="section-subtitle mb-0 text-start">
+                        @Model.T("home.hot_products.subtitle", lang == "th"
+                            ? "เลือกชมสินค้าแนะนำ โปรโมชั่น และเครื่องมือที่เหมาะกับธุรกิจของคุณ"
+                            : "Discover highlighted products, promotions, and recommended instruments for your business.")
+                    </p>
+                </div>
+                <a asp-controller="Product" asp-action="Index"
+                   class="btn btn-outline-primary flex-shrink-0"
+                   style="border-color:var(--needis-primary);color:var(--needis-primary)">
+                    @(lang == "th" ? "ดูสินค้าทั้งหมด" : "View All Products")
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var (product, pIdx) in Model.HotProducts.Select((p, i) => (p, i)))
+                {
+                    var pName  = L(product.NameTH,              product.NameEN);
+                    var pDesc  = L(product.ShortDescriptionTH,  product.ShortDescriptionEN);
+                    var pCat   = L(product.Category?.NameTH,    product.Category?.NameEN);
+                    var pDelay = (pIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
+
+                    <div class="col-xl-3 col-lg-4 col-md-6 reveal @pDelay">
+                        <div class="home-product-card hot-product-card h-100">
+                            <div class="position-relative">
+                                @if (product.IsFeatured)
+                                {
+                                    <span class="hot-product-badge">
+                                        @(lang == "th" ? "แนะนำ" : "Hot")
+                                    </span>
+                                }
+                                <a asp-controller="Product" asp-action="Detail"
+                                   asp-route-slug="@product.Slug"
+                                   class="text-decoration-none d-block">
+                                    @if (!string.IsNullOrEmpty(product.MainImagePath))
+                                    {
+                                        <img src="@product.MainImagePath" alt="@pName"
+                                             class="home-product-img" />
+                                    }
+                                    else
+                                    {
+                                        <div class="home-product-img-placeholder">
+                                            <i class="bi bi-box-seam"></i>
+                                        </div>
+                                    }
+                                </a>
+                            </div>
+                            <div class="home-product-body">
+                                @if (!string.IsNullOrEmpty(pCat))
+                                {
+                                    <span class="hot-product-cat-chip">@pCat</span>
+                                }
+                                @if (!string.IsNullOrEmpty(product.Brand))
+                                {
+                                    <span class="home-product-brand">@product.Brand</span>
+                                }
+                                <h6 class="home-product-name mt-1">
+                                    <a asp-controller="Product" asp-action="Detail"
+                                       asp-route-slug="@product.Slug"
+                                       class="text-decoration-none text-dark">@pName</a>
+                                </h6>
+                                @if (!string.IsNullOrEmpty(product.Model))
+                                {
+                                    <p class="home-product-model">@product.Model</p>
+                                }
+                                @if (!string.IsNullOrEmpty(pDesc))
+                                {
+                                    <p class="home-product-desc">
+                                        @(pDesc.Length > 80 ? pDesc[..80] + "…" : pDesc)
+                                    </p>
+                                }
+                                <div class="hot-product-footer">
+                                    @if (product.IsPriceVisible && product.Price.HasValue)
+                                    {
+                                        <span class="home-product-price">
+                                            @product.Price.Value.ToString("N2") ฿
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="home-product-price-na">
+                                            @(lang == "th" ? "ติดต่อสอบถามราคา" : "Contact for pricing")
+                                        </span>
+                                    }
+                                    <div class="hot-product-actions">
+                                        <form asp-controller="QuotationCart" asp-action="AddProduct" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@product.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <input type="hidden" name="returnUrl" value="/" />
+                                            <button type="submit" class="hot-product-btn-quote"
+                                                    title="@(lang == "th" ? "เพิ่มในรายการขอราคา" : "Add to Quote")">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                        <a asp-controller="Product" asp-action="Detail"
+                                           asp-route-slug="@product.Slug"
+                                           class="hot-product-btn-detail">
+                                            @(lang == "th" ? "ดูรายละเอียด" : "View Details")
+                                            <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+
+@* ══════════════════════════════════════════════════════════════
+   3. PRODUCT CATEGORIES — Explore Our Product Lines
    ══════════════════════════════════════════════════════════════ *@
 <section class="py-5 bg-white" id="categories">
     <div class="container">
         <div class="text-center mb-5">
-            <p class="section-eyebrow">@(lang == "th" ? "หมวดหมู่สินค้า" : "CATEGORIES")</p>
+            <p class="section-eyebrow">@Model.T("home.product_lines.eyebrow", lang == "th" ? "หมวดหมู่สินค้า" : "CATEGORIES")</p>
             <h2 class="section-title">
-                @(lang == "th" ? "สำรวจกลุ่มผลิตภัณฑ์ของเรา" : "Explore Our Product Lines")
+                @Model.T("home.product_lines.title", lang == "th" ? "สำรวจกลุ่มผลิตภัณฑ์ของเรา" : "Explore Our Product Lines")
             </h2>
             <p class="section-subtitle">
-                @(lang == "th"
+                @Model.T("home.product_lines.subtitle", lang == "th"
                     ? "เครื่องมือและอุปกรณ์จากแบรนด์ชั้นนำสำหรับทุกอุตสาหกรรมและการวิจัย"
                     : "Precision instruments and equipment from leading brands, serving every industry and research need.")
             </p>
@@ -362,222 +488,17 @@ else
 
 
 @* ══════════════════════════════════════════════════════════════
-   3. FEATURED PRODUCTS (grouped by category)
-   ══════════════════════════════════════════════════════════════ *@
-<section class="py-5" style="background:#f8fafc" id="featured">
-    <div class="container">
-        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
-            <div>
-                <p class="section-eyebrow mb-1">@(lang == "th" ? "สินค้าแนะนำ" : "PRODUCTS")</p>
-                <h2 class="section-title mb-1">
-                    @(lang == "th" ? "สำรวจเครื่องมือของเรา" : "Explore Our Instruments")
-                </h2>
-                <p class="section-subtitle mb-0 text-start">
-                    @(lang == "th"
-                        ? "เครื่องมือวัดและอุปกรณ์วิทยาศาสตร์ที่ผ่านการคัดสรร พร้อมบริการครบวงจร"
-                        : "Hand-picked measuring instruments and scientific equipment, backed by complete support.")
-                </p>
-            </div>
-            <a asp-controller="Product" asp-action="Index"
-               class="btn btn-outline-primary flex-shrink-0"
-               style="border-color:var(--needis-primary);color:var(--needis-primary)">
-                @(lang == "th" ? "ดูสินค้าทั้งหมด" : "View All Products")
-                <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-        </div>
-
-        @if (Model.ProductGroups.Any())
-        {
-            @foreach (var grp in Model.ProductGroups)
-            {
-                var grpName = L(grp.CategoryNameTH, grp.CategoryNameEN);
-                var grpDesc = L(grp.CategoryDescriptionTH, grp.CategoryDescriptionEN);
-
-                <div class="mb-5 reveal">
-                    @* Group header *@
-                    <div class="product-group-header">
-                        @if (!string.IsNullOrEmpty(grp.CategoryImagePath))
-                        {
-                            <img src="@grp.CategoryImagePath" alt="@grpName" class="product-group-cat-img" />
-                        }
-                        else
-                        {
-                            <div class="product-group-cat-placeholder">
-                                <i class="bi bi-grid-3x3-gap"></i>
-                            </div>
-                        }
-                        <div class="flex-grow-1">
-                            <h4 class="fw-bold mb-0" style="color:var(--needis-dark);font-size:1.15rem">@grpName</h4>
-                            @if (!string.IsNullOrEmpty(grpDesc))
-                            {
-                                <p class="text-muted small mb-0 mt-1">@grpDesc</p>
-                            }
-                        </div>
-                        <a asp-controller="Product" asp-action="Index"
-                           asp-route-category="@grp.CategorySlug"
-                           class="btn btn-sm btn-outline-secondary flex-shrink-0">
-                            @(lang == "th" ? "ดูทั้งหมด" : "View All")
-                            <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-
-                    @* Product cards *@
-                    <div class="row g-4">
-                        @foreach (var (product, pIdx) in grp.Products.Select((p, i) => (p, i)))
-                        {
-                            var pName  = L(product.NameTH, product.NameEN);
-                            var pDesc  = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
-                            var pDelay = pIdx switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
-
-                            <div class="col-lg-4 col-md-6 reveal @pDelay">
-                                <div class="home-product-card h-100">
-                                    <a asp-controller="Product" asp-action="Detail"
-                                       asp-route-slug="@product.Slug"
-                                       class="text-decoration-none d-block">
-                                        @if (!string.IsNullOrEmpty(product.MainImagePath))
-                                        {
-                                            <img src="@product.MainImagePath" alt="@pName"
-                                                 class="home-product-img" />
-                                        }
-                                        else
-                                        {
-                                            <div class="home-product-img-placeholder">
-                                                <i class="bi bi-box-seam"></i>
-                                            </div>
-                                        }
-                                    </a>
-                                    <div class="home-product-body">
-                                        @if (!string.IsNullOrEmpty(product.Brand))
-                                        {
-                                            <span class="home-product-brand">@product.Brand</span>
-                                        }
-                                        <h6 class="home-product-name mt-1">
-                                            <a asp-controller="Product" asp-action="Detail"
-                                               asp-route-slug="@product.Slug"
-                                               class="text-decoration-none text-dark">@pName</a>
-                                        </h6>
-                                        @if (!string.IsNullOrEmpty(product.Model))
-                                        {
-                                            <p class="home-product-model">@product.Model</p>
-                                        }
-                                        @if (!string.IsNullOrEmpty(pDesc))
-                                        {
-                                            <p class="home-product-desc">
-                                                @(pDesc.Length > 80 ? pDesc[..80] + "…" : pDesc)
-                                            </p>
-                                        }
-                                        <div class="home-product-footer">
-                                            @if (product.IsPriceVisible && product.Price.HasValue)
-                                            {
-                                                <span class="home-product-price">
-                                                    @product.Price.Value.ToString("N2") ฿
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="home-product-price-na">
-                                                    @(lang == "th" ? "ติดต่อสอบถามราคา" : "Contact for pricing")
-                                                </span>
-                                            }
-                                            <a asp-controller="Product" asp-action="Detail"
-                                               asp-route-slug="@product.Slug"
-                                               class="home-product-link">
-                                                @(lang == "th" ? "ดูรายละเอียด" : "View Details")
-                                                <i class="bi bi-arrow-right ms-1"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-        }
-        else if (Model.FeaturedProducts.Any())
-        {
-            @* Fallback: flat grid if no grouped data *@
-            <div class="row g-4">
-                @foreach (var (product, pIdx) in Model.FeaturedProducts.Take(8).Select((p, i) => (p, i)))
-                {
-                    var pName  = L(product.NameTH, product.NameEN);
-                    var pDesc  = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
-                    var pDelay = (pIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
-
-                    <div class="col-xl-3 col-lg-4 col-md-6 reveal @pDelay">
-                        <div class="home-product-card h-100">
-                            <a asp-controller="Product" asp-action="Detail"
-                               asp-route-slug="@product.Slug"
-                               class="text-decoration-none d-block">
-                                @if (!string.IsNullOrEmpty(product.MainImagePath))
-                                {
-                                    <img src="@product.MainImagePath" alt="@pName"
-                                         class="home-product-img" />
-                                }
-                                else
-                                {
-                                    <div class="home-product-img-placeholder">
-                                        <i class="bi bi-box-seam"></i>
-                                    </div>
-                                }
-                            </a>
-                            <div class="home-product-body">
-                                @if (!string.IsNullOrEmpty(product.Brand))
-                                {
-                                    <span class="home-product-brand">@product.Brand</span>
-                                }
-                                <h6 class="home-product-name mt-1">
-                                    <a asp-controller="Product" asp-action="Detail"
-                                       asp-route-slug="@product.Slug"
-                                       class="text-decoration-none text-dark">@pName</a>
-                                </h6>
-                                @if (!string.IsNullOrEmpty(product.Model))
-                                {
-                                    <p class="home-product-model">@product.Model</p>
-                                }
-                                @if (!string.IsNullOrEmpty(pDesc))
-                                {
-                                    <p class="home-product-desc">
-                                        @(pDesc.Length > 80 ? pDesc[..80] + "…" : pDesc)
-                                    </p>
-                                }
-                                <div class="home-product-footer">
-                                    <a asp-controller="Product" asp-action="Detail"
-                                       asp-route-slug="@product.Slug"
-                                       class="home-product-link">
-                                        @(lang == "th" ? "ดูรายละเอียด" : "View Details")
-                                        <i class="bi bi-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="text-center text-muted py-5">
-                <i class="bi bi-box-seam fs-1 d-block mb-3" style="color:#c5cde8"></i>
-                <p>@(lang == "th" ? "ยังไม่มีสินค้าแนะนำ" : "No featured products yet.")</p>
-            </div>
-        }
-    </div>
-</section>
-
-
-@* ══════════════════════════════════════════════════════════════
    4. SERVICES
    ══════════════════════════════════════════════════════════════ *@
 <section class="py-5 bg-white" id="services">
     <div class="container">
         <div class="text-center mb-5">
-            <p class="section-eyebrow">@(lang == "th" ? "บริการของเรา" : "SERVICES")</p>
+            <p class="section-eyebrow">@Model.T("home.services.eyebrow", lang == "th" ? "บริการของเรา" : "SERVICES")</p>
             <h2 class="section-title">
-                @(lang == "th" ? "บริการและการสนับสนุนอย่างครบวงจร" : "Comprehensive Support & Services")
+                @Model.T("home.services.title", lang == "th" ? "บริการและการสนับสนุนอย่างครบวงจร" : "Comprehensive Support & Services")
             </h2>
             <p class="section-subtitle">
-                @(lang == "th"
+                @Model.T("home.services.subtitle", lang == "th"
                     ? "เราให้บริการครบวงจรตั้งแต่การจำหน่ายจนถึงการสอบเทียบและบำรุงรักษา"
                     : "From procurement and installation to calibration and maintenance — we support you end-to-end.")
             </p>
@@ -658,7 +579,7 @@ else
         <div class="text-center mt-4">
             <a asp-controller="Services" asp-action="Index"
                class="btn btn-outline-primary px-4" style="border-color:var(--needis-primary);color:var(--needis-primary)">
-                @(lang == "th" ? "ดูบริการทั้งหมด" : "View All Services")
+                @(lang == "th" ? "ดูบริการเช่า" : "View Rental Services")
                 <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -675,12 +596,12 @@ else
         <div class="container">
             <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
                 <div>
-                    <p class="section-eyebrow mb-1">@(lang == "th" ? "กิจกรรม" : "ACTIVITY")</p>
+                    <p class="section-eyebrow mb-1">@Model.T("home.activities.eyebrow", lang == "th" ? "กิจกรรม" : "ACTIVITY")</p>
                     <h2 class="section-title mb-1">
-                        @(lang == "th" ? "ข่าวสารและอัปเดต" : "News & Updates")
+                        @Model.T("home.activities.title", lang == "th" ? "ข่าวสารและอัปเดต" : "News & Updates")
                     </h2>
                     <p class="section-subtitle mb-0 text-start">
-                        @(lang == "th"
+                        @Model.T("home.activities.subtitle", lang == "th"
                             ? "ติดตามข่าวสาร กิจกรรม และนวัตกรรมล่าสุดจากทีมงานของเรา"
                             : "Stay updated with our latest news, events, and innovations.")
                     </p>
@@ -764,11 +685,11 @@ else
                     @(lang == "th" ? "ติดต่อเรา" : "GET IN TOUCH")
                 </p>
                 <h2 class="text-white fw-bold mb-3" style="font-size:clamp(1.6rem,3vw,2.25rem)">
-                    @(lang == "th" ? "พร้อมค้นหาเครื่องมือที่เหมาะกับงานของคุณหรือยัง?"
+                    @Model.T("home.cta.title", lang == "th" ? "พร้อมค้นหาเครื่องมือที่เหมาะกับงานของคุณหรือยัง?"
                                    : "Ready to Find the Right Instrument?")
                 </h2>
                 <p class="mb-4" style="color:rgba(255,255,255,.7);line-height:1.75;max-width:520px">
-                    @(lang == "th"
+                    @Model.T("home.cta.subtitle", lang == "th"
                         ? "ทีมผู้เชี่ยวชาญของเราพร้อมให้คำปรึกษาและจัดทำใบเสนอราคาให้ฟรีภายใน 24 ชั่วโมง"
                         : "Our specialists will help you select the ideal instruments and provide a free quotation within 24 hours.")
                 </p>
@@ -808,7 +729,7 @@ else
                     <a asp-controller="Quotation" asp-action="Create"
                        class="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2">
                         <i class="bi bi-file-earmark-text"></i>
-                        @(lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
+                        @Model.T("home.cta.button", lang == "th" ? "ขอใบเสนอราคา" : "Request Quotation")
                     </a>
                     <a asp-controller="Contact" asp-action="Index"
                        class="btn btn-outline-light px-4 py-2 d-flex align-items-center gap-2">
@@ -821,7 +742,10 @@ else
     </div>
 </section>
 
-@await Component.InvokeAsync("HomePopup")
+@if (FF.HomePopupEnabled)
+{
+    @await Component.InvokeAsync("HomePopup")
+}
 
 @section Scripts {
 <script>

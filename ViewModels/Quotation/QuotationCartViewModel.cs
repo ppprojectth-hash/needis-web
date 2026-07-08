@@ -2,7 +2,7 @@ using Needis.Web.Models;
 
 namespace Needis.Web.ViewModels.Quotation;
 
-public class QuotationCartViewModel
+public class QuotationCartViewModel : Needis.Web.ViewModels.SiteTextViewModelBase
 {
     public string CurrentLanguage { get; set; } = "en";
     public List<QuotationCartItem> Items { get; set; } = new();

@@ -42,6 +42,7 @@
                             @if (!string.IsNullOrEmpty(b.LogoUrl))
                             {
                                 <img src="@b.LogoUrl" alt="@b.BrandName" style="max-height:36px;max-width:60px;object-fit:contain" />
+                                <div class="admin-file-size mt-1">@FileInfoSvc.GetFileSizeDisplay(b.LogoUrl)</div>
                             }
                             else { <span class="text-muted">—</span> }
                         </td>
@@ -59,13 +60,24 @@
                         <td class="text-center">
                             <span class="badge @(b.IsActive ? "bg-success" : "bg-secondary")">@(b.IsActive ? "Active" : "Inactive")</span>
                         </td>
-                        <td class="text-end pe-3">
-                            <a asp-action="Edit" asp-route-id="@b.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
-                            <form asp-action="Delete" asp-route-id="@b.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete this brand partner?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <td class="actions-cell pe-3">
+                            <div class="admin-actions">
+                                <a asp-action="Edit" asp-route-id="@b.Id"
+                                   class="admin-action-btn admin-action-btn-edit"
+                                   title="Edit" aria-label="Edit brand partner">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@b.Id" method="post"
+                                      class="admin-action-form"
+                                      onsubmit="return confirm('Delete this brand partner?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-action-btn admin-action-btn-delete"
+                                            title="Delete" aria-label="Delete brand partner">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

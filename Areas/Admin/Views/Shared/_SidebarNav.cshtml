@@ -17,7 +17,7 @@
 </nav>
 
 @if (await PermSvc.HasPermissionAsync(User, "Banner.View") ||
-     await PermSvc.HasPermissionAsync(User, "HomePopup.View") ||
+     (FF.HomePopupEnabled && await PermSvc.HasPermissionAsync(User, "HomePopup.View")) ||
      await PermSvc.HasPermissionAsync(User, "Category.View") ||
      await PermSvc.HasPermissionAsync(User, "Product.View"))
 {
@@ -30,7 +30,7 @@
                 <i class="bi bi-images"></i> Home Banners
             </a>
         }
-        @if (await PermSvc.HasPermissionAsync(User, "HomePopup.View"))
+        @if (FF.HomePopupEnabled && await PermSvc.HasPermissionAsync(User, "HomePopup.View"))
         {
             <a class="nav-link @Active("HomePopup")"
                asp-area="Admin" asp-controller="HomePopup" asp-action="Index">
@@ -187,6 +187,17 @@
         <a class="nav-link @Active("Manual")"
            asp-area="Admin" asp-controller="Manual" asp-action="Index">
             <i class="bi bi-book"></i> Manuals / คู่มือ
+        </a>
+    </nav>
+}
+
+@if (await PermSvc.HasPermissionAsync(User, "SiteText.View"))
+{
+    <div class="sidebar-section">Website Texts</div>
+    <nav class="sidebar-nav nav flex-column gap-1 mb-2">
+        <a class="nav-link @Active("SiteText")"
+           asp-area="Admin" asp-controller="SiteText" asp-action="Index">
+            <i class="bi bi-textarea-t"></i> Website Texts
         </a>
     </nav>
 }

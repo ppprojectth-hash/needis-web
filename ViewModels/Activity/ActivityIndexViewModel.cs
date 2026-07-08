@@ -2,7 +2,7 @@ using Needis.Web.Models;
 
 namespace Needis.Web.ViewModels.Activity;
 
-public class ActivityIndexViewModel
+public class ActivityIndexViewModel : SiteTextViewModelBase
 {
     public string CurrentLanguage { get; set; } = "en";
     public ActivityPage? ActivityPage { get; set; }

@@ -35,19 +35,23 @@
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ShortDescriptionEN" class="form-label fw-medium">Short Description EN</label>
-                    <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 2, Language = "en" }' />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ShortDescriptionTH" class="form-label fw-medium">Short Description TH</label>
-                    <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 2, Language = "th" }' />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="SummaryEN" class="form-label fw-medium">Summary EN</label>
-                    <textarea asp-for="SummaryEN" class="form-control" rows="3"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "SummaryEN", Value = Model.SummaryEN, Rows = 3, Language = "en" }' />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="SummaryTH" class="form-label fw-medium">Summary TH</label>
-                    <textarea asp-for="SummaryTH" class="form-control" rows="3"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "SummaryTH", Value = Model.SummaryTH, Rows = 3, Language = "th" }' />
                 </div>
 
                 <div class="col-12"><h6 class="text-muted border-bottom pb-2 mt-2">Details</h6></div>

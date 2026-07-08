@@ -5,6 +5,7 @@ using Needis.Web.Data;
 using Needis.Web.Models;
 using Needis.Web.Options;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
 using Needis.Web.Services.Email;
 using Needis.Web.Services.Quotation;
 using Needis.Web.ViewModels.Quotation;
@@ -20,6 +21,7 @@ public class QuotationCartController : Controller
     private readonly IEmailTemplateService _emailTemplate;
     private readonly EmailOptions _emailOpts;
     private readonly ILogger<QuotationCartController> _logger;
+    private readonly ISiteTextService _siteText;
 
     public QuotationCartController(
         AppDbContext db,
@@ -28,7 +30,8 @@ public class QuotationCartController : Controller
         IEmailSender emailSender,
         IEmailTemplateService emailTemplate,
         IOptions<EmailOptions> emailOpts,
-        ILogger<QuotationCartController> logger)
+        ILogger<QuotationCartController> logger,
+        ISiteTextService siteText)
     {
         _db            = db;
         _lang          = lang;
@@ -37,6 +40,7 @@ public class QuotationCartController : Controller
         _emailTemplate = emailTemplate;
         _emailOpts     = emailOpts.Value;
         _logger        = logger;
+        _siteText      = siteText;
     }
 
     // ── GET /QuotationCart ───────────────────────────────────────────────────
@@ -51,6 +55,7 @@ public class QuotationCartController : Controller
         {
             CurrentLanguage = lang,
             Items           = cart?.Items.ToList() ?? new List<QuotationCartItem>(),
+            Texts           = await _siteText.GetTextsAsync(["quote.empty_cart"], lang),
         };
 
         if (vm.TotalItems > 0)

@@ -90,23 +90,26 @@
                                     @(user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm") : "—")
                                 </td>
                                 <td class="text-muted small">@user.CreatedAt.ToString("yyyy-MM-dd")</td>
-                                <td class="text-end">
-                                    <div class="d-flex gap-1 justify-content-end">
+                                <td class="actions-cell">
+                                    <div class="admin-actions">
                                         <a asp-action="Edit" asp-route-id="@user.Id"
-                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                           class="admin-action-btn admin-action-btn-edit"
+                                           title="Edit" aria-label="Edit user">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <a asp-action="ChangePassword" asp-route-id="@user.Id"
-                                           class="btn btn-sm btn-outline-warning" title="Change Password">
+                                           class="admin-action-btn admin-action-btn-warning"
+                                           title="Change Password" aria-label="Change password">
                                             <i class="bi bi-key"></i>
                                         </a>
                                         <form asp-action="ToggleActive" asp-route-id="@user.Id"
-                                              method="post" class="d-inline"
+                                              method="post" class="admin-action-form"
                                               onsubmit="return confirmToggle('@user.Username', @(user.IsActive ? "true" : "false"))">
                                             @Html.AntiForgeryToken()
                                             <button type="submit"
-                                                    class="btn btn-sm @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")"
-                                                    title="@(user.IsActive ? "Deactivate" : "Activate")">
+                                                    class="admin-action-btn @(user.IsActive ? "admin-action-btn-delete" : "admin-action-btn-success")"
+                                                    title="@(user.IsActive ? "Deactivate" : "Activate")"
+                                                    aria-label="@(user.IsActive ? "Deactivate user" : "Activate user")">
                                                 <i class="bi @(user.IsActive ? "bi-person-slash" : "bi-person-check")"></i>
                                             </button>
                                         </form>

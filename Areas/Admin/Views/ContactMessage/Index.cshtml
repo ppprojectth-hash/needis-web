@@ -158,11 +158,14 @@
                             <span class="badge @badgeBg @badgeText">@(item.Status ?? "New")</span>
                         </td>
                         <td class="small text-muted d-none d-lg-table-cell">@(item.AssignedTo ?? "—")</td>
-                        <td class="text-end">
-                            <a asp-action="Detail" asp-route-id="@item.Id"
-                               class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                        <td class="actions-cell">
+                            <div class="admin-actions">
+                                <a asp-action="Detail" asp-route-id="@item.Id"
+                                   class="admin-action-btn admin-action-btn-view"
+                                   title="View Message" aria-label="View message">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 }

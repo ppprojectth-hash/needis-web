@@ -4,7 +4,7 @@ using ServiceModel = Needis.Web.Models.Service;
 
 namespace Needis.Web.ViewModels.Quotation;
 
-public class QuotationRequestFormViewModel
+public class QuotationRequestFormViewModel : Needis.Web.ViewModels.SiteTextViewModelBase
 {
     [Required(ErrorMessage = "Please enter your name.")]
     [MaxLength(200)]

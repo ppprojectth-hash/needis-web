@@ -122,24 +122,34 @@
                             <td class="py-2 text-center">
                                 <span class="badge rounded-pill @statusClass">@statusBadge</span>
                             </td>
-                            <td class="py-2 text-end pe-4">
-                                <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form asp-action="ToggleActive" asp-route-id="@p.Id" method="post" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary me-1"
-                                            title="@(p.IsActive ? "Deactivate" : "Activate")">
-                                        <i class="bi @(p.IsActive ? "bi-toggle-on text-success" : "bi-toggle-off text-secondary")"></i>
-                                    </button>
-                                </form>
-                                <form asp-action="Delete" asp-route-id="@p.Id" method="post" style="display:inline"
-                                      onsubmit="return confirm('Delete this popup? This cannot be undone.')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                            <td class="actions-cell pe-4">
+                                <div class="admin-actions">
+                                    <a asp-action="Edit" asp-route-id="@p.Id"
+                                       class="admin-action-btn admin-action-btn-edit"
+                                       title="Edit" aria-label="Edit popup">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="ToggleActive" asp-route-id="@p.Id" method="post"
+                                          class="admin-action-form">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit"
+                                                class="admin-action-btn @(p.IsActive ? "admin-action-btn-success" : "admin-action-btn-secondary")"
+                                                title="@(p.IsActive ? "Deactivate" : "Activate")"
+                                                aria-label="@(p.IsActive ? "Deactivate popup" : "Activate popup")">
+                                            <i class="bi @(p.IsActive ? "bi-toggle-on" : "bi-toggle-off")"></i>
+                                        </button>
+                                    </form>
+                                    <form asp-action="Delete" asp-route-id="@p.Id" method="post"
+                                          class="admin-action-form"
+                                          onsubmit="return confirm('Delete this popup? This cannot be undone.')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit"
+                                                class="admin-action-btn admin-action-btn-delete"
+                                                title="Delete" aria-label="Delete popup">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }

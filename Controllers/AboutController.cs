@@ -1,20 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
+using Needis.Web.Services.Features;
 using Needis.Web.ViewModels.About;
 
 namespace Needis.Web.Controllers;
 
 public class AboutController : Controller
 {
-    private readonly AppDbContext _db;
-    private readonly ILanguageService _lang;
+    private readonly AppDbContext        _db;
+    private readonly ILanguageService    _lang;
+    private readonly IFeatureFlagService _features;
+    private readonly ISiteTextService    _siteText;
 
-    public AboutController(AppDbContext db, ILanguageService lang)
+    private static readonly string[] TextKeys =
+    [
+        "about.page.title", "about.page.subtitle",
+        "about.company.title", "about.company.description",
+        "about.team.eyebrow", "about.team.title", "about.team.subtitle",
+        "about.location.title", "about.location.subtitle", "about.location.button",
+    ];
+
+    public AboutController(
+        AppDbContext db, ILanguageService lang, IFeatureFlagService features, ISiteTextService siteText)
     {
-        _db   = db;
-        _lang = lang;
+        _db       = db;
+        _lang     = lang;
+        _features = features;
+        _siteText = siteText;
     }
 
     [HttpGet]
@@ -53,6 +69,8 @@ public class AboutController : Controller
             .OrderBy(s => s.FullNameEN)
             .Take(8)
             .ToListAsync();
+
+        var siteSetting = await _db.SiteSettings.AsNoTracking().FirstOrDefaultAsync();
 
         // Pre-compute dynamic stat values
         var brandCount  = await _db.BrandPartners
@@ -100,16 +118,63 @@ public class AboutController : Controller
             };
         }).ToList();
 
+        // Resolve safe map URLs
+        var safeMapUrl   = GoogleMapHelper.IsSafeGoogleMapUrl(siteSetting?.GoogleMapUrl)
+                               ? siteSetting!.GoogleMapUrl
+                               : null;
+        var safeEmbedUrl = GoogleMapHelper.IsSafeGoogleMapEmbedUrl(siteSetting?.GoogleMapEmbedUrl)
+                               ? siteSetting!.GoogleMapEmbedUrl
+                               : null;
+
+        var texts = await _siteText.GetTextsAsync(TextKeys, lang);
+
         var vm = new AboutIndexViewModel
         {
             CurrentLanguage     = lang,
+            Texts               = texts,
             Sections            = sections,
             Histories           = histories,
             StatCards           = displayStats,
             BrandPartners       = brandPartners,
             PublicStaffProfiles = staff,
+
+            ShowMapOnAboutPage  = siteSetting?.ShowMapOnAboutPage ?? false,
+            GoogleMapUrl        = safeMapUrl,
+            GoogleMapEmbedUrl   = safeEmbedUrl,
+            MapTitleTH          = siteSetting?.MapTitleTH,
+            MapTitleEN          = siteSetting?.MapTitleEN,
+            MapDescriptionTH    = siteSetting?.MapDescriptionTH,
+            MapDescriptionEN    = siteSetting?.MapDescriptionEN,
+            AddressTH           = siteSetting?.AddressTH,
+            AddressEN           = siteSetting?.AddressEN,
+            ContactPhone        = siteSetting?.ContactPhone,
+            ContactEmail        = siteSetting?.ContactEmail,
         };
 
         return View(vm);
+    }
+
+    [HttpGet("About/Staff/{slug}")]
+    public async Task<IActionResult> StaffDetail(string slug)
+    {
+        if (!_features.StaffProfileDetailEnabled) return NotFound();
+        if (string.IsNullOrWhiteSpace(slug)) return NotFound();
+
+        var lang = _lang.GetCurrentLanguage(HttpContext);
+        ViewData["SeoPageKey"] = "about-staff";
+
+        var staff = await _db.StaffProfiles.AsNoTracking()
+            .FirstOrDefaultAsync(s => s.Slug == slug && s.IsActive && !s.IsDelete);
+
+        if (staff is null || !staff.ShowDetailPage) return NotFound();
+
+        var siteSetting = await _db.SiteSettings.AsNoTracking().FirstOrDefaultAsync();
+
+        ViewBag.CurrentLanguage = lang;
+        ViewBag.CompanyName = lang == "th"
+            ? (siteSetting?.CompanyNameTH ?? siteSetting?.CompanyNameEN ?? "Needis")
+            : (siteSetting?.CompanyNameEN ?? siteSetting?.CompanyNameTH ?? "Needis");
+
+        return View(staff);
     }
 }

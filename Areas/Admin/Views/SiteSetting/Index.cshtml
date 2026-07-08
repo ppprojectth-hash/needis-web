@@ -132,7 +132,7 @@
             </div>
 
             @* D. Social Links *@
-            <div class="card border-0 shadow-sm rounded-3">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
                 <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
                     <h6 class="fw-semibold mb-0">
                         <i class="bi bi-share me-2 text-primary"></i>Social Links
@@ -169,6 +169,101 @@
                 </div>
             </div>
 
+            @* E. Location / Google Map *@
+            @if (FF.AboutGoogleMapEnabled)
+            {
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-geo-alt me-2 text-primary"></i>Location / Google Map
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    @* Show Map switch *@
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="ShowMapOnAboutPage" class="form-check-input" type="checkbox"
+                                   role="switch" />
+                            <label asp-for="ShowMapOnAboutPage" class="form-check-label small fw-semibold">
+                                Show Map on About Page
+                            </label>
+                        </div>
+                    </div>
+
+                    @* Google Map URL *@
+                    <div class="mb-3">
+                        <label asp-for="GoogleMapUrl" class="form-label small fw-semibold">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>
+                            @Html.DisplayNameFor(m => m.GoogleMapUrl)
+                        </label>
+                        <input asp-for="GoogleMapUrl" class="form-control"
+                               placeholder="https://maps.app.goo.gl/..." />
+                        <div class="text-muted small mt-1">
+                            Used for the <strong>Open in Google Maps</strong> button. Allows
+                            maps.app.goo.gl, google.com/maps.
+                        </div>
+                        <span asp-validation-for="GoogleMapUrl" class="text-danger small"></span>
+                    </div>
+
+                    @* Google Map Embed URL *@
+                    <div class="mb-3">
+                        <label asp-for="GoogleMapEmbedUrl" class="form-label small fw-semibold">
+                            <i class="bi bi-code-square me-1"></i>
+                            @Html.DisplayNameFor(m => m.GoogleMapEmbedUrl)
+                        </label>
+                        <textarea asp-for="GoogleMapEmbedUrl" class="form-control font-monospace" rows="3"
+                                  placeholder="https://www.google.com/maps/embed?pb=..."></textarea>
+                        <div class="text-muted small mt-1">
+                            From Google Maps → <strong>Share → Embed a map</strong> → copy the
+                            <code>src</code> value only. Must start with
+                            <code>https://www.google.com/maps/embed</code>.
+                        </div>
+                        <span asp-validation-for="GoogleMapEmbedUrl" class="text-danger small"></span>
+                    </div>
+
+                    @* Map Title EN / TH *@
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="MapTitleEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.MapTitleEN)
+                            </label>
+                            <input asp-for="MapTitleEN" class="form-control"
+                                   placeholder="Our Location" />
+                            <span asp-validation-for="MapTitleEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="MapTitleTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.MapTitleTH)
+                            </label>
+                            <input asp-for="MapTitleTH" class="form-control"
+                                   placeholder="ที่ตั้งของเรา" />
+                            <span asp-validation-for="MapTitleTH" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    @* Map Description EN / TH *@
+                    <div class="mb-3">
+                        <label asp-for="MapDescriptionEN" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.MapDescriptionEN)
+                        </label>
+                        <textarea asp-for="MapDescriptionEN" class="form-control" rows="2"
+                                  placeholder="Visit us or open the location in Google Maps."></textarea>
+                        <span asp-validation-for="MapDescriptionEN" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="MapDescriptionTH" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.MapDescriptionTH)
+                        </label>
+                        <textarea asp-for="MapDescriptionTH" class="form-control" rows="2"
+                                  placeholder="ดูที่ตั้งบริษัทหรือเปิดตำแหน่งใน Google Maps"></textarea>
+                        <span asp-validation-for="MapDescriptionTH" class="text-danger small"></span>
+                    </div>
+
+                </div>
+            </div>
+            } @* end AboutGoogleMapEnabled *@
+
         </div>
 
         @* ── Right column ── *@
@@ -190,10 +285,10 @@
                         </label>
                         @if (!string.IsNullOrEmpty(Model.LogoUrl))
                         {
-                            <div class="logo-preview-frame mb-2">
+                            <div class="logo-preview-frame mb-1">
                                 <img src="@Model.LogoUrl" alt="Current Logo" />
                             </div>
-                            <div class="text-muted small mb-2">Current logo</div>
+                            <div class="text-muted small mb-2">Current logo &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.LogoUrl)</span></div>
                         }
                         <label asp-for="LogoFile" class="form-label small fw-semibold d-none"></label>
                         <input asp-for="LogoFile" type="file" class="form-control"
@@ -211,11 +306,11 @@
                         </label>
                         @if (!string.IsNullOrEmpty(Model.FaviconUrl))
                         {
-                            <div class="mb-2 p-2 border rounded-2 bg-white d-inline-block">
+                            <div class="mb-1 p-2 border rounded-2 bg-white d-inline-block">
                                 <img src="@Model.FaviconUrl" alt="Current Favicon"
                                      style="width:32px;height:32px;object-fit:contain" />
                             </div>
-                            <div class="text-muted small mb-2">Current favicon</div>
+                            <div class="text-muted small mb-2">Current favicon &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.FaviconUrl)</span></div>
                         }
                         <label asp-for="FaviconFile" class="form-label small fw-semibold d-none"></label>
                         <input asp-for="FaviconFile" type="file" class="form-control"

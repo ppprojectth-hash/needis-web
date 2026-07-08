@@ -2,7 +2,7 @@ using Needis.Web.Models;
 
 namespace Needis.Web.ViewModels.Contact;
 
-public class ContactPageViewModel
+public class ContactPageViewModel : SiteTextViewModelBase
 {
     public string         CurrentLanguage { get; init; } = "en";
     public SiteSetting?   SiteSetting     { get; init; }

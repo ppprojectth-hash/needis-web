@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
 using Needis.Web.Models;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
+using Needis.Web.Services.Features;
 using Needis.Web.ViewModels.Home;
 using DiagActivity = System.Diagnostics.Activity;
 
@@ -11,13 +13,28 @@ namespace Needis.Web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly AppDbContext     _db;
-    private readonly ILanguageService _lang;
+    private readonly AppDbContext        _db;
+    private readonly ILanguageService    _lang;
+    private readonly IFeatureFlagService _features;
+    private readonly ISiteTextService    _siteText;
 
-    public HomeController(AppDbContext db, ILanguageService lang)
+    private static readonly string[] TextKeys =
+    [
+        "home.hero.title", "home.hero.subtitle", "home.hero.primary_button", "home.hero.secondary_button",
+        "home.product_lines.eyebrow", "home.product_lines.title", "home.product_lines.subtitle",
+        "home.hot_products.eyebrow", "home.hot_products.title", "home.hot_products.subtitle",
+        "home.services.eyebrow", "home.services.title", "home.services.subtitle",
+        "home.activities.eyebrow", "home.activities.title", "home.activities.subtitle",
+        "home.cta.title", "home.cta.subtitle", "home.cta.button",
+    ];
+
+    public HomeController(
+        AppDbContext db, ILanguageService lang, IFeatureFlagService features, ISiteTextService siteText)
     {
-        _db   = db;
-        _lang = lang;
+        _db       = db;
+        _lang     = lang;
+        _features = features;
+        _siteText = siteText;
     }
 
     public async Task<IActionResult> Index()
@@ -59,6 +76,19 @@ public class HomeController : Controller
             .Take(24)
             .ToListAsync();
 
+        // Hot Products: only load when feature is enabled
+        var hotProducts = _features.HotProductPromotionEnabled
+            ? await _db.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .Where(p => p.IsActive)
+                .OrderByDescending(p => p.IsFeatured)
+                .ThenBy(p => p.DisplayOrder)
+                .ThenByDescending(p => p.CreatedAt)
+                .Take(8)
+                .ToListAsync()
+            : [];
+
         var featuredServices = await _db.Services
             .AsNoTracking()
             .Where(s => s.IsActive && !s.IsDelete)
@@ -95,16 +125,20 @@ public class HomeController : Controller
             .Take(4)
             .ToList();
 
+        var texts = await _siteText.GetTextsAsync(TextKeys, lang);
+
         var vm = new HomeIndexViewModel
         {
             SiteSetting      = siteSetting,
             Banners          = banners,
             Categories       = categories,
             FeaturedProducts = featuredProducts,
+            HotProducts      = hotProducts,
             ProductGroups    = productGroups,
             FeaturedServices = featuredServices,
             LatestActivities = latestActivities,
             CurrentLanguage  = lang,
+            Texts            = texts,
         };
 
         ViewData["SeoPageKey"] = "home";

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
+using Needis.Web.Helpers;
 using Needis.Web.Models;
 using Needis.Web.ViewModels.Admin;
 
@@ -66,6 +67,7 @@ public class ProductController : Controller
                 IsFeatured      = p.IsFeatured,
                 IsActive        = p.IsActive,
                 DisplayOrder    = p.DisplayOrder,
+                HasVideo        = p.ShowYoutubeVideo && p.YoutubeVideoUrl != null && p.YoutubeVideoUrl != "",
             })
             .ToListAsync();
 
@@ -134,28 +136,34 @@ public class ProductController : Controller
 
         var product = new Product
         {
-            CategoryId         = vm.ProductCategoryId,
-            NameTH             = vm.ProductNameTH     ?? string.Empty,
-            NameEN             = vm.ProductNameEN      ?? string.Empty,
-            Slug               = vm.Slug,
-            Brand              = vm.Brand,
-            Model              = vm.Model,
-            Sku                = vm.PartNumber,
-            ShortDescriptionTH = vm.ShortDescriptionTH,
-            ShortDescriptionEN = vm.ShortDescriptionEN,
-            FullDescriptionTH  = vm.DescriptionTH,
-            FullDescriptionEN  = vm.DescriptionEN,
-            SpecificationTH    = vm.SpecificationTH,
-            SpecificationEN    = vm.SpecificationEN,
-            Price              = vm.Price,
-            IsPriceVisible     = vm.IsPriceVisible,
-            MainImagePath      = imagePath,
-            BrochureFilePath   = brochurePath,
-            DisplayOrder       = vm.DisplayOrder,
-            IsFeatured         = vm.IsFeatured,
-            IsActive           = vm.IsActive,
-            CreatedAt          = DateTime.UtcNow,
-            UpdatedAt          = DateTime.UtcNow,
+            CategoryId                  = vm.ProductCategoryId,
+            NameTH                      = vm.ProductNameTH     ?? string.Empty,
+            NameEN                      = vm.ProductNameEN      ?? string.Empty,
+            Slug                        = vm.Slug,
+            Brand                       = vm.Brand,
+            Model                       = vm.Model,
+            Sku                         = vm.PartNumber,
+            ShortDescriptionTH          = vm.ShortDescriptionTH,
+            ShortDescriptionEN          = vm.ShortDescriptionEN,
+            FullDescriptionTH           = vm.DescriptionTH,
+            FullDescriptionEN           = vm.DescriptionEN,
+            SpecificationTH             = vm.SpecificationTH,
+            SpecificationEN             = vm.SpecificationEN,
+            Price                       = vm.Price,
+            IsPriceVisible              = vm.IsPriceVisible,
+            MainImagePath               = imagePath,
+            BrochureFilePath            = brochurePath,
+            DisplayOrder                = vm.DisplayOrder,
+            IsFeatured                  = vm.IsFeatured,
+            IsActive                    = vm.IsActive,
+            ShowYoutubeVideo            = vm.ShowYoutubeVideo,
+            YoutubeVideoUrl             = string.IsNullOrWhiteSpace(vm.YoutubeVideoUrl) ? null : vm.YoutubeVideoUrl.Trim(),
+            YoutubeVideoTitleTH         = vm.YoutubeVideoTitleTH,
+            YoutubeVideoTitleEN         = vm.YoutubeVideoTitleEN,
+            YoutubeVideoDescriptionTH   = vm.YoutubeVideoDescriptionTH,
+            YoutubeVideoDescriptionEN   = vm.YoutubeVideoDescriptionEN,
+            CreatedAt                   = DateTime.UtcNow,
+            UpdatedAt                   = DateTime.UtcNow,
         };
 
         _db.Products.Add(product);
@@ -217,25 +225,31 @@ public class ProductController : Controller
             product.BrochureFilePath = path;
         }
 
-        product.CategoryId         = vm.ProductCategoryId;
-        product.NameTH             = vm.ProductNameTH     ?? string.Empty;
-        product.NameEN             = vm.ProductNameEN      ?? string.Empty;
-        product.Slug               = vm.Slug;
-        product.Brand              = vm.Brand;
-        product.Model              = vm.Model;
-        product.Sku                = vm.PartNumber;
-        product.ShortDescriptionTH = vm.ShortDescriptionTH;
-        product.ShortDescriptionEN = vm.ShortDescriptionEN;
-        product.FullDescriptionTH  = vm.DescriptionTH;
-        product.FullDescriptionEN  = vm.DescriptionEN;
-        product.SpecificationTH    = vm.SpecificationTH;
-        product.SpecificationEN    = vm.SpecificationEN;
-        product.Price              = vm.Price;
-        product.IsPriceVisible     = vm.IsPriceVisible;
-        product.DisplayOrder       = vm.DisplayOrder;
-        product.IsFeatured         = vm.IsFeatured;
-        product.IsActive           = vm.IsActive;
-        product.UpdatedAt          = DateTime.UtcNow;
+        product.CategoryId                  = vm.ProductCategoryId;
+        product.NameTH                      = vm.ProductNameTH     ?? string.Empty;
+        product.NameEN                      = vm.ProductNameEN      ?? string.Empty;
+        product.Slug                        = vm.Slug;
+        product.Brand                       = vm.Brand;
+        product.Model                       = vm.Model;
+        product.Sku                         = vm.PartNumber;
+        product.ShortDescriptionTH          = vm.ShortDescriptionTH;
+        product.ShortDescriptionEN          = vm.ShortDescriptionEN;
+        product.FullDescriptionTH           = vm.DescriptionTH;
+        product.FullDescriptionEN           = vm.DescriptionEN;
+        product.SpecificationTH             = vm.SpecificationTH;
+        product.SpecificationEN             = vm.SpecificationEN;
+        product.Price                       = vm.Price;
+        product.IsPriceVisible              = vm.IsPriceVisible;
+        product.DisplayOrder                = vm.DisplayOrder;
+        product.IsFeatured                  = vm.IsFeatured;
+        product.IsActive                    = vm.IsActive;
+        product.ShowYoutubeVideo            = vm.ShowYoutubeVideo;
+        product.YoutubeVideoUrl             = string.IsNullOrWhiteSpace(vm.YoutubeVideoUrl) ? null : vm.YoutubeVideoUrl.Trim();
+        product.YoutubeVideoTitleTH         = vm.YoutubeVideoTitleTH;
+        product.YoutubeVideoTitleEN         = vm.YoutubeVideoTitleEN;
+        product.YoutubeVideoDescriptionTH   = vm.YoutubeVideoDescriptionTH;
+        product.YoutubeVideoDescriptionEN   = vm.YoutubeVideoDescriptionEN;
+        product.UpdatedAt                   = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
 
@@ -348,26 +362,32 @@ public class ProductController : Controller
 
     private static ProductViewModel MapToViewModel(Product p) => new()
     {
-        ProductId          = p.Id,
-        ProductCategoryId  = p.CategoryId,
-        ProductNameTH      = p.NameTH,
-        ProductNameEN      = p.NameEN,
-        Slug               = p.Slug,
-        Brand              = p.Brand,
-        Model              = p.Model,
-        PartNumber         = p.Sku,
-        ShortDescriptionTH = p.ShortDescriptionTH,
-        ShortDescriptionEN = p.ShortDescriptionEN,
-        DescriptionTH      = p.FullDescriptionTH,
-        DescriptionEN      = p.FullDescriptionEN,
-        SpecificationTH    = p.SpecificationTH,
-        SpecificationEN    = p.SpecificationEN,
-        Price              = p.Price,
-        IsPriceVisible     = p.IsPriceVisible,
-        MainImageUrl       = p.MainImagePath,
-        BrochureFileUrl    = p.BrochureFilePath,
-        DisplayOrder       = p.DisplayOrder,
-        IsFeatured         = p.IsFeatured,
-        IsActive           = p.IsActive,
+        ProductId                   = p.Id,
+        ProductCategoryId           = p.CategoryId,
+        ProductNameTH               = p.NameTH,
+        ProductNameEN               = p.NameEN,
+        Slug                        = p.Slug,
+        Brand                       = p.Brand,
+        Model                       = p.Model,
+        PartNumber                  = p.Sku,
+        ShortDescriptionTH          = p.ShortDescriptionTH,
+        ShortDescriptionEN          = p.ShortDescriptionEN,
+        DescriptionTH               = p.FullDescriptionTH,
+        DescriptionEN               = p.FullDescriptionEN,
+        SpecificationTH             = p.SpecificationTH,
+        SpecificationEN             = p.SpecificationEN,
+        Price                       = p.Price,
+        IsPriceVisible              = p.IsPriceVisible,
+        MainImageUrl                = p.MainImagePath,
+        BrochureFileUrl             = p.BrochureFilePath,
+        DisplayOrder                = p.DisplayOrder,
+        IsFeatured                  = p.IsFeatured,
+        IsActive                    = p.IsActive,
+        ShowYoutubeVideo            = p.ShowYoutubeVideo,
+        YoutubeVideoUrl             = p.YoutubeVideoUrl,
+        YoutubeVideoTitleTH         = p.YoutubeVideoTitleTH,
+        YoutubeVideoTitleEN         = p.YoutubeVideoTitleEN,
+        YoutubeVideoDescriptionTH   = p.YoutubeVideoDescriptionTH,
+        YoutubeVideoDescriptionEN   = p.YoutubeVideoDescriptionEN,
     };
 }

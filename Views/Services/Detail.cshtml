@@ -1,4 +1,5 @@
 @model ServiceDetailViewModel
+@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
 @{
     var lang = Model.CurrentLanguage;
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
@@ -73,9 +74,9 @@
             @if (!string.IsNullOrEmpty(fullDesc) || !string.IsNullOrEmpty(shortDesc))
             {
                 <div class="service-detail-section reveal">
-                    <p class="text-muted lh-lg" style="white-space:pre-line">
-                        @(string.IsNullOrEmpty(fullDesc) ? shortDesc : fullDesc)
-                    </p>
+                    <div class="text-muted rich-content">
+                        @Html.Raw(MarkdownService.ToSafeHtml(string.IsNullOrEmpty(fullDesc) ? shortDesc : fullDesc))
+                    </div>
                 </div>
             }
 

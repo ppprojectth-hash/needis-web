@@ -1,0 +1,36 @@
+@model Needis.Web.ViewModels.Admin.RichTextEditorFieldViewModel
+@{
+    var id = string.IsNullOrEmpty(Model.FieldId) ? Model.FieldName : Model.FieldId;
+    var isTh = Model.Language == "th";
+}
+<div class="rich-text-editor-wrap">
+    <div class="rich-text-toolbar" data-target="#@id">
+        <button type="button" class="btn" data-action="bold" title="@(isTh ? "ตัวหนา" : "Bold")">
+            <strong>B</strong>
+        </button>
+        <button type="button" class="btn" data-action="bullet" title="@(isTh ? "รายการ bullet" : "Bullet list")">
+            &bull;
+        </button>
+        <button type="button" class="btn" data-action="number" title="@(isTh ? "รายการตัวเลข" : "Numbered list")">
+            1.
+        </button>
+        <button type="button" class="btn" data-action="heading" title="@(isTh ? "หัวข้อ" : "Heading")">
+            H
+        </button>
+        <button type="button" class="btn" data-action="preview" title="@(isTh ? "ดูตัวอย่าง" : "Preview")">
+            @(isTh ? "ดูตัวอย่าง" : "Preview")
+        </button>
+    </div>
+    <textarea name="@Model.FieldName" id="@id" class="form-control rich-text-editor" rows="@Model.Rows"
+              data-lang="@Model.Language"
+              placeholder="@Model.Placeholder">@Model.Value</textarea>
+</div>
+<div class="rich-text-help">
+    @(isTh
+        ? "เลือกข้อความแล้วกดปุ่มด้านบนเพื่อจัดรูปแบบ หรือกดดูตัวอย่างก่อนบันทึก"
+        : "Select text and use the buttons above to format it. You can preview before saving.")
+</div>
+<div class="rich-text-preview" id="@(id)-preview">
+    <div class="rich-text-preview-title">@(isTh ? "ตัวอย่าง" : "Preview")</div>
+    <div class="rich-content"></div>
+</div>

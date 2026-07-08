@@ -3,3 +3,5 @@
 @using Needis.Web.ViewModels.Admin
 @using System.Security.Claims
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Needis.Web.Services.Files.IFileInfoService FileInfoSvc
+@inject Needis.Web.Services.Features.IFeatureFlagService FF

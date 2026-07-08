@@ -34,6 +34,39 @@ public class StaffProfile
     [MaxLength(500)]
     public string? ProfileImageUrl { get; set; }
 
+    [MaxLength(250)]
+    public string? Slug { get; set; }
+
+    [MaxLength(100)]
+    public string? MobilePhone { get; set; }
+
+    [MaxLength(250)]
+    public string? Email { get; set; }
+
+    [MaxLength(4000)]
+    public string? BiographyTH { get; set; }
+
+    [MaxLength(4000)]
+    public string? BiographyEN { get; set; }
+
+    [MaxLength(4000)]
+    public string? AchievementTH { get; set; }
+
+    [MaxLength(4000)]
+    public string? AchievementEN { get; set; }
+
+    [MaxLength(500)]
+    public string? PdfFileUrl { get; set; }
+
+    [MaxLength(250)]
+    public string? PdfFileName { get; set; }
+
+    public bool ShowContactInfo { get; set; } = true;
+
+    public bool ShowDetailPage { get; set; } = true;
+
+    public int DisplayOrder { get; set; } = 0;
+
     public DateTime? StartDate { get; set; }
 
     public DateTime? EndDate { get; set; }

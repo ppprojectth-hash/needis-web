@@ -4,9 +4,9 @@
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
 
     var heroTitle = L(Model.ServicePage?.TitleTH, Model.ServicePage?.TitleEN) is { Length: > 0 } ht
-        ? ht : (lang == "th" ? "บริการของเรา" : "Our Services");
+        ? ht : Model.T("services.page.title", lang == "th" ? "บริการของเรา" : "Our Services");
     var heroSubtitle = L(Model.ServicePage?.SubtitleTH, Model.ServicePage?.SubtitleEN) is { Length: > 0 } hs
-        ? hs : (lang == "th" ? "บริการสนับสนุน สอบเทียบ ติดตั้ง และบำรุงรักษาเครื่องมืออย่างครบวงจร" : "Comprehensive support, calibration, and maintenance for all your instruments.");
+        ? hs : Model.T("services.page.subtitle", lang == "th" ? "บริการสนับสนุน สอบเทียบ ติดตั้ง และบำรุงรักษาเครื่องมืออย่างครบวงจร" : "Comprehensive support, calibration, and maintenance for all your instruments.");
     var heroDesc  = L(Model.ServicePage?.DescriptionTH, Model.ServicePage?.DescriptionEN);
     var heroBgUrl = Model.ServicePage?.BackgroundImageUrl;
 
@@ -97,7 +97,7 @@
                                    asp-route-slug="@svc.ServiceSlug"
                                    class="btn btn-primary mt-auto"
                                    style="background:var(--needis-primary);border-color:var(--needis-primary)">
-                                    @(lang == "th" ? "ดูรายละเอียด" : "View Details")
+                                    @Model.T("services.view_detail", lang == "th" ? "ดูรายละเอียด" : "View Details")
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>
@@ -109,16 +109,16 @@
     </section>
 }
 
-@* ── C. All Services ───────────────────────────────────────────────────────── *@
+@* ── C. Rental Services ─────────────────────────────────────────────────────── *@
 <section class="py-5 bg-white">
     <div class="container">
         <div class="text-center mb-5 reveal">
-            <p class="section-eyebrow">@(lang == "th" ? "บริการทั้งหมด" : "All Services")</p>
+            <p class="section-eyebrow">@(lang == "th" ? "บริการเช่า" : "Rental Services")</p>
             <h2 class="section-title">
-                @(lang == "th" ? "บริการครบวงจรของเรา" : "Our Complete Service Range")
+                @Model.T("services.rental.title", lang == "th" ? "บริการครบวงจรของเรา" : "Our Complete Service Range")
             </h2>
             <p class="section-subtitle">
-                @(lang == "th"
+                @Model.T("services.rental.subtitle", lang == "th"
                     ? "เราพร้อมดูแลเครื่องมือวัดของคุณทุกขั้นตอน ตั้งแต่การติดตั้งจนถึงการสอบเทียบ"
                     : "We support your instruments at every stage — from installation to calibration and beyond.")
             </p>

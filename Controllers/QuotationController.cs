@@ -5,6 +5,7 @@ using Needis.Web.Data;
 using Needis.Web.Models;
 using Needis.Web.Options;
 using Needis.Web.Services;
+using Needis.Web.Services.Content;
 using Needis.Web.Services.Email;
 using Needis.Web.ViewModels.Quotation;
 
@@ -18,6 +19,12 @@ public class QuotationController : Controller
     private readonly IEmailTemplateService _emailTemplate;
     private readonly EmailOptions _emailOpts;
     private readonly ILogger<QuotationController> _logger;
+    private readonly ISiteTextService _siteText;
+
+    private static readonly string[] TextKeys =
+    [
+        "quote.page.title", "quote.page.subtitle", "quote.submit_button",
+    ];
 
     public QuotationController(
         AppDbContext db,
@@ -25,7 +32,8 @@ public class QuotationController : Controller
         IEmailSender emailSender,
         IEmailTemplateService emailTemplate,
         IOptions<EmailOptions> emailOpts,
-        ILogger<QuotationController> logger)
+        ILogger<QuotationController> logger,
+        ISiteTextService siteText)
     {
         _db            = db;
         _lang          = lang;
@@ -33,6 +41,7 @@ public class QuotationController : Controller
         _emailTemplate = emailTemplate;
         _emailOpts     = emailOpts.Value;
         _logger        = logger;
+        _siteText      = siteText;
     }
 
     // ── GET /Quotation/Create ─────────────────────────────────────────────────
@@ -83,6 +92,7 @@ public class QuotationController : Controller
             Subject         = subject,
             RequestType     = requestType,
             Quantity        = 1,
+            Texts           = await _siteText.GetTextsAsync(TextKeys, lang),
         };
 
         ViewData["FullWidth"]  = true;
@@ -106,6 +116,7 @@ public class QuotationController : Controller
         var service = await LoadServiceAsync(model.ServiceSlug, model.ServiceId);
         model.Product = product;
         model.Service = service;
+        model.Texts   = await _siteText.GetTextsAsync(TextKeys, lang);
 
         ViewData["FullWidth"] = true;
 

@@ -1,6 +1,8 @@
 @model Needis.Web.ViewModels.Admin.ProductViewModel
+@using Needis.Web.Helpers
 @{
     ViewData["Title"] = "Edit Product";
+    var editEmbedUrl = YoutubeHelper.GetEmbedUrl(Model.YoutubeVideoUrl);
 }
 
 <form asp-action="Edit" asp-route-id="@Model.ProductId" method="post" enctype="multipart/form-data">
@@ -121,14 +123,16 @@
                             <label asp-for="ShortDescriptionEN" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionEN)
                             </label>
-                            <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 2, Language = "en" }' />
                             <span asp-validation-for="ShortDescriptionEN" class="text-danger small"></span>
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="ShortDescriptionTH" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionTH)
                             </label>
-                            <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 2, Language = "th" }' />
                             <span asp-validation-for="ShortDescriptionTH" class="text-danger small"></span>
                         </div>
                     </div>
@@ -150,14 +154,18 @@
                             <label asp-for="DescriptionEN" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.DescriptionEN)
                             </label>
-                            <textarea asp-for="DescriptionEN" class="form-control" rows="5"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "DescriptionEN", Value = Model.DescriptionEN, Rows = 5,
+                                Placeholder = "Key features...", Language = "en" }' />
                             <span asp-validation-for="DescriptionEN" class="text-danger small"></span>
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="DescriptionTH" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.DescriptionTH)
                             </label>
-                            <textarea asp-for="DescriptionTH" class="form-control" rows="5"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "DescriptionTH", Value = Model.DescriptionTH, Rows = 5,
+                                Placeholder = "จุดเด่นสินค้า...", Language = "th" }' />
                             <span asp-validation-for="DescriptionTH" class="text-danger small"></span>
                         </div>
                     </div>
@@ -167,20 +175,105 @@
                             <label asp-for="SpecificationEN" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.SpecificationEN)
                             </label>
-                            <textarea asp-for="SpecificationEN" class="form-control" rows="5"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "SpecificationEN", Value = Model.SpecificationEN, Rows = 5, Language = "en" }' />
                             <span asp-validation-for="SpecificationEN" class="text-danger small"></span>
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="SpecificationTH" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.SpecificationTH)
                             </label>
-                            <textarea asp-for="SpecificationTH" class="form-control" rows="5"></textarea>
+                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                                FieldName = "SpecificationTH", Value = Model.SpecificationTH, Rows = 5, Language = "th" }' />
                             <span asp-validation-for="SpecificationTH" class="text-danger small"></span>
                         </div>
                     </div>
 
                 </div>
             </div>
+
+            @* C. YouTube Video *@
+            @if (FF.ProductYoutubeVideoEnabled)
+            {
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4">
+                    <h6 class="fw-semibold mb-0">
+                        <i class="bi bi-youtube me-2" style="color:#ff0000"></i>Product Video / YouTube
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 pt-3">
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="ShowYoutubeVideo" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="ShowYoutubeVideo" class="form-check-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.ShowYoutubeVideo)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="YoutubeVideoUrl" class="form-label small fw-semibold">
+                            @Html.DisplayNameFor(m => m.YoutubeVideoUrl)
+                        </label>
+                        <input asp-for="YoutubeVideoUrl" class="form-control font-monospace"
+                               id="YoutubeVideoUrlInput"
+                               placeholder="https://www.youtube.com/watch?v=xxxx  or  https://youtu.be/xxxx" />
+                        <span asp-validation-for="YoutubeVideoUrl" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-2">
+                            EN: Paste a YouTube link. Supported: youtube.com/watch, youtu.be, embed, or shorts.<br />
+                            TH: วางลิงก์ YouTube รองรับรูปแบบ youtube.com/watch, youtu.be, embed หรือ shorts
+                        </div>
+                    </div>
+
+                    @if (editEmbedUrl is not null)
+                    {
+                        <div class="mb-3">
+                            <div class="text-muted small mb-1 fw-semibold">Current Video Preview</div>
+                            <div class="product-video-frame" style="border-radius:10px;overflow:hidden;max-height:220px">
+                                <iframe src="@editEmbedUrl"
+                                        title="Current video preview"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowfullscreen loading="lazy"
+                                        referrerpolicy="strict-origin-when-cross-origin"
+                                        style="width:100%;height:220px;border:0"></iframe>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="YoutubeVideoTitleEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.YoutubeVideoTitleEN)
+                            </label>
+                            <input asp-for="YoutubeVideoTitleEN" class="form-control" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="YoutubeVideoTitleTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.YoutubeVideoTitleTH)
+                            </label>
+                            <input asp-for="YoutubeVideoTitleTH" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label asp-for="YoutubeVideoDescriptionEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.YoutubeVideoDescriptionEN)
+                            </label>
+                            <textarea asp-for="YoutubeVideoDescriptionEN" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="YoutubeVideoDescriptionTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.YoutubeVideoDescriptionTH)
+                            </label>
+                            <textarea asp-for="YoutubeVideoDescriptionTH" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            } @* end ProductYoutubeVideoEnabled *@
 
         </div>
 
@@ -200,10 +293,10 @@
                         <label class="form-label small fw-semibold">Product Image</label>
                         @if (!string.IsNullOrEmpty(Model.MainImageUrl))
                         {
-                            <div class="admin-upload-preview-frame mb-2">
+                            <div class="admin-upload-preview-frame mb-1">
                                 <img id="imagePreview" src="@Model.MainImageUrl" alt="Current image" />
                             </div>
-                            <div class="text-muted small mt-1">Current image</div>
+                            <div class="text-muted small mb-2">Current image &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.MainImageUrl)</span></div>
                         }
                         else
                         {
@@ -213,7 +306,9 @@
                         }
                         <input asp-for="MainImageFile" type="file" class="form-control"
                                accept=".jpg,.jpeg,.png,.webp" id="ImageFileInput"
-                               data-preview-target="#imagePreview" />
+                               data-preview-target="#imagePreview"
+                               data-file-size-target="#productImgSize" />
+                        <span id="productImgSize" class="upload-file-meta"></span>
                         <span asp-validation-for="MainImageFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
                             Recommended: <strong>1200 × 900 px</strong> with white/transparent background<br />
@@ -225,14 +320,17 @@
                         <label class="form-label small fw-semibold">Brochure (PDF)</label>
                         @if (!string.IsNullOrEmpty(Model.BrochureFileUrl))
                         {
-                            <div class="mb-2">
+                            <div class="mb-1">
                                 <a href="@Model.BrochureFileUrl" target="_blank" class="btn btn-sm btn-outline-secondary w-100">
                                     <i class="bi bi-file-earmark-pdf me-1 text-danger"></i>View Current Brochure
                                 </a>
                             </div>
+                            <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.BrochureFileUrl)</span></div>
                         }
                         <input asp-for="BrochureFile" type="file" class="form-control"
-                               accept=".pdf" id="BrochureFileInput" />
+                               accept=".pdf" id="BrochureFileInput"
+                               data-file-size-target="#productPdfSize" />
+                        <span id="productPdfSize" class="upload-file-meta"></span>
                         <span asp-validation-for="BrochureFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
                             PDF only &nbsp;·&nbsp; Max 20 MB<br />

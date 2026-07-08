@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
 using Needis.Web.Models;
+using Needis.Web.Services.Features;
 using Needis.Web.ViewModels.Admin;
 
 namespace Needis.Web.Areas.Admin.Controllers;
@@ -16,11 +17,13 @@ public class HomePopupController : Controller
 
     private readonly AppDbContext        _db;
     private readonly IWebHostEnvironment _env;
+    private readonly IFeatureFlagService _features;
 
-    public HomePopupController(AppDbContext db, IWebHostEnvironment env)
+    public HomePopupController(AppDbContext db, IWebHostEnvironment env, IFeatureFlagService features)
     {
-        _db  = db;
-        _env = env;
+        _db      = db;
+        _env     = env;
+        _features = features;
     }
 
     // ── Index ───────────────────────────────────────────────────────────────
@@ -28,6 +31,7 @@ public class HomePopupController : Controller
     [RequirePermission("HomePopup.View")]
     public async Task<IActionResult> Index()
     {
+        if (!_features.HomePopupEnabled) return NotFound();
         var popups = await _db.HomePopups
             .AsNoTracking()
             .Where(p => !p.IsDelete)
@@ -42,13 +46,18 @@ public class HomePopupController : Controller
 
     [HttpGet]
     [RequirePermission("HomePopup.Create")]
-    public IActionResult Create() => View(new HomePopupViewModel { IsActive = true, ShowOnlyHomePage = true, ShowOncePerDay = true, OpenLinkInNewTab = true, DisplayDelaySeconds = 1 });
+    public IActionResult Create()
+    {
+        if (!_features.HomePopupEnabled) return NotFound();
+        return View(new HomePopupViewModel { IsActive = true, ShowOnlyHomePage = true, ShowOncePerDay = true, OpenLinkInNewTab = true, DisplayDelaySeconds = 1 });
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission("HomePopup.Create")]
     public async Task<IActionResult> Create(HomePopupViewModel vm)
     {
+        if (!_features.HomePopupEnabled) return NotFound();
         if (vm.ImageFile is not { Length: > 0 })
             ModelState.AddModelError(nameof(vm.ImageFile), "Popup image is required.");
 
@@ -101,6 +110,7 @@ public class HomePopupController : Controller
     [RequirePermission("HomePopup.Edit")]
     public async Task<IActionResult> Edit(int id)
     {
+        if (!_features.HomePopupEnabled) return NotFound();
         var popup = await _db.HomePopups.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id && !p.IsDelete);
         if (popup is null) return NotFound();
         return View(MapToViewModel(popup));
@@ -111,6 +121,7 @@ public class HomePopupController : Controller
     [RequirePermission("HomePopup.Edit")]
     public async Task<IActionResult> Edit(int id, HomePopupViewModel vm)
     {
+        if (!_features.HomePopupEnabled) return NotFound();
         if (!ModelState.IsValid) return View(vm);
 
         var popup = await _db.HomePopups.FindAsync(id);
@@ -163,6 +174,7 @@ public class HomePopupController : Controller
     [RequirePermission("HomePopup.Edit")]
     public async Task<IActionResult> ToggleActive(int id)
     {
+        if (!_features.HomePopupEnabled) return NotFound();
         var popup = await _db.HomePopups.FindAsync(id);
         if (popup is not null && !popup.IsDelete)
         {
@@ -183,6 +195,7 @@ public class HomePopupController : Controller
     [RequirePermission("HomePopup.Delete")]
     public async Task<IActionResult> Delete(int id)
     {
+        if (!_features.HomePopupEnabled) return NotFound();
         var popup = await _db.HomePopups.FindAsync(id);
         if (popup is not null)
         {

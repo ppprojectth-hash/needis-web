@@ -42,6 +42,26 @@ public class SiteSetting
     [MaxLength(500)]
     public string? LinkedInUrl { get; set; }
 
+    [MaxLength(1000)]
+    public string? GoogleMapUrl { get; set; }
+
+    [MaxLength(2000)]
+    public string? GoogleMapEmbedUrl { get; set; }
+
+    [MaxLength(200)]
+    public string? MapTitleTH { get; set; }
+
+    [MaxLength(200)]
+    public string? MapTitleEN { get; set; }
+
+    [MaxLength(500)]
+    public string? MapDescriptionTH { get; set; }
+
+    [MaxLength(500)]
+    public string? MapDescriptionEN { get; set; }
+
+    public bool ShowMapOnAboutPage { get; set; } = true;
+
     [Required, MaxLength(5)]
     public string DefaultLanguage { get; set; } = "EN";
 

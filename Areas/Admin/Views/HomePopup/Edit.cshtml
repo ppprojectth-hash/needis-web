@@ -88,10 +88,10 @@
                         <label asp-for="ImageFile" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ImageFile)</label>
                         @if (!string.IsNullOrEmpty(Model.ImageUrl))
                         {
-                            <div class="admin-upload-preview-frame mb-2">
+                            <div class="admin-upload-preview-frame mb-1">
                                 <img id="imagePreview" src="@Model.ImageUrl" alt="Current popup image" />
                             </div>
-                            <div class="text-muted small mb-2">Current image</div>
+                            <div class="text-muted small mb-2">Current image &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ImageUrl)</span></div>
                         }
                         else
                         {
@@ -101,7 +101,9 @@
                         }
                         <input asp-for="ImageFile" type="file" class="form-control"
                                accept=".jpg,.jpeg,.png,.webp,.gif" id="ImageFileInput"
-                               data-preview-target="#imagePreview" />
+                               data-preview-target="#imagePreview"
+                               data-file-size-target="#popupImgSize" />
+                        <span id="popupImgSize" class="upload-file-meta"></span>
                         <div class="text-muted small mt-2">
                             Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP, GIF &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current.
                         </div>
@@ -110,10 +112,10 @@
                         <label asp-for="MobileImageFile" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.MobileImageFile)</label>
                         @if (!string.IsNullOrEmpty(Model.MobileImageUrl))
                         {
-                            <div class="mb-2">
+                            <div class="mb-1">
                                 <img src="@Model.MobileImageUrl" alt="Current mobile" class="img-thumbnail" style="max-height:80px" />
-                                <div class="text-muted small">Current mobile image</div>
                             </div>
+                            <div class="text-muted small mb-2">Current mobile &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.MobileImageUrl)</span></div>
                         }
                         else
                         {
@@ -123,7 +125,9 @@
                         }
                         <input asp-for="MobileImageFile" type="file" class="form-control"
                                accept=".jpg,.jpeg,.png,.webp,.gif" id="MobileImageFileInput"
-                               data-preview-target="#mobilePreview" />
+                               data-preview-target="#mobilePreview"
+                               data-file-size-target="#popupMobileSize" />
+                        <span id="popupMobileSize" class="upload-file-meta"></span>
                         <div class="text-muted small mt-2">
                             Recommended: 600 × 900 px (portrait) &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current.
                         </div>

@@ -56,6 +56,24 @@ public class Product
 
     public bool IsActive { get; set; } = true;
 
+    // ── YouTube Video ────────────────────────────────────────────────────────
+    [MaxLength(500)]
+    public string? YoutubeVideoUrl { get; set; }
+
+    [MaxLength(200)]
+    public string? YoutubeVideoTitleTH { get; set; }
+
+    [MaxLength(200)]
+    public string? YoutubeVideoTitleEN { get; set; }
+
+    [MaxLength(1000)]
+    public string? YoutubeVideoDescriptionTH { get; set; }
+
+    [MaxLength(1000)]
+    public string? YoutubeVideoDescriptionEN { get; set; }
+
+    public bool ShowYoutubeVideo { get; set; } = false;
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

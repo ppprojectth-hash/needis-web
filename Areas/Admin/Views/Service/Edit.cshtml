@@ -48,19 +48,23 @@
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ShortDescriptionEN" class="form-label fw-medium">Short Description EN</label>
-                    <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 2, Language = "en" }' />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ShortDescriptionTH" class="form-label fw-medium">Short Description TH</label>
-                    <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 2, Language = "th" }' />
                 </div>
                 <div class="col-12">
                     <label asp-for="FullDescriptionEN" class="form-label fw-medium">Full Description EN</label>
-                    <textarea asp-for="FullDescriptionEN" class="form-control" rows="4"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "FullDescriptionEN", Value = Model.FullDescriptionEN, Rows = 4, Language = "en" }' />
                 </div>
                 <div class="col-12">
                     <label asp-for="FullDescriptionTH" class="form-label fw-medium">Full Description TH</label>
-                    <textarea asp-for="FullDescriptionTH" class="form-control" rows="4"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "FullDescriptionTH", Value = Model.FullDescriptionTH, Rows = 4, Language = "th" }' />
                 </div>
             </div>
 
@@ -90,11 +94,14 @@
                     <label asp-for="CoverImageFile" class="form-label fw-medium">Cover Image</label>
                     @if (!string.IsNullOrEmpty(Model.ExistingCoverImageUrl))
                     {
-                        <div class="mb-2">
+                        <div class="mb-1">
                             <img src="@Model.ExistingCoverImageUrl" alt="cover" class="img-thumbnail" style="max-height:80px" />
                         </div>
+                        <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingCoverImageUrl)</span></div>
                     }
-                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-file-size-target="#svcCoverSize" />
+                    <span id="svcCoverSize" class="upload-file-meta"></span>
                     <span asp-validation-for="CoverImageFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current.</div>
                 </div>
@@ -102,11 +109,14 @@
                     <label asp-for="BannerImageFile" class="form-label fw-medium">Banner Image</label>
                     @if (!string.IsNullOrEmpty(Model.ExistingBannerImageUrl))
                     {
-                        <div class="mb-2">
+                        <div class="mb-1">
                             <img src="@Model.ExistingBannerImageUrl" alt="banner" class="img-thumbnail" style="max-height:80px" />
                         </div>
+                        <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingBannerImageUrl)</span></div>
                     }
-                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-file-size-target="#svcBannerSize" />
+                    <span id="svcBannerSize" class="upload-file-meta"></span>
                     <span asp-validation-for="BannerImageFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1920 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current.</div>
                 </div>
@@ -114,11 +124,14 @@
                     <label asp-for="IconFile" class="form-label fw-medium">Icon Image</label>
                     @if (!string.IsNullOrEmpty(Model.ExistingIconUrl))
                     {
-                        <div class="mb-2">
+                        <div class="mb-1">
                             <img src="@Model.ExistingIconUrl" alt="icon" class="img-thumbnail" style="max-height:80px" />
                         </div>
+                        <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingIconUrl)</span></div>
                     }
-                    <input asp-for="IconFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <input asp-for="IconFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-file-size-target="#svcIconSize" />
+                    <span id="svcIconSize" class="upload-file-meta"></span>
                     <span asp-validation-for="IconFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">PNG, SVG &nbsp;·&nbsp; Max 1 MB &nbsp;·&nbsp; Leave empty to keep current.</div>
                 </div>

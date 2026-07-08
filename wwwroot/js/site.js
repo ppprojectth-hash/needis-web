@@ -38,6 +38,23 @@
     });
 })();
 
+// Selected-file size display: wire <input type="file" data-file-size-target="#someSpan"> to a <span>.
+(function () {
+    function formatBytes(bytes) {
+        if (bytes < 1024)           return bytes + ' B';
+        if (bytes < 1024 * 1024)   return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+    }
+    document.querySelectorAll('input[type="file"][data-file-size-target]').forEach(function (input) {
+        var target = document.querySelector(input.getAttribute('data-file-size-target'));
+        if (!target) return;
+        input.addEventListener('change', function () {
+            var file = this.files && this.files[0];
+            target.textContent = file ? ('Selected: ' + formatBytes(file.size)) : '';
+        });
+    });
+})();
+
 // Navbar elevated shadow when user has scrolled past the top.
 (function () {
     var navbar = document.querySelector('.site-navbar');

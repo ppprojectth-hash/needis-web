@@ -47,11 +47,13 @@
                 </div>
                 <div class="col-12">
                     <label asp-for="DescriptionEN" class="form-label fw-medium">Description EN</label>
-                    <textarea asp-for="DescriptionEN" class="form-control" rows="3"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "DescriptionEN", Value = Model.DescriptionEN, Rows = 3, Language = "en" }' />
                 </div>
                 <div class="col-12">
                     <label asp-for="DescriptionTH" class="form-label fw-medium">Description TH</label>
-                    <textarea asp-for="DescriptionTH" class="form-control" rows="3"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "DescriptionTH", Value = Model.DescriptionTH, Rows = 3, Language = "th" }' />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ImageFile" class="form-label fw-medium">Image</label>

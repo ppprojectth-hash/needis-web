@@ -49,19 +49,23 @@
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ShortDescriptionEN" class="form-label fw-medium">Short Description EN</label>
-                    <textarea asp-for="ShortDescriptionEN" class="form-control" rows="2"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 2, Language = "en" }' />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="ShortDescriptionTH" class="form-label fw-medium">Short Description TH</label>
-                    <textarea asp-for="ShortDescriptionTH" class="form-control" rows="2"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 2, Language = "th" }' />
                 </div>
                 <div class="col-12">
                     <label asp-for="FullDescriptionEN" class="form-label fw-medium">Full Description EN</label>
-                    <textarea asp-for="FullDescriptionEN" class="form-control" rows="4"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "FullDescriptionEN", Value = Model.FullDescriptionEN, Rows = 4, Language = "en" }' />
                 </div>
                 <div class="col-12">
                     <label asp-for="FullDescriptionTH" class="form-label fw-medium">Full Description TH</label>
-                    <textarea asp-for="FullDescriptionTH" class="form-control" rows="4"></textarea>
+                    <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
+                        FieldName = "FullDescriptionTH", Value = Model.FullDescriptionTH, Rows = 4, Language = "th" }' />
                 </div>
             </div>
 

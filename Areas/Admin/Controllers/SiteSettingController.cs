@@ -52,11 +52,18 @@ public class SiteSettingController : Controller
         setting.ContactEmail   = vm.Email;
         setting.AddressTH      = vm.AddressTH;
         setting.AddressEN      = vm.AddressEN;
-        setting.FacebookUrl    = vm.FacebookUrl;
-        setting.LineUrl        = vm.LineUrl;
-        setting.LinkedInUrl    = vm.LinkedInUrl;
-        setting.IsActive       = vm.IsActive;
-        setting.UpdatedAt      = DateTime.UtcNow;
+        setting.FacebookUrl         = vm.FacebookUrl;
+        setting.LineUrl             = vm.LineUrl;
+        setting.LinkedInUrl         = vm.LinkedInUrl;
+        setting.ShowMapOnAboutPage  = vm.ShowMapOnAboutPage;
+        setting.GoogleMapUrl        = string.IsNullOrWhiteSpace(vm.GoogleMapUrl)  ? null : vm.GoogleMapUrl.Trim();
+        setting.GoogleMapEmbedUrl   = string.IsNullOrWhiteSpace(vm.GoogleMapEmbedUrl) ? null : vm.GoogleMapEmbedUrl.Trim();
+        setting.MapTitleTH          = string.IsNullOrWhiteSpace(vm.MapTitleTH)    ? null : vm.MapTitleTH.Trim();
+        setting.MapTitleEN          = string.IsNullOrWhiteSpace(vm.MapTitleEN)    ? null : vm.MapTitleEN.Trim();
+        setting.MapDescriptionTH    = string.IsNullOrWhiteSpace(vm.MapDescriptionTH) ? null : vm.MapDescriptionTH.Trim();
+        setting.MapDescriptionEN    = string.IsNullOrWhiteSpace(vm.MapDescriptionEN) ? null : vm.MapDescriptionEN.Trim();
+        setting.IsActive            = vm.IsActive;
+        setting.UpdatedAt           = DateTime.UtcNow;
 
         // Handle logo upload
         if (vm.LogoFile is { Length: > 0 })
@@ -117,20 +124,27 @@ public class SiteSettingController : Controller
 
     private static SiteSettingViewModel MapToViewModel(SiteSetting s) => new()
     {
-        SiteSettingId = s.Id,
-        CompanyNameTH = s.CompanyNameTH,
-        CompanyNameEN = s.CompanyNameEN,
-        LogoUrl       = s.LogoPath,
-        FaviconUrl    = s.FaviconPath,
-        MainColor     = s.MainColor,
-        Phone         = s.ContactPhone,
-        Email         = s.ContactEmail,
-        AddressTH     = s.AddressTH,
-        AddressEN     = s.AddressEN,
-        FacebookUrl   = s.FacebookUrl,
-        LineUrl       = s.LineUrl,
-        LinkedInUrl   = s.LinkedInUrl,
-        IsActive      = s.IsActive,
+        SiteSettingId      = s.Id,
+        CompanyNameTH      = s.CompanyNameTH,
+        CompanyNameEN      = s.CompanyNameEN,
+        LogoUrl            = s.LogoPath,
+        FaviconUrl         = s.FaviconPath,
+        MainColor          = s.MainColor,
+        Phone              = s.ContactPhone,
+        Email              = s.ContactEmail,
+        AddressTH          = s.AddressTH,
+        AddressEN          = s.AddressEN,
+        FacebookUrl        = s.FacebookUrl,
+        LineUrl            = s.LineUrl,
+        LinkedInUrl        = s.LinkedInUrl,
+        ShowMapOnAboutPage = s.ShowMapOnAboutPage,
+        GoogleMapUrl       = s.GoogleMapUrl,
+        GoogleMapEmbedUrl  = s.GoogleMapEmbedUrl,
+        MapTitleTH         = s.MapTitleTH,
+        MapTitleEN         = s.MapTitleEN,
+        MapDescriptionTH   = s.MapDescriptionTH,
+        MapDescriptionEN   = s.MapDescriptionEN,
+        IsActive           = s.IsActive,
     };
 
     private async Task<(bool ok, string error, string path)> SaveUploadAsync(

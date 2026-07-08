@@ -48,6 +48,7 @@ public class AppDbContext : DbContext
     public DbSet<QuotationCartItem>      QuotationCartItems     => Set<QuotationCartItem>();
     public DbSet<MediaFile>              MediaFiles             => Set<MediaFile>();
     public DbSet<HomePopup>              HomePopups             => Set<HomePopup>();
+    public DbSet<SiteText>               SiteTexts              => Set<SiteText>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
@@ -94,6 +95,16 @@ public class AppDbContext : DbContext
              .OnDelete(DeleteBehavior.Cascade);
         });
 
+        modelBuilder.Entity<SiteSetting>(e =>
+        {
+            e.Property(x => x.GoogleMapUrl).HasMaxLength(1000);
+            e.Property(x => x.GoogleMapEmbedUrl).HasMaxLength(2000);
+            e.Property(x => x.MapTitleTH).HasMaxLength(200);
+            e.Property(x => x.MapTitleEN).HasMaxLength(200);
+            e.Property(x => x.MapDescriptionTH).HasMaxLength(500);
+            e.Property(x => x.MapDescriptionEN).HasMaxLength(500);
+        });
+
         modelBuilder.Entity<HomeBanner>(e =>
         {
             e.Property(x => x.MediaType).HasMaxLength(50);
@@ -116,6 +127,12 @@ public class AppDbContext : DbContext
         {
             e.HasIndex(x => x.Slug).IsUnique();
             e.Property(x => x.Price).HasPrecision(18, 2);
+            e.Property(x => x.YoutubeVideoUrl).HasMaxLength(500);
+            e.Property(x => x.YoutubeVideoTitleTH).HasMaxLength(200);
+            e.Property(x => x.YoutubeVideoTitleEN).HasMaxLength(200);
+            e.Property(x => x.YoutubeVideoDescriptionTH).HasMaxLength(1000);
+            e.Property(x => x.YoutubeVideoDescriptionEN).HasMaxLength(1000);
+            e.HasIndex(x => x.ShowYoutubeVideo);
             e.HasOne(x => x.Category)
              .WithMany(x => x.Products)
              .HasForeignKey(x => x.CategoryId)
@@ -224,6 +241,18 @@ public class AppDbContext : DbContext
             e.HasIndex(x => x.EmployeeCode);
             e.HasIndex(x => x.IsExpert);
             e.HasIndex(x => x.IsDelete);
+            e.HasIndex(x => x.Slug).IsUnique().HasFilter("\"Slug\" IS NOT NULL");
+            e.Property(x => x.Slug).HasMaxLength(250);
+            e.Property(x => x.MobilePhone).HasMaxLength(100);
+            e.Property(x => x.Email).HasMaxLength(250);
+            e.Property(x => x.BiographyTH).HasMaxLength(4000);
+            e.Property(x => x.BiographyEN).HasMaxLength(4000);
+            e.Property(x => x.AchievementTH).HasMaxLength(4000);
+            e.Property(x => x.AchievementEN).HasMaxLength(4000);
+            e.Property(x => x.PdfFileUrl).HasMaxLength(500);
+            e.Property(x => x.PdfFileName).HasMaxLength(250);
+            e.HasIndex(x => x.DisplayOrder);
+            e.HasIndex(x => x.ShowDetailPage);
         });
 
         modelBuilder.Entity<ProductSale>(e =>
@@ -496,6 +525,14 @@ public class AppDbContext : DbContext
             e.HasIndex(x => x.EndDateUtc);
             e.HasIndex(x => x.DisplayOrder);
             e.HasIndex(x => x.PopupType);
+        });
+
+        modelBuilder.Entity<SiteText>(e =>
+        {
+            e.HasIndex(x => x.Key).IsUnique();
+            e.HasIndex(x => x.Page);
+            e.HasIndex(x => x.IsActive);
+            e.HasIndex(x => x.IsDelete);
         });
 
         modelBuilder.Entity<UsageLog>(e =>
