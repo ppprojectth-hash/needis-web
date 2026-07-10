@@ -23,15 +23,17 @@
                 </div>
                 <div class="col-12">
                     <label asp-for="LogoFile" class="form-label fw-medium">Logo Image</label>
+                    <div id="brandLogoPreviewWrap" class="admin-upload-preview-frame mb-1 @(string.IsNullOrEmpty(Model.ExistingLogoUrl) ? "d-none" : "")" style="max-width:220px;aspect-ratio:2/1">
+                        <img id="brandLogoPreview" src="@(Model.ExistingLogoUrl ?? "#")" alt="Preview" class="admin-image-preview" />
+                    </div>
                     @if (!string.IsNullOrEmpty(Model.ExistingLogoUrl))
                     {
-                        <div class="mb-1">
-                            <img src="@Model.ExistingLogoUrl" alt="current logo" style="max-height:50px;max-width:120px;object-fit:contain" class="border rounded p-1" />
-                        </div>
                         <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingLogoUrl)</span></div>
                     }
-                    <input asp-for="LogoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg"
-                           data-file-size-target="#brandLogoSize" />
+                    <input asp-for="LogoFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#brandLogoPreview"
+                           data-preview-wrapper="#brandLogoPreviewWrap"
+                           data-size-target="#brandLogoSize" />
                     <span id="brandLogoSize" class="upload-file-meta"></span>
                     <span asp-validation-for="LogoFile" class="text-danger small"></span>
                 </div>

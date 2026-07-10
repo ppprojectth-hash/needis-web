@@ -11,10 +11,11 @@ namespace Needis.Web.Controllers;
 
 public class AboutController : Controller
 {
-    private readonly AppDbContext        _db;
-    private readonly ILanguageService    _lang;
-    private readonly IFeatureFlagService _features;
-    private readonly ISiteTextService    _siteText;
+    private readonly AppDbContext          _db;
+    private readonly ILanguageService      _lang;
+    private readonly IFeatureFlagService   _features;
+    private readonly ISiteTextService      _siteText;
+    private readonly ILogger<AboutController> _logger;
 
     private static readonly string[] TextKeys =
     [
@@ -25,12 +26,14 @@ public class AboutController : Controller
     ];
 
     public AboutController(
-        AppDbContext db, ILanguageService lang, IFeatureFlagService features, ISiteTextService siteText)
+        AppDbContext db, ILanguageService lang, IFeatureFlagService features, ISiteTextService siteText,
+        ILogger<AboutController> logger)
     {
         _db       = db;
         _lang     = lang;
         _features = features;
         _siteText = siteText;
+        _logger   = logger;
     }
 
     [HttpGet]
@@ -64,9 +67,16 @@ public class AboutController : Controller
             .OrderBy(b => b.DisplayOrder).ThenBy(b => b.BrandName)
             .ToListAsync();
 
+        // Public staff card visibility: Active + ShowPublic + within the optional
+        // StartDate/EndDate display window. IsExpert is intentionally NOT part of
+        // this filter — it only affects the "expert count" stat card below.
+        var today = DateTime.UtcNow.Date;
         var staff = await _db.StaffProfiles.AsNoTracking()
             .Where(s => s.IsActive && !s.IsDelete && s.ShowPublic)
-            .OrderBy(s => s.FullNameEN)
+            .Where(s => s.StartDate == null || s.StartDate.Value.Date <= today)
+            .Where(s => s.EndDate   == null || s.EndDate.Value.Date   >= today)
+            .OrderBy(s => s.DisplayOrder)
+            .ThenBy(s => s.FullNameEN)
             .Take(8)
             .ToListAsync();
 
@@ -136,7 +146,7 @@ public class AboutController : Controller
             Histories           = histories,
             StatCards           = displayStats,
             BrandPartners       = brandPartners,
-            PublicStaffProfiles = staff,
+            PublicStaffProfiles = staff ?? new List<Models.StaffProfile>(),
 
             ShowMapOnAboutPage  = siteSetting?.ShowMapOnAboutPage ?? false,
             GoogleMapUrl        = safeMapUrl,
@@ -150,6 +160,8 @@ public class AboutController : Controller
             ContactPhone        = siteSetting?.ContactPhone,
             ContactEmail        = siteSetting?.ContactEmail,
         };
+
+        _logger.LogInformation("About page staff profiles loaded: {Count}", vm.PublicStaffProfiles.Count);
 
         return View(vm);
     }

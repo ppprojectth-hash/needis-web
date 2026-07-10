@@ -57,20 +57,21 @@
                         <input asp-for="Slug" class="form-control font-monospace" placeholder="e.g. john-doe" />
                         <span asp-validation-for="Slug" class="text-danger small"></span>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
                         <input asp-for="DisplayOrder" type="number" class="form-control" />
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-medium">Start / End Date</label>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <input asp-for="StartDate" type="date" class="form-control" placeholder="Start" />
-                            </div>
-                            <div class="col-6">
-                                <input asp-for="EndDate" type="date" class="form-control" placeholder="End" />
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label asp-for="StartDate" class="form-label fw-medium">Start Date</label>
+                        <input asp-for="StartDate" type="date" class="form-control admin-date-input"
+                               asp-format="{0:yyyy-MM-dd}" />
+                        <span asp-validation-for="StartDate" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EndDate" class="form-label fw-medium">End Date</label>
+                        <input asp-for="EndDate" type="date" class="form-control admin-date-input"
+                               asp-format="{0:yyyy-MM-dd}" />
+                        <span asp-validation-for="EndDate" class="text-danger small"></span>
                     </div>
                     <div class="col-12 d-flex flex-wrap gap-4 pt-1">
                         <div class="form-check">
@@ -178,13 +179,17 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label asp-for="ImageFile" class="form-label fw-medium">Profile Photo</label>
-                        <div class="mb-2" id="photoPreviewWrap" style="display:none">
+                        <div class="mb-2 d-none" id="staffPhotoPreviewWrap">
                             <div class="staff-photo-frame" style="width:80px;height:80px">
                                 <img id="staffPhotoPreview" src="#" alt="Preview" />
                             </div>
                         </div>
-                        <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp"
-                               onchange="showPhotoPreview(this)" />
+                        <input asp-for="ImageFile" type="file" class="form-control js-image-preview-input"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               data-preview-target="#staffPhotoPreview"
+                               data-preview-wrapper="#staffPhotoPreviewWrap"
+                               data-size-target="#staffPhotoSize" />
+                        <span id="staffPhotoSize" class="upload-file-meta"></span>
                         <span asp-validation-for="ImageFile" class="text-danger small"></span>
                         <div class="text-muted small mt-1">Recommended: 800×800 px or 4:5 portrait · JPG, PNG, WebP · Max 2 MB</div>
                     </div>
@@ -192,7 +197,9 @@
                     {
                     <div class="col-md-6">
                         <label asp-for="PdfFile" class="form-label fw-medium">Profile PDF <span class="text-muted small fw-normal">(optional)</span></label>
-                        <input asp-for="PdfFile" type="file" class="form-control" accept=".pdf" />
+                        <input asp-for="PdfFile" type="file" class="form-control js-file-meta-input" accept=".pdf"
+                               data-size-target="#staffPdfSize" />
+                        <span id="staffPdfSize" class="upload-file-meta"></span>
                         <span asp-validation-for="PdfFile" class="text-danger small"></span>
                         <div class="text-muted small mt-1">PDF only · Max 20 MB · Shown as download button on detail page</div>
                     </div>
@@ -210,15 +217,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        function showPhotoPreview(input) {
-            const wrap = document.getElementById('photoPreviewWrap');
-            const img  = document.getElementById('staffPhotoPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { img.src = e.target.result; wrap.style.display = ''; };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
 }

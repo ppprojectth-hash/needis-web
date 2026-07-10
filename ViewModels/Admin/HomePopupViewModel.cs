@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Needis.Web.Helpers;
 
 namespace Needis.Web.ViewModels.Admin;
 
@@ -72,5 +73,14 @@ public class HomePopupViewModel : IValidatableObject
     {
         if (StartDate.HasValue && EndDate.HasValue && StartDate.Value > EndDate.Value)
             yield return new ValidationResult("Start Date must be on or before End Date.", [nameof(StartDate), nameof(EndDate)]);
+
+        // LinkUrl is intentionally optional — some popups are informational only —
+        // but if one is provided it must be a safe, navigable URL.
+        if (!string.IsNullOrWhiteSpace(LinkUrl) && !UrlSafetyHelper.IsSafeLinkUrl(LinkUrl))
+        {
+            yield return new ValidationResult(
+                "Link URL must start with http://, https://, or / (javascript:, data:, and similar links are not allowed).",
+                [nameof(LinkUrl)]);
+        }
     }
 }

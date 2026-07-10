@@ -23,7 +23,14 @@
                 </div>
                 <div class="col-12">
                     <label asp-for="LogoFile" class="form-label fw-medium">Logo Image</label>
-                    <input asp-for="LogoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div id="brandLogoPreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                        <img id="brandLogoPreview" src="#" alt="Preview" class="admin-image-preview" />
+                    </div>
+                    <input asp-for="LogoFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#brandLogoPreview"
+                           data-preview-wrapper="#brandLogoPreviewWrap"
+                           data-size-target="#brandLogoSize" />
+                    <span id="brandLogoSize" class="upload-file-meta"></span>
                     <span asp-validation-for="LogoFile" class="text-danger small"></span>
                 </div>
                 <div class="col-12">

@@ -1,5 +1,6 @@
 @model HomeIndexViewModel
 @using Needis.Web.ViewModels.Home
+@inject Needis.Web.Services.Media.IYoutubeUrlService YtSvc
 @{
     ViewData["Title"] = "Home";
     ViewData["FullWidth"] = true;
@@ -9,23 +10,6 @@
 
     // Default service icons by position
     string[] svcIcons = ["bi-tools", "bi-shield-check", "bi-graph-up-arrow", "bi-headset"];
-
-    // Helper: extract YouTube video ID from various URL formats
-    string GetYouTubeId(string? url)
-    {
-        if (string.IsNullOrEmpty(url)) return "";
-        var u = url.Trim();
-        // youtu.be/ID
-        var idx = u.IndexOf("youtu.be/", StringComparison.OrdinalIgnoreCase);
-        if (idx >= 0) { var id = u[(idx + 9)..]; var q = id.IndexOf('?'); return q >= 0 ? id[..q] : id; }
-        // youtube.com/watch?v=ID
-        idx = u.IndexOf("v=", StringComparison.OrdinalIgnoreCase);
-        if (idx >= 0) { var id = u[(idx + 2)..]; var q = id.IndexOf('&'); return q >= 0 ? id[..q] : id; }
-        // youtube.com/embed/ID
-        idx = u.IndexOf("/embed/", StringComparison.OrdinalIgnoreCase);
-        if (idx >= 0) { var id = u[(idx + 7)..]; var q = id.IndexOf('?'); return q >= 0 ? id[..q] : id; }
-        return "";
-    }
 }
 
 @* ══════════════════════════════════════════════════════════════
@@ -63,7 +47,7 @@
                     var bBtnUrl   = string.IsNullOrEmpty(b.ButtonUrl) ? "/Product" : b.ButtonUrl;
                     var textAlign = b.TextPosition switch { "center" => "text-center", "right" => "text-end", _ => "" };
                     var contentCol = mt == "YouTube" ? "col-lg-5" : "col-lg-7 col-xl-6";
-                    var ytId      = mt == "YouTube" ? GetYouTubeId(b.VideoUrl) : "";
+                    var ytId      = mt == "YouTube" ? (YtSvc.ExtractVideoId(b.VideoUrl) ?? "") : "";
                     var overlayClass = b.OverlayStyle switch
                     {
                         "light"    => "hero-overlay-light",

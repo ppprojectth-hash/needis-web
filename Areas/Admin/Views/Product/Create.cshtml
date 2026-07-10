@@ -277,12 +277,15 @@
 
                     <div class="mb-4">
                         <label class="form-label small fw-semibold">Product Image</label>
-                        <div id="imagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
-                            <img id="imagePreview" src="#" alt="Preview" />
+                        <div id="productImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                            <img id="productImagePreview" src="#" alt="Preview" class="admin-image-preview" />
                         </div>
-                        <input asp-for="MainImageFile" type="file" class="form-control"
+                        <input asp-for="MainImageFile" type="file" class="form-control js-image-preview-input"
                                accept=".jpg,.jpeg,.png,.webp" id="ImageFileInput"
-                               data-preview-target="#imagePreview" />
+                               data-preview-target="#productImagePreview"
+                               data-preview-wrapper="#productImagePreviewWrap"
+                               data-size-target="#productImgSize" />
+                        <span id="productImgSize" class="upload-file-meta"></span>
                         <span asp-validation-for="MainImageFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
                             Recommended: <strong>1200 × 900 px</strong> with white/transparent background<br />
@@ -292,8 +295,10 @@
 
                     <div>
                         <label class="form-label small fw-semibold">Brochure (PDF)</label>
-                        <input asp-for="BrochureFile" type="file" class="form-control"
-                               accept=".pdf" id="BrochureFileInput" />
+                        <input asp-for="BrochureFile" type="file" class="form-control js-file-meta-input"
+                               accept=".pdf" id="BrochureFileInput"
+                               data-size-target="#productPdfSize" />
+                        <span id="productPdfSize" class="upload-file-meta"></span>
                         <span asp-validation-for="BrochureFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">PDF only &nbsp;·&nbsp; Max 20 MB</div>
                     </div>
@@ -379,12 +384,6 @@
             .replace(/-{2,}/g, '-')
             .replace(/^-+|-+$/g, '');
         slugInput.value = val;
-    });
-
-    // Image preview (data-preview-target in site.js handles src; just show the frame)
-    document.getElementById('ImageFileInput')?.addEventListener('change', function () {
-        const wrap = document.getElementById('imagePreviewWrap');
-        if (wrap && this.files[0]) wrap.classList.remove('d-none');
     });
 </script>
 }

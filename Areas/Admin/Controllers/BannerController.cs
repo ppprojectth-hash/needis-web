@@ -52,6 +52,8 @@ public class BannerController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
+        var mediaType = string.IsNullOrWhiteSpace(vm.MediaType) ? "Image" : vm.MediaType.Trim();
+
         var banner = new HomeBanner
         {
             TitleTH             = vm.TitleTH      ?? string.Empty,
@@ -61,8 +63,10 @@ public class BannerController : Controller
             ButtonTextTH        = vm.ButtonTextTH,
             ButtonTextEN        = vm.ButtonTextEN,
             ButtonUrl           = vm.ButtonUrl,
-            MediaType           = vm.MediaType,
-            VideoUrl            = vm.VideoUrl,
+            MediaType           = mediaType,
+            // The DB has a single VideoUrl column shared by the Video and YouTube
+            // media types; which ViewModel field feeds it depends on MediaType.
+            VideoUrl            = mediaType == "YouTube" ? vm.YoutubeUrl?.Trim() : vm.VideoUrl?.Trim(),
             IsAutoplay          = vm.IsAutoplay,
             IsMuted             = vm.IsMuted,
             IsLoop              = vm.IsLoop,
@@ -78,36 +82,41 @@ public class BannerController : Controller
             UpdatedAt           = DateTime.UtcNow,
         };
 
-        // Image upload
-        if (vm.ImageFile is { Length: > 0 })
+        // A stale file selection left in a hidden Image/Video tab must never attach
+        // itself to a YouTube banner, so file uploads are skipped entirely for that type.
+        if (mediaType != "YouTube")
         {
-            var (ok, err, path) = await SaveImageAsync(vm.ImageFile);
-            if (!ok) { ModelState.AddModelError(nameof(vm.ImageFile), err); return View(vm); }
-            banner.ImagePath = path;
-        }
+            // Image upload
+            if (vm.ImageFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveImageAsync(vm.ImageFile);
+                if (!ok) { ModelState.AddModelError(nameof(vm.ImageFile), err); return View(vm); }
+                banner.ImagePath = path;
+            }
 
-        // Mobile image upload
-        if (vm.MobileImageFile is { Length: > 0 })
-        {
-            var (ok, err, path) = await SaveMobileImageAsync(vm.MobileImageFile);
-            if (!ok) { ModelState.AddModelError(nameof(vm.MobileImageFile), err); return View(vm); }
-            banner.MobileImageUrl = path;
-        }
+            // Mobile image upload
+            if (vm.MobileImageFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveMobileImageAsync(vm.MobileImageFile);
+                if (!ok) { ModelState.AddModelError(nameof(vm.MobileImageFile), err); return View(vm); }
+                banner.MobileImageUrl = path;
+            }
 
-        // Video file upload
-        if (vm.VideoFile is { Length: > 0 })
-        {
-            var (ok, err, path) = await SaveVideoAsync(vm.VideoFile);
-            if (!ok) { ModelState.AddModelError(nameof(vm.VideoFile), err); return View(vm); }
-            banner.VideoFileUrl = path;
-        }
+            // Video file upload
+            if (vm.VideoFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveVideoAsync(vm.VideoFile);
+                if (!ok) { ModelState.AddModelError(nameof(vm.VideoFile), err); return View(vm); }
+                banner.VideoFileUrl = path;
+            }
 
-        // Mobile video file upload
-        if (vm.MobileVideoFile is { Length: > 0 })
-        {
-            var (ok, err, path) = await SaveVideoAsync(vm.MobileVideoFile, "mobile");
-            if (!ok) { ModelState.AddModelError(nameof(vm.MobileVideoFile), err); return View(vm); }
-            banner.MobileVideoUrl = path;
+            // Mobile video file upload
+            if (vm.MobileVideoFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveVideoAsync(vm.MobileVideoFile, "mobile");
+                if (!ok) { ModelState.AddModelError(nameof(vm.MobileVideoFile), err); return View(vm); }
+                banner.MobileVideoUrl = path;
+            }
         }
 
         _db.HomeBanners.Add(banner);
@@ -138,6 +147,8 @@ public class BannerController : Controller
         var banner = await _db.HomeBanners.FindAsync(id);
         if (banner is null) return NotFound();
 
+        var mediaType = string.IsNullOrWhiteSpace(vm.MediaType) ? "Image" : vm.MediaType.Trim();
+
         banner.TitleTH              = vm.TitleTH      ?? string.Empty;
         banner.TitleEN              = vm.TitleEN       ?? string.Empty;
         banner.SubtitleTH           = vm.SubtitleTH;
@@ -145,8 +156,8 @@ public class BannerController : Controller
         banner.ButtonTextTH         = vm.ButtonTextTH;
         banner.ButtonTextEN         = vm.ButtonTextEN;
         banner.ButtonUrl            = vm.ButtonUrl;
-        banner.MediaType            = vm.MediaType;
-        banner.VideoUrl             = vm.VideoUrl;
+        banner.MediaType            = mediaType;
+        banner.VideoUrl             = mediaType == "YouTube" ? vm.YoutubeUrl?.Trim() : vm.VideoUrl?.Trim();
         banner.IsAutoplay           = vm.IsAutoplay;
         banner.IsMuted              = vm.IsMuted;
         banner.IsLoop               = vm.IsLoop;
@@ -160,36 +171,41 @@ public class BannerController : Controller
         banner.IsActive             = vm.IsActive;
         banner.UpdatedAt            = DateTime.UtcNow;
 
-        // Image upload
-        if (vm.ImageFile is { Length: > 0 })
+        // A stale file selection left in a hidden Image/Video tab must never attach
+        // itself to a YouTube banner, so file uploads are skipped entirely for that type.
+        if (mediaType != "YouTube")
         {
-            var (ok, err, path) = await SaveImageAsync(vm.ImageFile);
-            if (!ok) { ModelState.AddModelError(nameof(vm.ImageFile), err); return View(vm); }
-            banner.ImagePath = path;
-        }
+            // Image upload
+            if (vm.ImageFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveImageAsync(vm.ImageFile);
+                if (!ok) { ModelState.AddModelError(nameof(vm.ImageFile), err); return View(vm); }
+                banner.ImagePath = path;
+            }
 
-        // Mobile image upload
-        if (vm.MobileImageFile is { Length: > 0 })
-        {
-            var (ok, err, path) = await SaveMobileImageAsync(vm.MobileImageFile);
-            if (!ok) { ModelState.AddModelError(nameof(vm.MobileImageFile), err); return View(vm); }
-            banner.MobileImageUrl = path;
-        }
+            // Mobile image upload
+            if (vm.MobileImageFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveMobileImageAsync(vm.MobileImageFile);
+                if (!ok) { ModelState.AddModelError(nameof(vm.MobileImageFile), err); return View(vm); }
+                banner.MobileImageUrl = path;
+            }
 
-        // Video file upload
-        if (vm.VideoFile is { Length: > 0 })
-        {
-            var (ok, err, path) = await SaveVideoAsync(vm.VideoFile);
-            if (!ok) { ModelState.AddModelError(nameof(vm.VideoFile), err); return View(vm); }
-            banner.VideoFileUrl = path;
-        }
+            // Video file upload
+            if (vm.VideoFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveVideoAsync(vm.VideoFile);
+                if (!ok) { ModelState.AddModelError(nameof(vm.VideoFile), err); return View(vm); }
+                banner.VideoFileUrl = path;
+            }
 
-        // Mobile video file upload
-        if (vm.MobileVideoFile is { Length: > 0 })
-        {
-            var (ok, err, path) = await SaveVideoAsync(vm.MobileVideoFile, "mobile");
-            if (!ok) { ModelState.AddModelError(nameof(vm.MobileVideoFile), err); return View(vm); }
-            banner.MobileVideoUrl = path;
+            // Mobile video file upload
+            if (vm.MobileVideoFile is { Length: > 0 })
+            {
+                var (ok, err, path) = await SaveVideoAsync(vm.MobileVideoFile, "mobile");
+                if (!ok) { ModelState.AddModelError(nameof(vm.MobileVideoFile), err); return View(vm); }
+                banner.MobileVideoUrl = path;
+            }
         }
 
         await _db.SaveChangesAsync();
@@ -278,7 +294,10 @@ public class BannerController : Controller
         ButtonUrl           = b.ButtonUrl,
         ImageUrl            = b.ImagePath,
         MediaType           = b.MediaType,
-        VideoUrl            = b.VideoUrl,
+        // The DB stores one VideoUrl column for both the Video and YouTube media
+        // types; split it back into the two form fields based on MediaType.
+        VideoUrl            = b.MediaType == "Video"   ? b.VideoUrl : null,
+        YoutubeUrl          = b.MediaType == "YouTube" ? b.VideoUrl : null,
         VideoFileUrl        = b.VideoFileUrl,
         MobileImageUrl      = b.MobileImageUrl,
         MobileVideoUrl      = b.MobileVideoUrl,

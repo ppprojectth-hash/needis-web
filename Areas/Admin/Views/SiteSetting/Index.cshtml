@@ -283,16 +283,20 @@
                         <label class="form-label small fw-semibold d-block">
                             Logo Image
                         </label>
+                        <div id="siteLogoPreviewWrap" class="logo-preview-frame mb-1 @(string.IsNullOrEmpty(Model.LogoUrl) ? "d-none" : "")">
+                            <img id="siteLogoPreview" src="@(Model.LogoUrl ?? "#")" alt="Preview" />
+                        </div>
                         @if (!string.IsNullOrEmpty(Model.LogoUrl))
                         {
-                            <div class="logo-preview-frame mb-1">
-                                <img src="@Model.LogoUrl" alt="Current Logo" />
-                            </div>
                             <div class="text-muted small mb-2">Current logo &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.LogoUrl)</span></div>
                         }
                         <label asp-for="LogoFile" class="form-label small fw-semibold d-none"></label>
-                        <input asp-for="LogoFile" type="file" class="form-control"
-                               accept=".jpg,.jpeg,.png,.webp,.svg" />
+                        <input asp-for="LogoFile" type="file" class="form-control js-image-preview-input"
+                               accept=".jpg,.jpeg,.png,.webp,.svg"
+                               data-preview-target="#siteLogoPreview"
+                               data-preview-wrapper="#siteLogoPreviewWrap"
+                               data-size-target="#siteLogoSize" />
+                        <span id="siteLogoSize" class="upload-file-meta"></span>
                         <span asp-validation-for="LogoFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-1">
                             Recommended: 250 × 80 px &nbsp;·&nbsp; JPG, PNG, WebP, SVG &nbsp;·&nbsp; Max 2 MB
@@ -304,17 +308,21 @@
                         <label class="form-label small fw-semibold d-block">
                             Favicon Image
                         </label>
+                        <div id="siteFaviconPreviewWrap" class="mb-1 p-2 border rounded-2 bg-white d-inline-block @(string.IsNullOrEmpty(Model.FaviconUrl) ? "d-none" : "")">
+                            <img id="siteFaviconPreview" src="@(Model.FaviconUrl ?? "#")" alt="Preview"
+                                 style="width:32px;height:32px;object-fit:contain" />
+                        </div>
                         @if (!string.IsNullOrEmpty(Model.FaviconUrl))
                         {
-                            <div class="mb-1 p-2 border rounded-2 bg-white d-inline-block">
-                                <img src="@Model.FaviconUrl" alt="Current Favicon"
-                                     style="width:32px;height:32px;object-fit:contain" />
-                            </div>
                             <div class="text-muted small mb-2">Current favicon &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.FaviconUrl)</span></div>
                         }
                         <label asp-for="FaviconFile" class="form-label small fw-semibold d-none"></label>
-                        <input asp-for="FaviconFile" type="file" class="form-control"
-                               accept=".jpg,.jpeg,.png,.webp,.ico" />
+                        <input asp-for="FaviconFile" type="file" class="form-control js-image-preview-input"
+                               accept=".jpg,.jpeg,.png,.webp,.ico"
+                               data-preview-target="#siteFaviconPreview"
+                               data-preview-wrapper="#siteFaviconPreviewWrap"
+                               data-size-target="#siteFaviconSize" />
+                        <span id="siteFaviconSize" class="upload-file-meta"></span>
                         <span asp-validation-for="FaviconFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-1">
                             Recommended: 64 × 64 px &nbsp;·&nbsp; PNG, ICO &nbsp;·&nbsp; Max 1 MB

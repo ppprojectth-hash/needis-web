@@ -1155,6 +1155,62 @@ body { margin-bottom: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans
 }
 
 /* ═══════════════════════════════════════════════
+   ADMIN TABLE — PREVIEW THUMBNAIL + INFO CELL
+   (used by Home Popup index; reusable elsewhere)
+═══════════════════════════════════════════════ */
+.home-popup-preview {
+    width: 88px;
+    max-width: 88px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+.popup-info-title {
+    font-weight: 700;
+    color: #111827;
+}
+
+.popup-info-subtitle {
+    color: #64748b;
+    font-size: .9rem;
+}
+
+.popup-info-meta {
+    color: #64748b;
+    font-size: .82rem;
+    margin-top: 4px;
+}
+
+.admin-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: .78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-badge-neutral {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.admin-badge-success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.admin-badge-muted {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ═══════════════════════════════════════════════
    ADMIN FORM HELPERS (unchanged)
 ═══════════════════════════════════════════════ */
 .form-floating > .form-control-plaintext::placeholder,
@@ -3542,6 +3598,35 @@ img {
     white-space: nowrap;
 }
 
+/* ── Generic <img> sizing for js-image-preview-input previews ── */
+.admin-image-preview {
+    max-width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #fff;
+}
+
+/* Alias of .admin-upload-preview-frame for new upload markup */
+.upload-preview-box {
+    min-height: 160px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+/* Ensures date inputs (e.g. Staff Profile Start/End Date) never shrink below a
+   readable width, even if a parent column collapses on narrow viewports. */
+.admin-date-input {
+    min-width: 170px;
+    width: 100%;
+}
+
 /* ═══════════════════════════════════════════════
    HOME POPUP / ANNOUNCEMENT MODAL
 ═══════════════════════════════════════════════ */
@@ -3616,14 +3701,31 @@ img {
     top: .75rem;
     right: .75rem;
     z-index: 10;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 999px;
     background: rgba(0,0,0,.5);
-    border-radius: 50%;
-    padding: .4rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    line-height: 1;
+    padding: 0;
     opacity: .85;
+    cursor: pointer;
     transition: opacity .2s;
 }
 
 .home-popup-close:hover { opacity: 1; }
+
+.home-popup-close span,
+.home-popup-close i {
+    display: block;
+    color: inherit;
+    line-height: 1;
+}
 
 @media (max-width: 575.98px) {
     .home-popup-dialog { margin: .5rem; max-width: 100%; }

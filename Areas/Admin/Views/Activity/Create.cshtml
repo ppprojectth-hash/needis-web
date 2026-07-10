@@ -81,13 +81,27 @@
 
                 <div class="col-md-6">
                     <label asp-for="CoverImageFile" class="form-label fw-medium">Cover Image</label>
-                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div id="activityCoverImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                        <img id="activityCoverImagePreview" src="#" alt="Preview" class="admin-image-preview" />
+                    </div>
+                    <input asp-for="CoverImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#activityCoverImagePreview"
+                           data-preview-wrapper="#activityCoverImagePreviewWrap"
+                           data-size-target="#actCoverSize" />
+                    <span id="actCoverSize" class="upload-file-meta"></span>
                     <span asp-validation-for="CoverImageFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB</div>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="BannerImageFile" class="form-label fw-medium">Banner Image</label>
-                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div id="activityBannerImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                        <img id="activityBannerImagePreview" src="#" alt="Preview" class="admin-image-preview" />
+                    </div>
+                    <input asp-for="BannerImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#activityBannerImagePreview"
+                           data-preview-wrapper="#activityBannerImagePreviewWrap"
+                           data-size-target="#actBannerSize" />
+                    <span id="actBannerSize" class="upload-file-meta"></span>
                     <span asp-validation-for="BannerImageFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1920 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB</div>
                 </div>

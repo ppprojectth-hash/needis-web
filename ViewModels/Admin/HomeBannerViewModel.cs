@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Needis.Web.Services.Media;
 
 namespace Needis.Web.ViewModels.Admin;
 
@@ -54,7 +55,7 @@ public class HomeBannerViewModel : IValidatableObject
     [Display(Name = "Mobile Image File")]
     public IFormFile? MobileImageFile { get; set; }
 
-    // Video
+    // Video (direct .mp4/.webm/.mov link)
     [Display(Name = "Video URL")]
     [MaxLength(500)]
     public string? VideoUrl { get; set; }
@@ -63,6 +64,12 @@ public class HomeBannerViewModel : IValidatableObject
 
     [Display(Name = "Video File (.mp4, .webm, .mov — max 50 MB)")]
     public IFormFile? VideoFile { get; set; }
+
+    // YouTube (separate property from VideoUrl so the Video-tab and YouTube-tab
+    // inputs never share a form field name and clobber each other on submit)
+    [Display(Name = "YouTube URL")]
+    [MaxLength(500)]
+    public string? YoutubeUrl { get; set; }
 
     [Display(Name = "Mobile Video URL")]
     [MaxLength(500)]
@@ -125,12 +132,22 @@ public class HomeBannerViewModel : IValidatableObject
                 [nameof(ImageFile)]);
         }
 
-        // YouTube type: needs video URL
-        if (MediaType == "YouTube" && string.IsNullOrEmpty(VideoUrl))
+        // YouTube type: needs a valid YouTube URL
+        if (MediaType == "YouTube")
         {
-            yield return new ValidationResult(
-                "YouTube URL is required.",
-                [nameof(VideoUrl)]);
+            if (string.IsNullOrWhiteSpace(YoutubeUrl))
+            {
+                yield return new ValidationResult(
+                    "YouTube URL is required.",
+                    [nameof(YoutubeUrl)]);
+            }
+            else if (validationContext.GetService(typeof(IYoutubeUrlService)) is IYoutubeUrlService yt &&
+                     !yt.IsValidYoutubeUrl(YoutubeUrl))
+            {
+                yield return new ValidationResult(
+                    "Please enter a valid YouTube URL, e.g. https://www.youtube.com/watch?v=VIDEO_ID or https://youtu.be/VIDEO_ID.",
+                    [nameof(YoutubeUrl)]);
+            }
         }
 
         // Video type: needs file or URL

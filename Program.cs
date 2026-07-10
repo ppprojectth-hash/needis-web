@@ -66,6 +66,9 @@ builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 // File info (size display for admin uploads)
 builder.Services.AddScoped<Needis.Web.Services.Files.IFileInfoService, Needis.Web.Services.Files.FileInfoService>();
 
+// YouTube URL parsing (home banner YouTube media type)
+builder.Services.AddScoped<IYoutubeUrlService, YoutubeUrlService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

@@ -93,19 +93,40 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label asp-for="CoverImageFile" class="form-label fw-medium">Cover Image</label>
-                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div id="serviceCoverImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                        <img id="serviceCoverImagePreview" src="#" alt="Preview" class="admin-image-preview" />
+                    </div>
+                    <input asp-for="CoverImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#serviceCoverImagePreview"
+                           data-preview-wrapper="#serviceCoverImagePreviewWrap"
+                           data-size-target="#svcCoverSize" />
+                    <span id="svcCoverSize" class="upload-file-meta"></span>
                     <span asp-validation-for="CoverImageFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB</div>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="BannerImageFile" class="form-label fw-medium">Banner Image</label>
-                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div id="serviceBannerImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                        <img id="serviceBannerImagePreview" src="#" alt="Preview" class="admin-image-preview" />
+                    </div>
+                    <input asp-for="BannerImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#serviceBannerImagePreview"
+                           data-preview-wrapper="#serviceBannerImagePreviewWrap"
+                           data-size-target="#svcBannerSize" />
+                    <span id="svcBannerSize" class="upload-file-meta"></span>
                     <span asp-validation-for="BannerImageFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1920 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB</div>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="IconFile" class="form-label fw-medium">Icon Image</label>
-                    <input asp-for="IconFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg" />
+                    <div id="serviceIconImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                        <img id="serviceIconImagePreview" src="#" alt="Preview" class="admin-image-preview" />
+                    </div>
+                    <input asp-for="IconFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#serviceIconImagePreview"
+                           data-preview-wrapper="#serviceIconImagePreviewWrap"
+                           data-size-target="#svcIconSize" />
+                    <span id="svcIconSize" class="upload-file-meta"></span>
                     <span asp-validation-for="IconFile" class="text-danger small"></span>
                     <div class="text-muted small mt-2">PNG, SVG &nbsp;·&nbsp; Max 1 MB</div>
                 </div>

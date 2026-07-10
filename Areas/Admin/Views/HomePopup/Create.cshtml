@@ -23,7 +23,7 @@
     {
         <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
             <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
-            <div><div asp-validation-summary="ModelOnly"></div></div>
+            <div><div asp-validation-summary="All"></div></div>
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -81,12 +81,15 @@
                 <div class="card-body px-4 pb-4 pt-3">
                     <div class="mb-4">
                         <label asp-for="ImageFile" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.ImageFile) <span class="text-danger">*</span></label>
-                        <div id="imagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
-                            <img id="imagePreview" src="#" alt="Preview" />
+                        <div id="popupImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                            <img id="popupImagePreview" src="#" alt="Preview" class="admin-image-preview" />
                         </div>
-                        <input asp-for="ImageFile" type="file" class="form-control"
+                        <input asp-for="ImageFile" type="file" class="form-control js-image-preview-input"
                                accept=".jpg,.jpeg,.png,.webp,.gif" id="ImageFileInput"
-                               data-preview-target="#imagePreview" />
+                               data-preview-target="#popupImagePreview"
+                               data-preview-wrapper="#popupImagePreviewWrap"
+                               data-size-target="#popupImgSize" />
+                        <span id="popupImgSize" class="upload-file-meta"></span>
                         <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
                             Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP, GIF &nbsp;·&nbsp; Max 5 MB
@@ -94,12 +97,15 @@
                     </div>
                     <div>
                         <label asp-for="MobileImageFile" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.MobileImageFile)</label>
-                        <div id="mobilePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
-                            <img id="mobilePreview" src="#" alt="Preview" />
+                        <div id="popupMobileImagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
+                            <img id="popupMobileImagePreview" src="#" alt="Preview" class="admin-image-preview" />
                         </div>
-                        <input asp-for="MobileImageFile" type="file" class="form-control"
+                        <input asp-for="MobileImageFile" type="file" class="form-control js-image-preview-input"
                                accept=".jpg,.jpeg,.png,.webp,.gif" id="MobileImageFileInput"
-                               data-preview-target="#mobilePreview" />
+                               data-preview-target="#popupMobileImagePreview"
+                               data-preview-wrapper="#popupMobileImagePreviewWrap"
+                               data-size-target="#popupMobileSize" />
+                        <span id="popupMobileSize" class="upload-file-meta"></span>
                         <div class="text-muted small mt-2">
                             Recommended: 600 × 900 px (portrait) &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB
                         </div>
@@ -116,7 +122,11 @@
                     <div class="mb-3">
                         <label asp-for="LinkUrl" class="form-label small fw-semibold">@Html.DisplayNameFor(m => m.LinkUrl)</label>
                         <input asp-for="LinkUrl" class="form-control" placeholder="https://... or /products" />
-                        <div class="text-muted small mt-1">Leave empty to show image only (no clickable link).</div>
+                        <span asp-validation-for="LinkUrl" class="text-danger small d-block mt-1"></span>
+                        <div class="text-muted small mt-1">
+                            Leave empty to show image only (no clickable link). If Button Text is set but Link URL is
+                            empty, the button will not be shown on the public site.
+                        </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-sm-6">
@@ -224,15 +234,5 @@
 </form>
 
 @section Scripts {
-<script>
-    document.getElementById('ImageFileInput')?.addEventListener('change', function () {
-        const wrap = document.getElementById('imagePreviewWrap');
-        if (wrap && this.files[0]) wrap.classList.remove('d-none');
-    });
-    document.getElementById('MobileImageFileInput')?.addEventListener('change', function () {
-        const wrap = document.getElementById('mobilePreviewWrap');
-        if (wrap && this.files[0]) wrap.classList.remove('d-none');
-    });
-</script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

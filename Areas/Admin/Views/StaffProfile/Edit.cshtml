@@ -58,22 +58,21 @@
                         <span asp-validation-for="Slug" class="text-danger small"></span>
                         <div class="text-muted small mt-1">Public URL: <code>/About/Staff/@(Model.Slug ?? "slug")</code></div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label asp-for="DisplayOrder" class="form-label fw-medium">Display Order</label>
                         <input asp-for="DisplayOrder" type="number" class="form-control" />
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-medium">Start / End Date</label>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <input asp-for="StartDate" type="date" class="form-control"
-                                       value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
-                            </div>
-                            <div class="col-6">
-                                <input asp-for="EndDate" type="date" class="form-control"
-                                       value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")" />
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label asp-for="StartDate" class="form-label fw-medium">Start Date</label>
+                        <input asp-for="StartDate" type="date" class="form-control admin-date-input"
+                               value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
+                        <span asp-validation-for="StartDate" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EndDate" class="form-label fw-medium">End Date</label>
+                        <input asp-for="EndDate" type="date" class="form-control admin-date-input"
+                               value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")" />
+                        <span asp-validation-for="EndDate" class="text-danger small"></span>
                     </div>
                     <div class="col-12 d-flex flex-wrap gap-4 pt-1">
                         <div class="form-check">
@@ -177,26 +176,19 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label asp-for="ImageFile" class="form-label fw-medium">Profile Photo</label>
+                        <div class="mb-1 @(string.IsNullOrEmpty(Model.ExistingImageUrl) ? "d-none" : "")" id="staffPhotoPreviewWrap">
+                            <div class="staff-photo-frame" style="width:80px;height:80px">
+                                <img id="staffPhotoPreview" src="@(Model.ExistingImageUrl ?? "#")" alt="Preview" />
+                            </div>
+                        </div>
                         @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
                         {
-                            <div class="mb-1" id="photoPreviewWrap">
-                                <div class="staff-photo-frame" style="width:80px;height:80px">
-                                    <img id="staffPhotoPreview" src="@Model.ExistingImageUrl" alt="Current photo" />
-                                </div>
-                            </div>
                             <div class="text-muted small mb-2">Current photo &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingImageUrl)</span></div>
                         }
-                        else
-                        {
-                            <div class="mb-2" id="photoPreviewWrap" style="display:none">
-                                <div class="staff-photo-frame" style="width:80px;height:80px">
-                                    <img id="staffPhotoPreview" src="#" alt="Preview" />
-                                </div>
-                            </div>
-                        }
-                        <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp"
-                               onchange="showPhotoPreview(this)"
-                               data-file-size-target="#staffPhotoSize" />
+                        <input asp-for="ImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp"
+                               data-preview-target="#staffPhotoPreview"
+                               data-preview-wrapper="#staffPhotoPreviewWrap"
+                               data-size-target="#staffPhotoSize" />
                         <span asp-validation-for="ImageFile" class="text-danger small"></span>
                         <span id="staffPhotoSize" class="upload-file-meta"></span>
                         <div class="text-muted small mt-1">Leave blank to keep current photo · Recommended 800×800 px · JPG, PNG, WebP · Max 2 MB</div>
@@ -215,8 +207,8 @@
                             </div>
                             <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingPdfUrl)</span></div>
                         }
-                        <input asp-for="PdfFile" type="file" class="form-control" accept=".pdf"
-                               data-file-size-target="#staffPdfSize" />
+                        <input asp-for="PdfFile" type="file" class="form-control js-file-meta-input" accept=".pdf"
+                               data-size-target="#staffPdfSize" />
                         <span asp-validation-for="PdfFile" class="text-danger small"></span>
                         <span id="staffPdfSize" class="upload-file-meta"></span>
                         <div class="text-muted small mt-1">
@@ -239,15 +231,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        function showPhotoPreview(input) {
-            const wrap = document.getElementById('photoPreviewWrap');
-            const img  = document.getElementById('staffPhotoPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { img.src = e.target.result; wrap.style.display = ''; };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
 }

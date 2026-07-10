@@ -1,6 +1,20 @@
 @model IEnumerable<Needis.Web.Models.HomePopup>
 @{
     ViewData["Title"] = "Home Popups / Announcements";
+
+    string TruncateUrl(string? url, int max = 40)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return "";
+        var display = System.Text.RegularExpressions.Regex.Replace(url.Trim(), @"^https?://(www\.)?", "");
+        return display.Length > max ? display[..max] + "…" : display;
+    }
+
+    string Truncate(string? text, int max = 70)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        var t = text.Trim();
+        return t.Length > max ? t[..max] + "…" : t;
+    }
 }
 
 @if (TempData["Success"] is string successMsg)
@@ -29,26 +43,26 @@
     {
         <div class="card-body text-center text-muted py-5">
             <i class="bi bi-megaphone fs-1 d-block mb-3" style="color:#c5cde8"></i>
-            <p class="mb-2">No popups yet.</p>
+            <p class="fw-semibold mb-1">No popups yet</p>
+            <p class="small mb-3">Create your first announcement popup for the home page.</p>
             <a asp-action="Create" class="btn btn-sm btn-primary" style="background:#2d4199;border-color:#2d4199">
-                <i class="bi bi-plus-lg me-1"></i>Create First Popup
+                <i class="bi bi-plus-lg me-1"></i>Add Popup
             </a>
         </div>
     }
     else
     {
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 admin-table">
                 <thead style="background:#f8f9fc">
                     <tr class="text-muted small fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.04em">
-                        <th class="ps-4 py-3" style="width:90px">Preview</th>
-                        <th class="py-3">Title</th>
-                        <th class="py-3" style="width:120px">Type</th>
-                        <th class="py-3" style="width:180px">Date Range</th>
-                        <th class="py-3 text-center" style="width:80px">Order</th>
-                        <th class="py-3 text-center" style="width:90px">Once/Day</th>
-                        <th class="py-3 text-center" style="width:100px">Status</th>
-                        <th class="py-3 text-end pe-4" style="width:120px">Actions</th>
+                        <th class="ps-4 py-3" style="width:104px">Preview</th>
+                        <th class="py-3">Popup Info</th>
+                        <th class="py-3" style="width:130px">Type</th>
+                        <th class="py-3" style="width:180px">Display Period</th>
+                        <th class="py-3" style="width:140px">Frequency</th>
+                        <th class="py-3" style="width:100px">Status</th>
+                        <th class="py-3 text-end pe-4 actions-cell">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,65 +75,78 @@
                         var isExpired   = p.EndDateUtc.HasValue   && p.EndDateUtc   < now;
                         string statusBadge;
                         string statusClass;
-                        if (!p.IsActive)          { statusBadge = "Inactive";  statusClass = "text-bg-secondary"; }
-                        else if (isExpired)        { statusBadge = "Expired";   statusClass = "text-bg-warning"; }
-                        else if (isScheduled)      { statusBadge = "Scheduled"; statusClass = "text-bg-info"; }
-                        else                       { statusBadge = "Active";    statusClass = "text-bg-success"; }
+                        if (!p.IsActive)      { statusBadge = "Inactive";  statusClass = "text-bg-secondary"; }
+                        else if (isExpired)   { statusBadge = "Expired";   statusClass = "text-bg-warning"; }
+                        else if (isScheduled) { statusBadge = "Scheduled"; statusClass = "text-bg-info"; }
+                        else                  { statusBadge = "Active";    statusClass = "text-bg-success"; }
+
+                        var typeLabel = string.IsNullOrWhiteSpace(p.PopupType) ? "General" : p.PopupType;
+
+                        string displayPeriod;
+                        if (p.StartDateUtc.HasValue && p.EndDateUtc.HasValue)
+                            displayPeriod = $"{p.StartDateUtc.Value.ToLocalTime():dd MMM yyyy} → {p.EndDateUtc.Value.ToLocalTime():dd MMM yyyy}";
+                        else if (p.StartDateUtc.HasValue)
+                            displayPeriod = $"From {p.StartDateUtc.Value.ToLocalTime():dd MMM yyyy}";
+                        else if (p.EndDateUtc.HasValue)
+                            displayPeriod = $"Until {p.EndDateUtc.Value.ToLocalTime():dd MMM yyyy}";
+                        else
+                            displayPeriod = "Always";
+
+                        string frequency = p.ShowOncePerDay     ? "Once per day"
+                                          : p.ShowOncePerSession ? "Once per session"
+                                          : "Every visit";
+
+                        var buttonText = string.IsNullOrWhiteSpace(p.ButtonTextEN) ? p.ButtonTextTH : p.ButtonTextEN;
+                        var descPreview = string.IsNullOrWhiteSpace(p.DescriptionEN) ? p.DescriptionTH : p.DescriptionEN;
 
                         <tr>
                             <td class="ps-4 py-2">
                                 @if (!string.IsNullOrEmpty(p.ImageUrl))
                                 {
-                                    <div class="rounded-2 overflow-hidden" style="width:72px;height:48px;background:#f8fafc;border:1px solid #eee">
-                                        <img src="@p.ImageUrl" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top" />
-                                    </div>
+                                    <img src="@p.ImageUrl" alt="" class="home-popup-preview" />
                                 }
                                 else
                                 {
-                                    <div class="rounded-2 d-flex align-items-center justify-content-center bg-light" style="width:72px;height:48px;color:#aaa">
+                                    <div class="home-popup-preview d-flex flex-column align-items-center justify-content-center text-muted">
                                         <i class="bi bi-image"></i>
+                                        <span style="font-size:.65rem">No image</span>
                                     </div>
                                 }
                             </td>
                             <td class="py-2">
-                                <div class="fw-semibold small">@(p.TitleEN)</div>
+                                <div class="popup-info-title">@p.TitleEN</div>
                                 @if (!string.IsNullOrEmpty(p.TitleTH))
                                 {
-                                    <div class="text-muted small">@p.TitleTH</div>
+                                    <div class="popup-info-subtitle">@p.TitleTH</div>
+                                }
+                                @if (!string.IsNullOrEmpty(buttonText) || !string.IsNullOrEmpty(p.LinkUrl))
+                                {
+                                    <div class="popup-info-meta">
+                                        @if (!string.IsNullOrEmpty(buttonText))
+                                        {
+                                            <div><i class="bi bi-hand-index-thumb me-1"></i>Button: @buttonText</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(p.LinkUrl))
+                                        {
+                                            <div class="text-truncate" style="max-width:320px">
+                                                <i class="bi bi-link-45deg me-1"></i>Link: @TruncateUrl(p.LinkUrl)
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(descPreview))
+                                {
+                                    <div class="popup-info-meta text-truncate" style="max-width:360px">@Truncate(descPreview)</div>
                                 }
                             </td>
-                            <td class="py-2 small">
-                                @if (!string.IsNullOrEmpty(p.PopupType))
-                                {
-                                    <span class="badge bg-light text-dark border">@p.PopupType</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">—</span>
-                                }
+                            <td class="py-2">
+                                <span class="admin-badge admin-badge-neutral">@typeLabel</span>
                             </td>
-                            <td class="py-2 small text-muted">
-                                @if (p.StartDateUtc.HasValue || p.EndDateUtc.HasValue)
-                                {
-                                    <div>@(p.StartDateUtc?.ToString("dd MMM yyyy") ?? "—")</div>
-                                    <div>→ @(p.EndDateUtc?.ToString("dd MMM yyyy") ?? "always")</div>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Always</span>
-                                }
+                            <td class="py-2 small text-muted">@displayPeriod</td>
+                            <td class="py-2">
+                                <span class="admin-badge admin-badge-muted">@frequency</span>
                             </td>
-                            <td class="py-2 text-center">
-                                @if (p.ShowOncePerDay)
-                                {
-                                    <i class="bi bi-check-circle-fill text-success"></i>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-x-circle text-muted"></i>
-                                }
-                            </td>
-                            <td class="py-2 text-center">
+                            <td class="py-2">
                                 <span class="badge rounded-pill @statusClass">@statusBadge</span>
                             </td>
                             <td class="actions-cell pe-4">

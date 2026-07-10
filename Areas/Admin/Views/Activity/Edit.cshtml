@@ -82,29 +82,33 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Cover Image</label>
+                    <div id="activityCoverImagePreviewWrap" class="admin-upload-preview-frame mb-1 @(string.IsNullOrEmpty(Model.ExistingCoverImageUrl) ? "d-none" : "")">
+                        <img id="activityCoverImagePreview" src="@(Model.ExistingCoverImageUrl ?? "#")" alt="Preview" class="admin-image-preview" />
+                    </div>
                     @if (!string.IsNullOrEmpty(Model.ExistingCoverImageUrl))
                     {
-                        <div class="mb-1">
-                            <img src="@Model.ExistingCoverImageUrl" alt="Cover" class="img-thumbnail" style="max-height:100px" />
-                        </div>
                         <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingCoverImageUrl)</span></div>
                     }
-                    <input asp-for="CoverImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg"
-                           data-file-size-target="#actCoverSize" />
+                    <input asp-for="CoverImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#activityCoverImagePreview"
+                           data-preview-wrapper="#activityCoverImagePreviewWrap"
+                           data-size-target="#actCoverSize" />
                     <span id="actCoverSize" class="upload-file-meta"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1200 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current.</div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Banner Image</label>
+                    <div id="activityBannerImagePreviewWrap" class="admin-upload-preview-frame mb-1 @(string.IsNullOrEmpty(Model.ExistingBannerImageUrl) ? "d-none" : "")">
+                        <img id="activityBannerImagePreview" src="@(Model.ExistingBannerImageUrl ?? "#")" alt="Preview" class="admin-image-preview" />
+                    </div>
                     @if (!string.IsNullOrEmpty(Model.ExistingBannerImageUrl))
                     {
-                        <div class="mb-1">
-                            <img src="@Model.ExistingBannerImageUrl" alt="Banner" class="img-thumbnail" style="max-height:100px" />
-                        </div>
                         <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.ExistingBannerImageUrl)</span></div>
                     }
-                    <input asp-for="BannerImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.svg"
-                           data-file-size-target="#actBannerSize" />
+                    <input asp-for="BannerImageFile" type="file" class="form-control js-image-preview-input" accept=".jpg,.jpeg,.png,.webp,.svg"
+                           data-preview-target="#activityBannerImagePreview"
+                           data-preview-wrapper="#activityBannerImagePreviewWrap"
+                           data-size-target="#actBannerSize" />
                     <span id="actBannerSize" class="upload-file-meta"></span>
                     <div class="text-muted small mt-2">Recommended: <strong>1920 × 800 px</strong> &nbsp;·&nbsp; JPG, PNG, WebP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Leave empty to keep current.</div>
                 </div>

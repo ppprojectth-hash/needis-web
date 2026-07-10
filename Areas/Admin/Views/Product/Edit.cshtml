@@ -291,23 +291,18 @@
 
                     <div class="mb-4">
                         <label class="form-label small fw-semibold">Product Image</label>
+                        <div id="productImagePreviewWrap" class="admin-upload-preview-frame mb-1 @(string.IsNullOrEmpty(Model.MainImageUrl) ? "d-none" : "")">
+                            <img id="productImagePreview" src="@(Model.MainImageUrl ?? "#")" alt="Preview" class="admin-image-preview" />
+                        </div>
                         @if (!string.IsNullOrEmpty(Model.MainImageUrl))
                         {
-                            <div class="admin-upload-preview-frame mb-1">
-                                <img id="imagePreview" src="@Model.MainImageUrl" alt="Current image" />
-                            </div>
                             <div class="text-muted small mb-2">Current image &nbsp;·&nbsp; <span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.MainImageUrl)</span></div>
                         }
-                        else
-                        {
-                            <div id="imagePreviewWrap" class="admin-upload-preview-frame mb-2 d-none">
-                                <img id="imagePreview" src="#" alt="Preview" />
-                            </div>
-                        }
-                        <input asp-for="MainImageFile" type="file" class="form-control"
+                        <input asp-for="MainImageFile" type="file" class="form-control js-image-preview-input"
                                accept=".jpg,.jpeg,.png,.webp" id="ImageFileInput"
-                               data-preview-target="#imagePreview"
-                               data-file-size-target="#productImgSize" />
+                               data-preview-target="#productImagePreview"
+                               data-preview-wrapper="#productImagePreviewWrap"
+                               data-size-target="#productImgSize" />
                         <span id="productImgSize" class="upload-file-meta"></span>
                         <span asp-validation-for="MainImageFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
@@ -327,9 +322,9 @@
                             </div>
                             <div class="text-muted small mb-2"><span class="admin-file-size">@FileInfoSvc.GetFileSizeDisplay(Model.BrochureFileUrl)</span></div>
                         }
-                        <input asp-for="BrochureFile" type="file" class="form-control"
+                        <input asp-for="BrochureFile" type="file" class="form-control js-file-meta-input"
                                accept=".pdf" id="BrochureFileInput"
-                               data-file-size-target="#productPdfSize" />
+                               data-size-target="#productPdfSize" />
                         <span id="productPdfSize" class="upload-file-meta"></span>
                         <span asp-validation-for="BrochureFile" class="text-danger small d-block mt-1"></span>
                         <div class="text-muted small mt-2">
@@ -402,12 +397,3 @@
     </div>
 </form>
 
-@section Scripts {
-<script>
-    // data-preview-target in site.js handles src update; just unhide the frame if needed
-    document.getElementById('ImageFileInput')?.addEventListener('change', function () {
-        const wrap = document.getElementById('imagePreviewWrap');
-        if (wrap && this.files[0]) wrap.classList.remove('d-none');
-    });
-</script>
-}

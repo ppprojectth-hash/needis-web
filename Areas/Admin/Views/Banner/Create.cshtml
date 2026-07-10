@@ -24,7 +24,7 @@
     {
         <div class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 rounded-3 mb-4">
             <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
-            <div><div asp-validation-summary="ModelOnly"></div></div>
+            <div><div asp-validation-summary="All"></div></div>
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -113,12 +113,15 @@
                                 Banner Image <span class="text-danger">*</span>
                                 <span class="text-muted fw-normal">(jpg, png, webp — max 5 MB, recommended 1920 × 800 px)</span>
                             </label>
-                            <input asp-for="ImageFile" type="file" class="form-control"
+                            <input asp-for="ImageFile" type="file" class="form-control js-image-preview-input"
                                    accept=".jpg,.jpeg,.png,.webp,.svg" id="ImageFileInput"
-                                   onchange="previewFile(this,'imagePreview','imagePreviewWrap')" />
+                                   data-preview-target="#bannerImagePreview"
+                                   data-preview-wrapper="#bannerImagePreviewWrap"
+                                   data-size-target="#bannerImgSize" />
+                            <span id="bannerImgSize" class="upload-file-meta"></span>
                             <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
-                            <div id="imagePreviewWrap" class="mt-2 d-none">
-                                <img id="imagePreview" src="#" alt="Preview"
+                            <div id="bannerImagePreviewWrap" class="mt-2 d-none">
+                                <img id="bannerImagePreview" src="#" alt="Preview"
                                      class="rounded-2" style="max-height:140px;max-width:100%;object-fit:contain" />
                             </div>
                             <div class="text-muted small mt-2">
@@ -130,11 +133,14 @@
                                 @Html.DisplayNameFor(m => m.MobileImageFile)
                                 <span class="text-muted fw-normal small">(optional — shown on small screens)</span>
                             </label>
-                            <input asp-for="MobileImageFile" type="file" class="form-control"
+                            <input asp-for="MobileImageFile" type="file" class="form-control js-image-preview-input"
                                    accept=".jpg,.jpeg,.png,.webp"
-                                   onchange="previewFile(this,'mobileImgPreview','mobileImgWrap')" />
-                            <div id="mobileImgWrap" class="mt-2 d-none">
-                                <img id="mobileImgPreview" src="#" alt="Preview"
+                                   data-preview-target="#bannerMobileImagePreview"
+                                   data-preview-wrapper="#bannerMobileImagePreviewWrap"
+                                   data-size-target="#bannerMobileSize" />
+                            <span id="bannerMobileSize" class="upload-file-meta"></span>
+                            <div id="bannerMobileImagePreviewWrap" class="mt-2 d-none">
+                                <img id="bannerMobileImagePreview" src="#" alt="Preview"
                                      class="rounded-2" style="max-height:100px;max-width:100%;object-fit:contain" />
                             </div>
                             <div class="text-muted small mt-2">
@@ -169,11 +175,12 @@
                                 Fallback / Poster Image
                                 <span class="text-muted fw-normal small">(shown while loading or on unsupported browsers)</span>
                             </label>
-                            <input asp-for="ImageFile" type="file" class="form-control"
-                                   accept=".jpg,.jpeg,.png,.webp"
-                                   onchange="previewFile(this,'videoFallbackPreview','videoFallbackWrap')" />
-                            <div id="videoFallbackWrap" class="mt-2 d-none">
-                                <img id="videoFallbackPreview" src="#" alt="Preview"
+                            <input asp-for="ImageFile" type="file" class="form-control js-image-preview-input"
+                                   accept=".jpg,.jpeg,.png,.webp" id="ImageFileFallbackInput"
+                                   data-preview-target="#bannerFallbackImagePreview"
+                                   data-preview-wrapper="#bannerFallbackImagePreviewWrap" />
+                            <div id="bannerFallbackImagePreviewWrap" class="mt-2 d-none">
+                                <img id="bannerFallbackImagePreview" src="#" alt="Preview"
                                      class="rounded-2" style="max-height:100px;max-width:100%;object-fit:contain" />
                             </div>
                         </div>
@@ -182,13 +189,16 @@
                     <!-- YouTube section -->
                     <div id="section-YouTube" class="d-none">
                         <div>
-                            <label asp-for="VideoUrl" class="form-label small fw-semibold">
+                            <label asp-for="YoutubeUrl" class="form-label small fw-semibold">
                                 YouTube URL <span class="text-danger">*</span>
                             </label>
-                            <input asp-for="VideoUrl" class="form-control"
+                            <input asp-for="YoutubeUrl" class="form-control"
                                    placeholder="https://www.youtube.com/watch?v=..." />
-                            <span asp-validation-for="VideoUrl" class="text-danger small d-block mt-1"></span>
-                            <div class="text-muted small mt-1">Paste the full YouTube URL or a youtu.be short link.</div>
+                            <span asp-validation-for="YoutubeUrl" class="text-danger small d-block mt-1"></span>
+                            <div class="text-muted small mt-2">
+                                EN: Paste a full YouTube link, for example https://www.youtube.com/watch?v=VIDEO_ID or https://youtu.be/VIDEO_ID<br />
+                                TH: วางลิงก์ YouTube เช่น https://www.youtube.com/watch?v=VIDEO_ID หรือ https://youtu.be/VIDEO_ID
+                            </div>
                         </div>
                     </div>
 
@@ -364,17 +374,5 @@
 
         showSection(mediaInput.value || 'Image');
     })();
-
-    function previewFile(input, imgId, wrapId) {
-        const wrap = document.getElementById(wrapId);
-        const img  = document.getElementById(imgId);
-        if (!wrap || !img) return;
-        if (input.files && input.files[0]) {
-            img.src = URL.createObjectURL(input.files[0]);
-            wrap.classList.remove('d-none');
-        } else {
-            wrap.classList.add('d-none');
-        }
-    }
     </script>
 }

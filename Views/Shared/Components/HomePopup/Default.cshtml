@@ -1,10 +1,13 @@
 @model Needis.Web.Models.HomePopup
+@using Needis.Web.Helpers
 @{
     var lang     = ViewData["CurrentLanguage"] as string ?? "EN";
     var title    = lang == "TH" && !string.IsNullOrEmpty(Model.TitleTH) ? Model.TitleTH : Model.TitleEN;
     var desc     = lang == "TH" && !string.IsNullOrEmpty(Model.DescriptionTH) ? Model.DescriptionTH : Model.DescriptionEN;
     var btnText  = lang == "TH" && !string.IsNullOrEmpty(Model.ButtonTextTH) ? Model.ButtonTextTH : Model.ButtonTextEN;
-    var hasLink  = !string.IsNullOrEmpty(Model.LinkUrl);
+    // Only ever treat the link as usable when it passes the safe-URL check (rejects
+    // javascript:, data:, vbscript:, etc.) — an unsafe or empty LinkUrl means no CTA.
+    var hasLink  = UrlSafetyHelper.IsSafeLinkUrl(Model.LinkUrl);
     var hasMobile = !string.IsNullOrEmpty(Model.MobileImageUrl);
     var popupKey = $"home_popup_{Model.Id}";
     var delayMs  = Model.DisplayDelaySeconds * 1000;
@@ -18,9 +21,12 @@
     <div class="modal-dialog modal-dialog-centered home-popup-dialog">
         <div class="modal-content home-popup-content border-0 shadow-lg">
 
-            @* Close button *@
-            <button type="button" class="home-popup-close btn-close btn-close-white"
-                    data-bs-dismiss="modal" aria-label="Close"></button>
+            @* Close button — plain "×" glyph, not Bootstrap's .btn-close (its icon is a
+               CSS background-image that home-popup-close's own background was clobbering) *@
+            <button type="button" class="home-popup-close"
+                    data-bs-dismiss="modal" aria-label="Close popup">
+                <span aria-hidden="true">&times;</span>
+            </button>
 
             @* Image *@
             <div class="home-popup-image-frame">
@@ -55,10 +61,12 @@
                     }
                     @if (hasLink && !string.IsNullOrEmpty(btnText))
                     {
+                        @* Real anchor with no data-bs-dismiss — Bootstrap's modal.js calls
+                           preventDefault() on any [data-bs-dismiss] click, which was silently
+                           blocking navigation. The JS below closes the modal without doing that. *@
                         <a href="@Model.LinkUrl" target="@linkTarget"
-                           class="btn home-popup-btn"
-                           rel="@(Model.OpenLinkInNewTab ? "noopener noreferrer" : null)"
-                           data-bs-dismiss="modal">
+                           class="btn home-popup-btn home-popup-cta-btn"
+                           rel="@(Model.OpenLinkInNewTab ? "noopener noreferrer" : null)">
                             @btnText
                         </a>
                     }
@@ -108,13 +116,22 @@
             modal.show();
             markSeen();
 
+            // CTA link: let the browser navigate normally (no preventDefault — that's
+            // what was silently blocking navigation before). Also close the modal so
+            // it doesn't linger behind when the link opens in a new tab.
+            el.querySelectorAll('.home-popup-cta-btn').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    modal.hide();
+                });
+            });
+
             // If image-only + link: click on image opens the link
             @if (hasLink && string.IsNullOrEmpty(btnText))
             {
                 <text>
                 el.querySelector('.home-popup-img')?.addEventListener('click', function () {
                     modal.hide();
-                    window.open('@Html.Raw(Model.LinkUrl)', '@linkTarget');
+                    window.open(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LinkUrl)), '@linkTarget');
                 });
                 el.querySelector('.home-popup-image-frame')?.style?.setProperty('cursor', 'pointer');
                 </text>
