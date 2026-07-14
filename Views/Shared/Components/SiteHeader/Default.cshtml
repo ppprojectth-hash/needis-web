@@ -3,7 +3,7 @@
     var lang        = (string)(ViewData["CurrentLanguage"] ?? "en");
     var currentPath = (string)(ViewData["CurrentPath"] ?? "/");
     var returnUrl   = (string)(ViewData["ReturnUrl"]    ?? "/");
-    var companyEN   = Model?.CompanyNameEN ?? "Needis";
+    var companyEN   = Model?.CompanyNameEN ?? "Neediss";
     var companyTH   = Model?.CompanyNameTH ?? companyEN;
     var companyName = lang == "th" ? companyTH : companyEN;
 }
