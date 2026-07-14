@@ -342,12 +342,51 @@
                         <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <div class="form-check form-switch">
                             <input asp-for="IsFeatured" class="form-check-input" type="checkbox" role="switch" />
                             <label asp-for="IsFeatured" class="form-check-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.IsFeatured)
+                                <span class="text-muted fw-normal">(สินค้าแนะนำ)</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="form-check form-switch">
+                            <input asp-for="IsPromotion" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsPromotion" class="form-check-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.IsPromotion)
+                                <span class="text-muted fw-normal">(โปรโมชั่น)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="text-muted small mb-3">
+                        EN: Hot Product and Promotion tags will be shown on product cards and the home page.<br />
+                        TH: ระบบจะแสดงป้ายสินค้าแนะนำและโปรโมชั่นบนการ์ดสินค้าและหน้า Home
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label asp-for="PromotionLabelEN" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.PromotionLabelEN)
+                            </label>
+                            <textarea asp-for="PromotionLabelEN" class="form-control" rows="2" maxlength="200"
+                                      placeholder="e.g. Buy 1 Get 1, Special discount, Limited time offer"></textarea>
+                            <span asp-validation-for="PromotionLabelEN" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="PromotionLabelTH" class="form-label small fw-semibold">
+                                @Html.DisplayNameFor(m => m.PromotionLabelTH)
+                            </label>
+                            <textarea asp-for="PromotionLabelTH" class="form-control" rows="2" maxlength="200"
+                                      placeholder="เช่น ซื้อ 1 แถม 1, ส่วนลดพิเศษ, โปรโมชั่นจำกัดเวลา"></textarea>
+                            <span asp-validation-for="PromotionLabelTH" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 text-muted small">
+                            EN: Leave blank to use the default "Promotion" badge text.<br />
+                            TH: เว้นว่างไว้เพื่อใช้ข้อความป้ายเริ่มต้น "โปรโมชั่น"
                         </div>
                     </div>
 

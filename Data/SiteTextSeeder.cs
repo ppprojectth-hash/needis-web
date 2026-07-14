@@ -35,8 +35,8 @@ public static class SiteTextSeeder
         ("home.hot_products.title", "home", "hot_products", "Hot Products Title",
             "สินค้าแนะนำ / โปรโมชั่น", "Hot Product / Promotion", "Heading for the hot products section.", 9),
         ("home.hot_products.subtitle", "home", "hot_products", "Hot Products Subtitle",
-            "เลือกชมสินค้าแนะนำ โปรโมชั่น และเครื่องมือที่เหมาะกับธุรกิจของคุณ",
-            "Discover highlighted products, promotions, and recommended instruments for your business.",
+            "เลือกชมสินค้าแนะนำและโปรโมชั่นที่เราคัดสรรไว้ให้คุณ",
+            "Discover highlighted products and current promotions selected for you.",
             "Subtitle for the hot products section.", 10),
 
         ("home.services.eyebrow", "home", "services", "Services Eyebrow",
@@ -69,7 +69,7 @@ public static class SiteTextSeeder
 
         // ── About ─────────────────────────────────────────────────────────────
         ("about.page.title", "about", "hero", "Page Title",
-            "เกี่ยวกับ Needis", "About Needis", "Main heading of the About page.", 1),
+            "เกี่ยวกับ Neediss", "About Neediss", "Main heading of the About page.", 1),
         ("about.page.subtitle", "about", "hero", "Page Subtitle",
             "พันธมิตรด้านเครื่องมือวัด เครื่องมือวิทยาศาสตร์ และบริการสนับสนุนทางเทคนิค",
             "Trusted partner for measuring tools, scientific instruments, and technical support.",
@@ -77,8 +77,8 @@ public static class SiteTextSeeder
         ("about.company.title", "about", "company", "Company Section Title",
             "เกี่ยวกับบริษัทของเรา", "About Our Company", "Generic company introduction heading (optional use).", 3),
         ("about.company.description", "about", "company", "Company Section Description",
-            "Needis เป็นผู้นำด้านเครื่องมือวัด เครื่องมือวิทยาศาสตร์ และอุปกรณ์ตรวจสอบสิ่งแวดล้อม",
-            "Needis is a leading provider of measuring instruments, scientific equipment, and environmental monitoring devices.",
+            "Neediss เป็นผู้นำด้านเครื่องมือวัด เครื่องมือวิทยาศาสตร์ และอุปกรณ์ตรวจสอบสิ่งแวดล้อม",
+            "Neediss is a leading provider of measuring instruments, scientific equipment, and environmental monitoring devices.",
             "Generic company introduction paragraph (optional use).", 4),
         ("about.team.eyebrow", "about", "team", "Team Eyebrow",
             "ทีมงานของเรา", "Meet the Team", "Small label above the team heading.", 5),

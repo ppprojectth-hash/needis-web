@@ -260,7 +260,7 @@ ASPNETCORE_URLS=http://+:10000
 | `EmailSettings__SmtpPort` | SMTP Port | `587` |
 | `EmailSettings__SmtpUser` | อีเมลผู้ส่ง | `noreply@yourcompany.com` |
 | `EmailSettings__SmtpPass` | รหัสผ่าน SMTP | `your-app-password` |
-| `EmailSettings__FromName` | ชื่อผู้ส่ง | `Needis Support` |
+| `EmailSettings__FromName` | ชื่อผู้ส่ง | `Neediss Support` |
 
 ### วิธีตั้ง Environment Variables
 

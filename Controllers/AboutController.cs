@@ -184,8 +184,8 @@ public class AboutController : Controller
 
         ViewBag.CurrentLanguage = lang;
         ViewBag.CompanyName = lang == "th"
-            ? (siteSetting?.CompanyNameTH ?? siteSetting?.CompanyNameEN ?? "Needis")
-            : (siteSetting?.CompanyNameEN ?? siteSetting?.CompanyNameTH ?? "Needis");
+            ? (siteSetting?.CompanyNameTH ?? siteSetting?.CompanyNameEN ?? "Neediss")
+            : (siteSetting?.CompanyNameEN ?? siteSetting?.CompanyNameTH ?? "Neediss");
 
         return View(staff);
     }

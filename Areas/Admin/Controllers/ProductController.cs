@@ -65,6 +65,7 @@ public class ProductController : Controller
                 Price           = p.Price,
                 IsPriceVisible  = p.IsPriceVisible,
                 IsFeatured      = p.IsFeatured,
+                IsPromotion     = p.IsPromotion,
                 IsActive        = p.IsActive,
                 DisplayOrder    = p.DisplayOrder,
                 HasVideo        = p.ShowYoutubeVideo && p.YoutubeVideoUrl != null && p.YoutubeVideoUrl != "",
@@ -155,6 +156,9 @@ public class ProductController : Controller
             BrochureFilePath            = brochurePath,
             DisplayOrder                = vm.DisplayOrder,
             IsFeatured                  = vm.IsFeatured,
+            IsPromotion                 = vm.IsPromotion,
+            PromotionLabelTH            = vm.PromotionLabelTH,
+            PromotionLabelEN            = vm.PromotionLabelEN,
             IsActive                    = vm.IsActive,
             ShowYoutubeVideo            = vm.ShowYoutubeVideo,
             YoutubeVideoUrl             = string.IsNullOrWhiteSpace(vm.YoutubeVideoUrl) ? null : vm.YoutubeVideoUrl.Trim(),
@@ -242,6 +246,9 @@ public class ProductController : Controller
         product.IsPriceVisible              = vm.IsPriceVisible;
         product.DisplayOrder                = vm.DisplayOrder;
         product.IsFeatured                  = vm.IsFeatured;
+        product.IsPromotion                 = vm.IsPromotion;
+        product.PromotionLabelTH            = vm.PromotionLabelTH;
+        product.PromotionLabelEN            = vm.PromotionLabelEN;
         product.IsActive                    = vm.IsActive;
         product.ShowYoutubeVideo            = vm.ShowYoutubeVideo;
         product.YoutubeVideoUrl             = string.IsNullOrWhiteSpace(vm.YoutubeVideoUrl) ? null : vm.YoutubeVideoUrl.Trim();
@@ -382,6 +389,9 @@ public class ProductController : Controller
         BrochureFileUrl             = p.BrochureFilePath,
         DisplayOrder                = p.DisplayOrder,
         IsFeatured                  = p.IsFeatured,
+        IsPromotion                 = p.IsPromotion,
+        PromotionLabelTH            = p.PromotionLabelTH,
+        PromotionLabelEN            = p.PromotionLabelEN,
         IsActive                    = p.IsActive,
         ShowYoutubeVideo            = p.ShowYoutubeVideo,
         YoutubeVideoUrl             = p.YoutubeVideoUrl,

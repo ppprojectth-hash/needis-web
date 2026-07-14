@@ -76,13 +76,17 @@ public class HomeController : Controller
             .Take(24)
             .ToListAsync();
 
-        // Hot Products: only load when feature is enabled
+        // Hot Products / Promotion: only load when feature is enabled, and only
+        // products the admin has explicitly tagged as Promotion or Hot Product
+        // (IsFeatured is reused as the Hot Product flag) — never a generic fallback,
+        // so the customer fully controls what appears in this section.
         var hotProducts = _features.HotProductPromotionEnabled
             ? await _db.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
-                .Where(p => p.IsActive)
-                .OrderByDescending(p => p.IsFeatured)
+                .Where(p => p.IsActive && (p.IsPromotion || p.IsFeatured))
+                .OrderByDescending(p => p.IsPromotion)
+                .ThenByDescending(p => p.IsFeatured)
                 .ThenBy(p => p.DisplayOrder)
                 .ThenByDescending(p => p.CreatedAt)
                 .Take(8)

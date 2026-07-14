@@ -91,7 +91,7 @@
                         <th class="py-3" style="width:160px">Brand / Model</th>
                         <th class="py-3" style="width:120px">Part No.</th>
                         <th class="py-3 text-end" style="width:110px">Price</th>
-                        <th class="py-3 text-center" style="width:75px">Featured</th>
+                        <th class="py-3" style="width:150px">Tags</th>
                         <th class="py-3 text-center" style="width:80px">Order</th>
                         <th class="py-3 text-center" style="width:90px">Status</th>
                         <th class="py-3 actions-cell pe-4">Actions</th>
@@ -154,14 +154,23 @@
                                     <span class="text-muted">—</span>
                                 }
                             </td>
-                            <td class="py-2 text-center">
-                                @if (item.IsFeatured)
+                            <td class="py-2">
+                                @if (item.IsFeatured || item.IsPromotion)
                                 {
-                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @if (item.IsFeatured)
+                                        {
+                                            <span class="admin-badge admin-badge-hot">Hot Product</span>
+                                        }
+                                        @if (item.IsPromotion)
+                                        {
+                                            <span class="admin-badge admin-badge-promotion">Promotion</span>
+                                        }
+                                    </div>
                                 }
                                 else
                                 {
-                                    <i class="bi bi-star text-muted"></i>
+                                    <span class="text-muted small">—</span>
                                 }
                             </td>
                             <td class="py-2 text-center">

@@ -110,8 +110,8 @@ public class SiteSettingController : Controller
 
         setting = new SiteSetting
         {
-            CompanyNameEN   = "Needis",
-            CompanyNameTH   = "Needis",
+            CompanyNameEN   = "Neediss",
+            CompanyNameTH   = "Neediss",
             MainColor       = "#2d4199",
             DefaultLanguage = "EN",
             IsActive        = true,

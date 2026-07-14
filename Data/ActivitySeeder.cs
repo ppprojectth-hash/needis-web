@@ -63,7 +63,7 @@ public static class ActivitySeeder
         {
             ActivitySlug       = "hplc-technology-asean-lab-expo-2026",
             ActivityTitleEN    = "SciInstruments Showcases Latest HPLC Technology at ASEAN Lab Expo 2026",
-            ActivityTitleTH    = "Needis จัดแสดงเทคโนโลยี HPLC ล่าสุดในงาน ASEAN Lab Expo 2026",
+            ActivityTitleTH    = "Neediss จัดแสดงเทคโนโลยี HPLC ล่าสุดในงาน ASEAN Lab Expo 2026",
             ShortDescriptionEN = "We were proud to showcase our latest HPLC solutions and measurement instruments at ASEAN Lab Expo 2026.",
             ShortDescriptionTH = "เรายินดีนำเสนอโซลูชัน HPLC ล่าสุดและเครื่องมือวัดในงาน ASEAN Lab Expo 2026",
             IsFeatured         = true,
@@ -72,7 +72,7 @@ public static class ActivitySeeder
             IsActive           = true,
             ActivityDate       = now.AddDays(-30),
             PublishedDate      = now.AddDays(-30),
-            AuthorName         = "Needis Team",
+            AuthorName         = "Neediss Team",
             CreatedAt          = now,
             CreatedBy          = "seeder",
         };
@@ -106,7 +106,7 @@ public static class ActivitySeeder
             IsActive           = true,
             ActivityDate       = now.AddDays(-15),
             PublishedDate      = now.AddDays(-15),
-            AuthorName         = "Needis Team",
+            AuthorName         = "Neediss Team",
             CreatedAt          = now,
             CreatedBy          = "seeder",
         };

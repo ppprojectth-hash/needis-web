@@ -1,6 +1,6 @@
 @model ProductDetailViewModel
 @using Needis.Web.Models
-@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
+@inject Needis.Web.Services.Content.IRichContentService RichContentSvc
 @{
     var lang = Model.CurrentLanguage;
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
@@ -123,6 +123,25 @@
                         </div>
                     }
 
+                    @* Hot Product / Promotion badges *@
+                    @if (product.IsFeatured || product.IsPromotion)
+                    {
+                        var promoLabel = lang == "th"
+                            ? (!string.IsNullOrWhiteSpace(product.PromotionLabelTH) ? product.PromotionLabelTH : "โปรโมชั่น")
+                            : (!string.IsNullOrWhiteSpace(product.PromotionLabelEN) ? product.PromotionLabelEN : "Promotion");
+                        var hotLabel = lang == "th" ? "สินค้าแนะนำ" : "Hot Product";
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            @if (product.IsPromotion)
+                            {
+                                <span class="product-badge product-badge-promotion">@promoLabel</span>
+                            }
+                            @if (product.IsFeatured)
+                            {
+                                <span class="product-badge product-badge-hot">@hotLabel</span>
+                            }
+                        </div>
+                    }
+
                     @* Price *@
                     <div class="product-price-block">
                         @if (product.IsPriceVisible && product.Price.HasValue)
@@ -142,7 +161,7 @@
                     @* Short description *@
                     @if (!string.IsNullOrEmpty(shortDesc))
                     {
-                        <div class="product-short-desc rich-content">@Html.Raw(MarkdownService.ToSafeHtml(shortDesc))</div>
+                        <div class="product-short-desc rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(shortDesc))</div>
                     }
 
                     @* Key Spec highlights *@
@@ -292,7 +311,7 @@
                                 </h3>
                             </div>
                             <div class="product-content-card-body">
-                                <div class="product-description rich-content">@Html.Raw(MarkdownService.ToSafeHtml(fullDesc))</div>
+                                <div class="product-description rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(fullDesc))</div>
                             </div>
                         </div>
                     </div>
@@ -372,7 +391,7 @@
                                 }
                                 else
                                 {
-                                    <div class="product-spec rich-content">@Html.Raw(MarkdownService.ToSafeHtml(spec))</div>
+                                    <div class="product-spec rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(spec))</div>
                                 }
                             </div>
                         </div>
@@ -408,6 +427,7 @@
 
                     <div class="col-lg-3 col-md-6 reveal @relDelay">
                         <div class="product-card card shadow-sm h-100">
+                            <partial name="_ProductBadges" model="(rel, lang)" />
                             <a asp-controller="Product" asp-action="Detail"
                                asp-route-slug="@rel.Slug"
                                class="text-decoration-none">

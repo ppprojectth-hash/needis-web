@@ -37,7 +37,7 @@ public class EmailTemplateService : IEmailTemplateService
             // Footer
             "<tr><td style=\"background:#f8f9fc;padding:16px 32px;border-top:1px solid #e5e7eb;" +
             "text-align:center;color:#9ca3af;font-size:12px\">" +
-            "Needis &mdash; Precision Instruments &amp; Scientific Equipment<br>" +
+            "Neediss &mdash; Precision Instruments &amp; Scientific Equipment<br>" +
             "This is an automated message. Please do not reply directly to this email." +
             "</td></tr>" +
             "</table></td></tr></table></body></html>";
@@ -173,7 +173,7 @@ public class EmailTemplateService : IEmailTemplateService
         sb.Append(ItemsTable(items, useTh: false));
         sb.Append(Button(adminUrl, "View in Admin Panel →"));
 
-        return Wrap("Needis — New Quotation Request", sb.ToString());
+        return Wrap("Neediss — New Quotation Request", sb.ToString());
     }
 
     // ── Template 2: Customer auto-reply ─────────────────────────────────────
@@ -231,8 +231,8 @@ public class EmailTemplateService : IEmailTemplateService
         sb.Append($"<p style=\"color:#6b7280;font-size:12px;margin:0\">{keepRef}</p>");
 
         string headerLabel = isTh
-            ? "Needis — ยืนยันการรับคำขอใบเสนอราคา"
-            : "Needis — Quotation Request Received";
+            ? "Neediss — ยืนยันการรับคำขอใบเสนอราคา"
+            : "Neediss — Quotation Request Received";
 
         return Wrap(headerLabel, sb.ToString());
     }
@@ -270,6 +270,6 @@ public class EmailTemplateService : IEmailTemplateService
                       "View in Admin Panel</a></p>");
         }
 
-        return Wrap("Needis — New Contact Message", sb.ToString());
+        return Wrap("Neediss — New Contact Message", sb.ToString());
     }
 }

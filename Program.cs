@@ -59,6 +59,10 @@ builder.Services.AddScoped<ISiteTextService, SiteTextService>();
 // Markdown rendering for rich description/content fields
 builder.Services.AddScoped<IMarkdownService, MarkdownService>();
 
+// Sanitized HTML rendering for WYSIWYG-edited content (falls back to Markdown for
+// content saved before the WYSIWYG editor existed)
+builder.Services.AddScoped<IRichContentService, RichContentService>();
+
 // Feature flags
 builder.Services.Configure<FeatureFlagsOptions>(builder.Configuration.GetSection("FeatureFlags"));
 builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();

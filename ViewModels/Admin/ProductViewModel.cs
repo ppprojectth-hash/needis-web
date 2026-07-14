@@ -78,8 +78,19 @@ public class ProductViewModel : IValidatableObject
     [Range(0, 9999)]
     public int DisplayOrder { get; set; } = 0;
 
-    [Display(Name = "Featured")]
+    [Display(Name = "Hot Product")]
     public bool IsFeatured { get; set; }
+
+    [Display(Name = "Promotion")]
+    public bool IsPromotion { get; set; }
+
+    [Display(Name = "Promotion Label (Thai)")]
+    [MaxLength(200)]
+    public string? PromotionLabelTH { get; set; }
+
+    [Display(Name = "Promotion Label (English)")]
+    [MaxLength(200)]
+    public string? PromotionLabelEN { get; set; }
 
     [Display(Name = "Active")]
     public bool IsActive { get; set; } = true;
@@ -131,6 +142,7 @@ public class ProductListItem
     public decimal? Price       { get; set; }
     public bool   IsPriceVisible { get; set; }
     public bool   IsFeatured    { get; set; }
+    public bool   IsPromotion   { get; set; }
     public bool   IsActive      { get; set; }
     public int    DisplayOrder  { get; set; }
     public bool   HasVideo      { get; set; }

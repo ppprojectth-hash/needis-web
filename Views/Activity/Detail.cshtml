@@ -1,5 +1,5 @@
 @model ActivityDetailViewModel
-@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
+@inject Needis.Web.Services.Content.IRichContentService RichContentSvc
 @{
     var lang = Model.CurrentLanguage;
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
@@ -144,7 +144,7 @@
                         }
                         @if (!string.IsNullOrEmpty(bContent))
                         {
-                            <div class="activity-block-text rich-content">@Html.Raw(MarkdownService.ToSafeHtml(bContent))</div>
+                            <div class="activity-block-text rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(bContent))</div>
                         }
                     }
                     else if (blk.BlockType == "quote")

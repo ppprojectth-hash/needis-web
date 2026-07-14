@@ -1,0 +1,24 @@
+@model (Needis.Web.Models.Product Product, string Lang)
+@{
+    var p = Model.Product;
+    var lang = Model.Lang;
+    var isHot = p.IsFeatured;
+    var isPromo = p.IsPromotion;
+    var promoLabel = lang == "th"
+        ? (!string.IsNullOrWhiteSpace(p.PromotionLabelTH) ? p.PromotionLabelTH : "โปรโมชั่น")
+        : (!string.IsNullOrWhiteSpace(p.PromotionLabelEN) ? p.PromotionLabelEN : "Promotion");
+    var hotLabel = lang == "th" ? "สินค้าแนะนำ" : "Hot Product";
+}
+@if (isHot || isPromo)
+{
+    <div class="product-badges">
+        @if (isPromo)
+        {
+            <span class="product-badge product-badge-promotion">@promoLabel</span>
+        }
+        @if (isHot)
+        {
+            <span class="product-badge product-badge-hot">@hotLabel</span>
+        }
+    </div>
+}

@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Needis Admin</title>
+    <title>@ViewData["Title"] — Neediss Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -123,13 +123,13 @@
     <div class="offcanvas-header" style="border-bottom:1px solid rgba(255,255,255,.07); padding:.9rem 1rem">
         <div class="d-flex align-items-center gap-2">
             <div class="brand-icon"><i class="bi bi-layers-half text-white"></i></div>
-            <span class="text-white fw-bold">Needis Admin</span>
+            <span class="text-white fw-bold">Neediss Admin</span>
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
         @await Html.PartialAsync("_SidebarNav", ctrl)
-        <div class="sidebar-footer">Needis Back Office</div>
+        <div class="sidebar-footer">Neediss Back Office</div>
     </div>
 </div>
 
@@ -139,10 +139,10 @@
     <aside class="admin-sidebar d-none d-lg-flex">
         <a class="sidebar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
             <div class="brand-icon"><i class="bi bi-layers-half text-white"></i></div>
-            Needis Admin
+            Neediss Admin
         </a>
         @await Html.PartialAsync("_SidebarNav", ctrl)
-        <div class="sidebar-footer">Needis Back Office</div>
+        <div class="sidebar-footer">Neediss Back Office</div>
     </aside>
 
     <div class="flex-grow-1 d-flex flex-column" style="min-width:0">
@@ -179,7 +179,7 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/admin-rich-text-editor.js" asp-append-version="true"></script>
+<script src="~/js/admin-wysiwyg-editor.js" asp-append-version="true"></script>
 <script src="~/js/admin-upload-preview.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -274,8 +274,8 @@ else
                     </h2>
                     <p class="section-subtitle mb-0 text-start">
                         @Model.T("home.hot_products.subtitle", lang == "th"
-                            ? "เลือกชมสินค้าแนะนำ โปรโมชั่น และเครื่องมือที่เหมาะกับธุรกิจของคุณ"
-                            : "Discover highlighted products, promotions, and recommended instruments for your business.")
+                            ? "เลือกชมสินค้าแนะนำและโปรโมชั่นที่เราคัดสรรไว้ให้คุณ"
+                            : "Discover highlighted products and current promotions selected for you.")
                     </p>
                 </div>
                 <a asp-controller="Product" asp-action="Index"
@@ -297,12 +297,7 @@ else
                     <div class="col-xl-3 col-lg-4 col-md-6 reveal @pDelay">
                         <div class="home-product-card hot-product-card h-100">
                             <div class="position-relative">
-                                @if (product.IsFeatured)
-                                {
-                                    <span class="hot-product-badge">
-                                        @(lang == "th" ? "แนะนำ" : "Hot")
-                                    </span>
-                                }
+                                <partial name="_ProductBadges" model="(product, lang)" />
                                 <a asp-controller="Product" asp-action="Detail"
                                    asp-route-slug="@product.Slug"
                                    class="text-decoration-none d-block">

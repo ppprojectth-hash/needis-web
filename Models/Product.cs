@@ -52,7 +52,16 @@ public class Product
 
     public int DisplayOrder { get; set; }
 
+    // Reused as the "Hot Product" marketing flag (see Admin UI label).
     public bool IsFeatured { get; set; }
+
+    public bool IsPromotion { get; set; } = false;
+
+    [MaxLength(200)]
+    public string? PromotionLabelTH { get; set; }
+
+    [MaxLength(200)]
+    public string? PromotionLabelEN { get; set; }
 
     public bool IsActive { get; set; } = true;
 

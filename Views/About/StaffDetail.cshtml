@@ -1,8 +1,8 @@
 @model Needis.Web.Models.StaffProfile
-@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
+@inject Needis.Web.Services.Content.IRichContentService RichContentSvc
 @{
     var lang         = ViewBag.CurrentLanguage as string ?? "en";
-    var companyName  = ViewBag.CompanyName as string ?? "Needis";
+    var companyName  = ViewBag.CompanyName as string ?? "Neediss";
     var name         = lang == "th" ? (Model.FullNameTH ?? Model.FullNameEN) : (Model.FullNameEN ?? Model.FullNameTH);
     var position     = lang == "th" ? Model.PositionTH  : Model.PositionEN;
     var biography    = lang == "th" ? Model.BiographyTH : Model.BiographyEN;
@@ -101,7 +101,7 @@
                                 @(lang == "th" ? "ประวัติ" : "Biography")
                             </h5>
                             <div class="staff-detail-body rich-content">
-                                @Html.Raw(MarkdownService.ToSafeHtml(biography))
+                                @Html.Raw(RichContentSvc.ToSafeHtml(biography))
                             </div>
                         </div>
                     }
@@ -114,7 +114,7 @@
                                 @(lang == "th" ? "ผลงานและประสบการณ์" : "Achievements & Experience")
                             </h5>
                             <div class="staff-detail-body rich-content">
-                                @Html.Raw(MarkdownService.ToSafeHtml(achievement))
+                                @Html.Raw(RichContentSvc.ToSafeHtml(achievement))
                             </div>
                         </div>
                     }

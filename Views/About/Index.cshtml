@@ -1,5 +1,5 @@
 @model AboutIndexViewModel
-@inject Needis.Web.Services.Content.IMarkdownService MarkdownService
+@inject Needis.Web.Services.Content.IRichContentService RichContentSvc
 @{
     var lang = Model.CurrentLanguage;
     string L(string? th, string? en) => lang == "th" ? (th ?? en ?? "") : (en ?? th ?? "");
@@ -88,7 +88,7 @@
                     }
                     @if (!string.IsNullOrEmpty(sDesc))
                     {
-                        <div class="section-subtitle rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div>
+                        <div class="section-subtitle rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(sDesc))</div>
                     }
                 </div>
                 @if (sItems.Any())
@@ -142,7 +142,7 @@
                         }
                         @if (!string.IsNullOrEmpty(sDesc))
                         {
-                            <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div>
+                            <div class="text-muted rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(sDesc))</div>
                         }
                     </div>
                 </div>
@@ -161,7 +161,7 @@
                         <div class="col-lg-7 reveal reveal-delay-1">
                             @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
                             @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
-                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(sDesc))</div> }
                         </div>
                     }
                     else if (!imgLeft && !string.IsNullOrEmpty(sImageUrl))
@@ -169,7 +169,7 @@
                         <div class="col-lg-7 reveal">
                             @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
                             @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
-                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(sDesc))</div> }
                         </div>
                         <div class="col-lg-5 reveal reveal-delay-1">
                             <img src="@sImageUrl" alt="@sTitle" class="about-section-img w-100" />
@@ -181,7 +181,7 @@
                         <div class="col-lg-7 reveal">
                             @if (!string.IsNullOrEmpty(sTitle)) { <p class="section-eyebrow">@sTitle</p> }
                             @if (!string.IsNullOrEmpty(sSubtitle)) { <h2 class="section-title">@sSubtitle</h2> }
-                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(MarkdownService.ToSafeHtml(sDesc))</div> }
+                            @if (!string.IsNullOrEmpty(sDesc)) { <div class="text-muted rich-content">@Html.Raw(RichContentSvc.ToSafeHtml(sDesc))</div> }
                         </div>
                         @if (sItems.Any())
                         {

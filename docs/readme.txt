@@ -2,7 +2,7 @@ export ConnectionStrings__DefaultConnection="Host=localhost;Port=5432;Database=N
 
 dotnet ef database update
 
-export ConnectionStrings__DefaultConnection="Host=119.59.102.62;Port=5432;Database=NeedisDb;Username=needis_admin;Password=รหัสจริง;SSL Mode=Prefer;Trust Server Certificate=true"
+export ConnectionStrings__DefaultConnection="Host=119.59.102.62;Port=5432;Database=NeedisDb;Username=needis_admin;Password=needis_password;SSL Mode=Prefer;Trust Server Certificate=true"
 
 
 ถ้าเคย export เป็นตัวจริงไว้ ต้องล้างก่อน
