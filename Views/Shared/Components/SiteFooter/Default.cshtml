@@ -5,7 +5,7 @@
     var texts = ViewData["SiteTexts"] as Dictionary<string, string> ?? new();
     string T(string key, string fallback) => texts.TryGetValue(key, out var v) && !string.IsNullOrEmpty(v) ? v : fallback;
 
-    var companyEN   = Model?.CompanyNameEN ?? "Needis";
+    var companyEN   = Model?.CompanyNameEN ?? "Neediss";
     var companyTH   = Model?.CompanyNameTH ?? companyEN;
     var companyName = lang == "th" ? companyTH : companyEN;
 
