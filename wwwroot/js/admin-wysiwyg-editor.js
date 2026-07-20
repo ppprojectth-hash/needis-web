@@ -51,11 +51,56 @@
         return /<(p|br|strong|b|em|i|ul|ol|li|h[234]|a|div|span)\b[^>]*>/i.test(value);
     }
 
+    // Cleans up what document.execCommand leaves behind (style/class attributes, empty
+    // list items from the bullet/numbered-list buttons, blank paragraphs) before the
+    // editor's HTML is written into the hidden textarea that actually gets saved. Runs
+    // on a detached container, never on the live contenteditable, so it can't disturb
+    // the user's cursor position while they're still typing.
+    function cleanEditorHtml(html) {
+        var container = document.createElement('div');
+        container.innerHTML = html;
+
+        container.querySelectorAll('[style]').forEach(function (el) { el.removeAttribute('style'); });
+        container.querySelectorAll('[class]').forEach(function (el) { el.removeAttribute('class'); });
+
+        var changed = true;
+        while (changed) {
+            changed = false;
+
+            container.querySelectorAll('li').forEach(function (li) {
+                var text = li.textContent.replace(/ /g, ' ').trim();
+                if (!text && !li.querySelector('img,a,strong,em,b,i')) {
+                    li.remove();
+                    changed = true;
+                }
+            });
+
+            container.querySelectorAll('ul,ol').forEach(function (list) {
+                if (!list.querySelector('li')) {
+                    list.remove();
+                    changed = true;
+                }
+            });
+
+            container.querySelectorAll('p,div').forEach(function (el) {
+                var text = el.textContent.replace(/ /g, ' ').trim();
+                var hasMeaningfulChild = el.querySelector('img,a,strong,em,b,i,ul,ol');
+                if (!text && !hasMeaningfulChild) {
+                    el.remove();
+                    changed = true;
+                }
+            });
+        }
+
+        return container.innerHTML.trim();
+    }
+
     function syncEditorToTextarea(editor) {
         var targetSelector = editor.getAttribute('data-target');
         var textarea = targetSelector ? document.querySelector(targetSelector) : null;
         if (!textarea) return;
-        textarea.value = editor.innerHTML === '<br>' ? '' : editor.innerHTML;
+        var html = editor.innerHTML === '<br>' ? '' : editor.innerHTML;
+        textarea.value = cleanEditorHtml(html);
     }
 
     function initEditor(editor) {

@@ -790,17 +790,18 @@ body { margin-bottom: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans
     padding: 1.25rem;
 }
 
-/* ── Text content ── */
+/* ── Text content ──
+   No white-space: pre-line/pre-wrap here: content is sanitized HTML (rendered via
+   .rich-content), and preserving literal source line breaks on top of that HTML's
+   own <p>/<li> spacing was producing extra blank lines / empty-looking cards. ── */
 .product-description {
     line-height: 1.8;
     color: #4a5568;
-    white-space: pre-line;
 }
 
 .product-spec {
     font-family: 'Segoe UI', system-ui, sans-serif;
     font-size: .9rem;
-    white-space: pre-wrap;
     word-break: break-word;
     background: var(--needis-light);
     border-radius: 8px;
@@ -3798,22 +3799,27 @@ img {
 }
 
 .rich-content p {
-    margin: 0 0 .75rem;
+    margin: 0 0 .7rem;
 }
 
 .rich-content ul,
 .rich-content ol {
-    margin: .35rem 0 .85rem 1.25rem;
-    padding-left: 1.1rem;
+    margin: .35rem 0 .75rem 1.2rem;
+    padding-left: 1rem;
 }
 
 .rich-content li {
-    margin-bottom: .2rem;
+    margin: 0;
+    padding: 0;
     line-height: 1.5;
 }
 
 .rich-content li + li {
-    margin-top: .15rem;
+    margin-top: .18rem;
+}
+
+.rich-content > :last-child {
+    margin-bottom: 0;
 }
 
 .rich-content strong,

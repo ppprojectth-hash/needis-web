@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Needis.Web.Data;
 using Needis.Web.Helpers;
 using Needis.Web.Models;
+using Needis.Web.Services.Content;
 using Needis.Web.ViewModels.Admin;
 
 namespace Needis.Web.Areas.Admin.Controllers;
@@ -21,11 +22,13 @@ public class ProductController : Controller
 
     private readonly AppDbContext _db;
     private readonly IWebHostEnvironment _env;
+    private readonly IRichContentService _richContent;
 
-    public ProductController(AppDbContext db, IWebHostEnvironment env)
+    public ProductController(AppDbContext db, IWebHostEnvironment env, IRichContentService richContent)
     {
         _db  = db;
         _env = env;
+        _richContent = richContent;
     }
 
     // ── Index ───────────────────────────────────────────────────────────────
@@ -146,10 +149,10 @@ public class ProductController : Controller
             Sku                         = vm.PartNumber,
             ShortDescriptionTH          = vm.ShortDescriptionTH,
             ShortDescriptionEN          = vm.ShortDescriptionEN,
-            FullDescriptionTH           = vm.DescriptionTH,
-            FullDescriptionEN           = vm.DescriptionEN,
-            SpecificationTH             = vm.SpecificationTH,
-            SpecificationEN             = vm.SpecificationEN,
+            FullDescriptionTH           = SanitizedOrNull(vm.DescriptionTH),
+            FullDescriptionEN           = SanitizedOrNull(vm.DescriptionEN),
+            SpecificationTH             = SanitizedOrNull(vm.SpecificationTH),
+            SpecificationEN             = SanitizedOrNull(vm.SpecificationEN),
             Price                       = vm.Price,
             IsPriceVisible              = vm.IsPriceVisible,
             MainImagePath               = imagePath,
@@ -238,10 +241,10 @@ public class ProductController : Controller
         product.Sku                         = vm.PartNumber;
         product.ShortDescriptionTH          = vm.ShortDescriptionTH;
         product.ShortDescriptionEN          = vm.ShortDescriptionEN;
-        product.FullDescriptionTH           = vm.DescriptionTH;
-        product.FullDescriptionEN           = vm.DescriptionEN;
-        product.SpecificationTH             = vm.SpecificationTH;
-        product.SpecificationEN             = vm.SpecificationEN;
+        product.FullDescriptionTH           = SanitizedOrNull(vm.DescriptionTH);
+        product.FullDescriptionEN           = SanitizedOrNull(vm.DescriptionEN);
+        product.SpecificationTH             = SanitizedOrNull(vm.SpecificationTH);
+        product.SpecificationEN             = SanitizedOrNull(vm.SpecificationEN);
         product.Price                       = vm.Price;
         product.IsPriceVisible              = vm.IsPriceVisible;
         product.DisplayOrder                = vm.DisplayOrder;
@@ -296,6 +299,14 @@ public class ProductController : Controller
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
+
+    // Description/Specification are saved as sanitized HTML so the DB never stores the raw
+    // execCommand output (style attributes, empty <li>/<p> junk) the WYSIWYG editor can produce.
+    private string? SanitizedOrNull(string? html)
+    {
+        var safe = _richContent.ToSafeHtml(html);
+        return string.IsNullOrWhiteSpace(safe) ? null : safe;
+    }
 
     private static string NormalizeSlug(string input)
     {

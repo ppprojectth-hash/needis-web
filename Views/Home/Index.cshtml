@@ -1,6 +1,7 @@
 @model HomeIndexViewModel
 @using Needis.Web.ViewModels.Home
 @inject Needis.Web.Services.Media.IYoutubeUrlService YtSvc
+@inject Needis.Web.Services.Content.IRichContentService RichContentSvc
 @{
     ViewData["Title"] = "Home";
     ViewData["FullWidth"] = true;
@@ -290,7 +291,11 @@ else
                 @foreach (var (product, pIdx) in Model.HotProducts.Select((p, i) => (p, i)))
                 {
                     var pName  = L(product.NameTH,              product.NameEN);
-                    var pDesc  = L(product.ShortDescriptionTH,  product.ShortDescriptionEN);
+                    var pDescRaw = L(product.ShortDescriptionTH,  product.ShortDescriptionEN);
+                    var pDescFallbackRaw = L(product.FullDescriptionTH, product.FullDescriptionEN);
+                    var pDesc  = !string.IsNullOrWhiteSpace(pDescRaw)
+                        ? RichContentSvc.ToPlainText(pDescRaw, 80)
+                        : RichContentSvc.ToPlainText(pDescFallbackRaw, 80);
                     var pCat   = L(product.Category?.NameTH,    product.Category?.NameEN);
                     var pDelay = (pIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
 
@@ -335,7 +340,7 @@ else
                                 @if (!string.IsNullOrEmpty(pDesc))
                                 {
                                     <p class="home-product-desc">
-                                        @(pDesc.Length > 80 ? pDesc[..80] + "…" : pDesc)
+                                        @pDesc
                                     </p>
                                 }
                                 <div class="hot-product-footer">

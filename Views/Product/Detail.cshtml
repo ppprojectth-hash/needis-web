@@ -301,7 +301,7 @@
                 @if (!string.IsNullOrEmpty(fullDesc))
                 {
                     <div class="@(hasSpec ? "col-lg-6" : "col-12") reveal">
-                        <div class="product-content-card h-100">
+                        <div class="product-content-card">
                             <div class="product-content-card-header">
                                 <div class="product-section-icon-wrap">
                                     <i class="bi bi-file-text-fill"></i>
@@ -320,7 +320,7 @@
                 @if (hasSpec)
                 {
                     <div class="@(!string.IsNullOrEmpty(fullDesc) ? "col-lg-6" : "col-12") reveal @(!string.IsNullOrEmpty(fullDesc) ? "reveal-delay-1" : "")">
-                        <div class="product-content-card h-100">
+                        <div class="product-content-card">
                             <div class="product-content-card-header">
                                 <div class="product-section-icon-wrap">
                                     <i class="bi bi-list-check"></i>
@@ -422,7 +422,11 @@
                 @foreach (var (rel, relIdx) in Model.RelatedProducts.Select((r, i) => (r, i)))
                 {
                     var relName  = L(rel.NameTH, rel.NameEN);
-                    var relDesc  = L(rel.ShortDescriptionTH, rel.ShortDescriptionEN);
+                    var relDescRaw = L(rel.ShortDescriptionTH, rel.ShortDescriptionEN);
+                    var relDescFallbackRaw = L(rel.FullDescriptionTH, rel.FullDescriptionEN);
+                    var relDesc  = !string.IsNullOrWhiteSpace(relDescRaw)
+                        ? RichContentSvc.ToPlainText(relDescRaw, 70)
+                        : RichContentSvc.ToPlainText(relDescFallbackRaw, 70);
                     var relDelay = (relIdx % 4) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", 3 => "reveal-delay-3", _ => "" };
 
                     <div class="col-lg-3 col-md-6 reveal @relDelay">
@@ -458,7 +462,7 @@
                                 @if (!string.IsNullOrEmpty(relDesc))
                                 {
                                     <p class="small text-muted mb-0 flex-grow-1">
-                                        @(relDesc.Length > 70 ? relDesc[..70] + "…" : relDesc)
+                                        @relDesc
                                     </p>
                                 }
                                 <div class="mt-auto pt-2">

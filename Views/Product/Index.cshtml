@@ -1,4 +1,5 @@
 @model ProductListViewModel
+@inject Needis.Web.Services.Content.IRichContentService RichContentSvc
 @{
     ViewData["FullWidth"] = true;
     var lang = Model.CurrentLanguage;
@@ -187,7 +188,11 @@
                     @foreach (var (product, prodIdx) in Model.Products.Select((p, i) => (p, i)))
                     {
                         var name     = L(product.NameTH, product.NameEN);
-                        var shortDesc = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
+                        var shortDescRaw = L(product.ShortDescriptionTH, product.ShortDescriptionEN);
+                        var descRaw  = L(product.FullDescriptionTH, product.FullDescriptionEN);
+                        var cardDescription = !string.IsNullOrWhiteSpace(shortDescRaw)
+                            ? RichContentSvc.ToPlainText(shortDescRaw, 90)
+                            : RichContentSvc.ToPlainText(descRaw, 90);
                         var catName  = L(product.Category?.NameTH, product.Category?.NameEN);
                         var pDelay = (prodIdx % 3) switch { 1 => "reveal-delay-1", 2 => "reveal-delay-2", _ => "" };
 
@@ -231,10 +236,10 @@
                                             <code>@product.Sku</code>
                                         </p>
                                     }
-                                    @if (!string.IsNullOrEmpty(shortDesc))
+                                    @if (!string.IsNullOrEmpty(cardDescription))
                                     {
                                         <p class="small text-muted flex-grow-1 mb-2">
-                                            @(shortDesc.Length > 90 ? shortDesc[..90] + "…" : shortDesc)
+                                            @cardDescription
                                         </p>
                                     }
                                     <div class="mt-auto pt-2 d-flex align-items-center justify-content-between">

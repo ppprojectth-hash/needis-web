@@ -123,16 +123,16 @@
                             <label asp-for="ShortDescriptionEN" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionEN)
                             </label>
-                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
-                                FieldName = "ShortDescriptionEN", Value = Model.ShortDescriptionEN, Rows = 2, Language = "en" }' />
+                            <textarea asp-for="ShortDescriptionEN" class="form-control" rows="4"
+                                      maxlength="500"></textarea>
                             <span asp-validation-for="ShortDescriptionEN" class="text-danger small"></span>
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="ShortDescriptionTH" class="form-label small fw-semibold">
                                 @Html.DisplayNameFor(m => m.ShortDescriptionTH)
                             </label>
-                            <partial name="_RichTextEditor" model='new RichTextEditorFieldViewModel {
-                                FieldName = "ShortDescriptionTH", Value = Model.ShortDescriptionTH, Rows = 2, Language = "th" }' />
+                            <textarea asp-for="ShortDescriptionTH" class="form-control" rows="4"
+                                      maxlength="500"></textarea>
                             <span asp-validation-for="ShortDescriptionTH" class="text-danger small"></span>
                         </div>
                     </div>
